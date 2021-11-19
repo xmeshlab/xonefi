@@ -1,0 +1,118 @@
+body {
+  margin:0;
+}
+
+.icon-bar {
+  width: 100px;
+  height: 1280px;
+  background-color: #555;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.icon-bar a {
+  display: block;
+  text-align: center;
+  padding: 16px;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 36px;
+}
+
+.icon-bar a:hover {
+  background-color: #000;
+}
+
+.active {
+  background-color: #4CAF50;
+}
+
+.main {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 100px;
+    padding: 10px;
+    background: linear-gradient(#363636, #0c0c0c);
+    width: calc(100% - 100px);
+    height: 100%;
+}
+
+.maintable {
+  color: #fff;
+  width: 100%;
+}
+
+.h1a {
+  color: #fff;
+  font-variant: caps;
+  margin-bottom: -8px;
+  margin-top: -8px;
+}
+
+.onefi-btn-normal {
+  font-size: 1.2em;
+  padding: 5px;
+  margin: 5px;
+}
+
+.onefi-text-big {
+  color: #fff;
+  font-size: 1.4em;
+}
+
+.onefi-text-normal {
+  color: #fff;
+  font-size: 1.0em;
+}
+
+.copy-button {
+  color: #000;
+  background-color: #fff;
+  padding: 10px;
+  font-size: 1.6em;
+}
+
+.greenspan {
+  color: #fff;
+  background-color: #198754;
+}
+
+.hr-header {
+  border-top: 3px solid white;
+}
+
+.input-seed {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 7px;
+}
+
+.input-prk {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 7px;  
+}
+
+.red-pwd {
+  background-color: rgba(255, 200, 200, 1.0);
+}
+
+.green-pwd {
+  background-color: rgba(200, 255, 200, 1.0);
+}
+
+.onefipwd {
+  width: 291px;
+}
+
+a {
+  color: red;
+}
+
+.bgswitch:checked {
+  background-color: #198754;
+  border-color: #198754;
+}

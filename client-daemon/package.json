@@ -1,0 +1,9 @@
+{
+  "name": "onefi-client-daemon",
+  "version": "1.0.0",
+  "description": "OneFi Provider Daemon",
+  "dependencies": {
+    "web3": "^1.3.5",
+    "thread-sleep": "*"
+  }
+}

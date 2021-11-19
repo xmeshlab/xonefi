@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="bootstrap-5.0.0-beta2-dist/css/bootstrap.min.css">
+<script defer src="fa5/js/all.js"></script>
+<link rel="stylesheet" href="style.css">
+  <title>OneFi Manager</title>
+</head>
+
+<body>
+
+<div class="icon-bar">
+  <a class="linkstatus" class="active" href="#" onclick="statusTab();"><i class="fas fa-home"></i></a>
+  <a class="linkaccount" href="#" onclick="accountTab();"><i class="far fa-address-card"></i></a> 
+  <a class="linkclient" href="#" onclick="clientTab();"><i class="fa fa-wifi"></i></a> 
+  <a class="linkprovider" href="#" onclick="providerTab();"><i class="fas fa-broadcast-tower"></i></a>
+  <a class="linksettings" href="#" onclick="settingsTab();"><i class="fas fa-cog"></i></a>
+  <a class="linkinfo" href="#" onclick="infoTab();"><i class="fas fa-info-circle"></i></a>
+</div>
+
+<div class="main" style="overflow-y: auto;">
+</div>
+
+<script>
+    const log = require("../api/log");
+    const config = require("../api/config");
+    const account = require("../api/account");
+    const client = require("../api/client");
+    const provider = require("../api/provider");
+    const bnetwork = require("../api/bnetwork");
+    const infura = require("../api/infura");
+    const balances = require("../api/balances");
+    const privateaccess = require("../api/privateaccess");
+    const ip = require("../api/ip");
+    const pafren = require("../api/pafren");
+    const wlan_interfaces = require("../api/wlan-interfaces");
+    const ssid = require("../api/ssid");
+    const e2e = require("../api/e2e_mode");
+
+    const main = document.querySelector('.main');
+
+    const linkstatus = document.querySelector('.linkstatus');
+    const linkaccount = document.querySelector('.linkaccount');
+    const linkclient = document.querySelector('.linkclient');
+    const linkprovider = document.querySelector('.linkprovider');
+    const linksettings = document.querySelector('.linksettings');
+    const linkinfo = document.querySelector('.linkinfo');
+
+    statusTab();
+
+    // ============== STATUS TAB ==============
+
+    function statusTab() {
+        linkstatus.setAttribute("class", "linkstatus active");
+        linkaccount.setAttribute("class", "linkaccount");
+        linkclient.setAttribute("class", "linkclient");
+        linkprovider.setAttribute("class", "linkprovider");
+        linksettings.setAttribute("class", "linksettings");
+        linkinfo.setAttribute("class", "linkinfo");
+
+        var config_json = config.read_default_config();
+
+        balances.get_account_balance((balance) => {
+            //ssid.ssid_scan(config_json.wlan_interface, (ssids) => {
+                log.log(`CONFIG: ${JSON.stringify(config_json)}`);
+                const client_status_badge = get_client_status_badge(config_json.client_on);
+                const provider_status_badge = get_provider_status_badge(config_json.ap_on);
+
+                main.innerHTML = `
+                <h1 class="h1a">OneFi Status &nbsp; <a href="#" onclick="statusTab();"><button type="button" class="btn btn-success btn-sm"><b>refresh</b></button></a></h1>
+                <hr class="hr-header">
+
+                <table class="table table-dark table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="onefi-text-big"><i class="far fa-list-alt"></i> System Parameters</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  
+                  <tbody>
+                    <tr>
+                      <th>Client Activated</th>
+                      <td style="text-align: right;">${client_status_badge}</td>
+                    </tr>
+
+                    <tr>
+                      <th>Provider Activated</th>
+                      <td style="text-align: right;">${provider_status_badge}</td>
+                    </tr>
+
+
+                    <tr>
+                      <th>Blockchain Network</th>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary"><i class="fab fa-ethereum"></i> Ropsten</span></td>
+                    </tr>
+
+                  </tbody>
+                </table>
+                
+
+                <table class="table table-dark table-striped">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="onefi-text-big"><i class="fa fa-wifi"></i> Wireless Network</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  
+                  <tbody>
+                    <tr>
+                      <th>Wireless Interface</th>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary">${config_json.wlan_interface}</span></td>
+                    </tr>
+
+                    <tr>
+                      <th>OneFi Access Points Available</th>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary">${ssid.filter_onefi_ssids(config_json.ssids).length}</span></td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+
+                <table class="table table-dark table-striped" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="onefi-text-big"><i class="fas fa-wallet"></i> Wallet</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  
+                  <tbody style="width: 100%;">
+                    <tr style="width: 100%;">
+                      <th>Account Address (Wallet ID)</th>
+                      <td style="text-align: right;"><span class="badge bg-info text-dark">${config_json.account.address}</span></td>
+                      
+                    </tr>
+
+                    <tr>
+                      <th>Account Balance</th>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary">${balance} points</span></td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+                  <table class="table table-dark table-striped" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="onefi-text-big"><i class="fas fa-satellite-dish"></i> List of Available Networks</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody style="width: 100%;">
+                    <tr style="width: 100%;">
+                      <td colspan="2" style="width: 100%; text-align: right;">
+                        <select class="form-select" size="10" style="background-color: #2c3034; color: white; width: 100%; margin-right: 0;">
+                            ${ssid.prepare_ssid_html(config_json.ssids)}
+                        </select>
+                    </td>
+                    </tr>
+
+                  </tbody>
+
+                  </table>
+
+                `;
+            //});
+        });
+    }
+
+
+    function get_client_status_badge(client_status) {
+        if(client_status) {
+            return `<span class="badge rounded-pill bg-success">ON</span>`;
+        } else {
+            return `<span class="badge rounded-pill bg-secondary">OFF</span>`;
+        }
+    }
+
+    function get_provider_status_badge(provider_status) {
+        if(provider_status) {
+            return `<span class="badge rounded-pill bg-success">ON</span>`;
+        } else {
+            return `<span class="badge rounded-pill bg-secondary">OFF</span>`;
+        }
+    }
+
+    // ============== ACCOUNT TAB ==============
+
+    function accountTab() {
+      linkstatus.setAttribute("class", "linkstatus");
+      linkaccount.setAttribute("class", "linkaccount active");
+      linkclient.setAttribute("class", "linkclient");
+      linkprovider.setAttribute("class", "linkprovider");
+      linksettings.setAttribute("class", "linksettings");
+      linkinfo.setAttribute("class", "linkinfo");
+
+      var config_json = config.read_default_config();
+
+      if(config_json.account_set === true) {
+          main.innerHTML = `
+            <h1 class="h1a">OneFi Crypto Account</h1>
+            <hr class="hr-header">
+
+            <p class="onefi-text-big">OneFi account is ready.</p>
+
+            <div class="input-group input-group">
+              <span class="input-group-text greenspan" id="inputGroup-sizing-default">Address:</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${config_json.account.address}" readonly>
+              <button type="button" class="btn btn-success btn" onclick='copyToClipboard("${config_json.account.address}");'><i class="far fa-copy"></i></button>
+            </div>
+
+            <br />
+
+            <div class="copy-alert alert alert-success alert-dismissible fade show" role="alert" hidden>
+              <strong>Success!</string> The address has been copied to the clipboard!
+              <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlert();" aria-label="Close"></button>
+            </div>
+
+            <br /><br /><br />
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="delaccount-button btn btn-success btn-lg" style="margin-bottom:10px;" type="button" onclick="deleteAccountDialog();"><i class="fas fa-trash-alt"></i>&nbsp;&nbsp;Unlink account</button>
+            <button class="export-prk-button btn btn-success btn-lg" type="button" onclick="exportAccountDialog();"><i class="fas fa-file-import"></i>&nbsp;&nbsp;Export account's private key</button>
+            </div>
+        `;
+      } else {
+          main.innerHTML = `
+              <h1 class="h1a">OneFi Crypto Account</h1>
+              <hr class="hr-header">
+
+              <p class="onefi-text-big">No account set up yet.</p>
+
+              <p class="onefi-text-normal">To use OneFi, you need a crypto account. Crypto accounts are <strong>different</strong> from traditional online accounts.</p>
+
+              <br />
+              <br />
+              <br />
+              <br />
+
+              <div class="d-grid gap-2 col-6 mx-auto">
+
+                  <button class="genaccount-button btn btn-success btn-lg" type="button" style="margin-bottom:10px;" onclick="generateAccountDialog();"><i class="fas fa-key"></i>&nbsp;&nbsp;Generate a new account</button>
+
+                  <button class="importaccount-button btn btn-success btn-lg" type="button" onclick="importAccountDialog();"><i class="fas fa-file-import"></i>&nbsp;&nbsp;Import an existing account</button>
+
+              </div>
+              `;
+      }
+    }
+
+    function copyToClipboard(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+        const copy_alert = document.querySelector(".copy-alert");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlert() {
+      const copy_alert = document.querySelector(".copy-alert");
+      copy_alert.setAttribute("hidden", "");
+    }
+
+    function deleteAccountDialog() {
+        main.innerHTML = `
+        <h1 class="h1a">OneFi Crypto Account</h1>
+        <hr class="hr-header">
+        
+        <p class="onefi-text-big">If you have not saved your private key, this account will be lost forever with all funds stored in it. If you have your private key stored, you will be able to restore this account on any device. By confirming deletion of this account, you agree to permanently erase the stored private key from this computer.</p>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <button class="confirm-delete-button btn btn-danger btn-lg" type="button" onclick="confirmDeleteAccount();">Unlink account</button>
+        <button class="cancel-delete-button btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+        </div>
+        `;
+    }
+
+    function confirmDeleteAccount() {
+        var res = account.delete_current_account();
+
+        if(res === true) {
+            main.innerHTML = `
+            <h1 class="h1a">OneFi Crypto Account</h1>
+            <hr class="hr-header">
+
+            <p class="onefi-text-big">The account has been unlinked.</p>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="cancel-delete-button btn btn-success btn-lg" type="button" onclick="accountTab();">Done</button>
+            </div>
+            `;
+        } else {
+            main.innerHTML = `
+            <h1 class="h1a">OneFi Crypto Account</h1>
+            <hr class="hr-header">
+
+            <p class="onefi-text-big">Sorry, an error occurred. This is abnormal. Please contact the support.</p>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="cancel-delete-button btn btn-secondary btn-lg" type="button" onclick="accountTab();">Done</button>
+            </div>
+            `;
+        }
+    }
+
+    function exportAccountDialog() {
+      main.innerHTML = `
+        <h1 class="h1a">OneFi Crypto Account</h1>
+        <hr class="hr-header">
+        
+        <p class="onefi-text-big">Export private key.</p>
+        <p class="onefi-text-normal">To export your account private key, you need to enter the password. Plese keep in mind that who knows the private key of the account has full ownership of the account.</p>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col align-self-start">
+              </div>
+              <div class="col align-self-center">
+                <div class="onefi-text-normal" style="text-align: left;">Password:</div>
+                <input class="export-password onefipwd" type="password" /> 
+              </div>
+              <div class="col align-self-end">
+              </div>
+            </div>
+          </div>
+
+          <br />
+
+          <div class="container">
+            <div class="row">
+              <div class="col align-self-start">
+              </div>
+              <div class="col align-self-center">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <button class="button-gen-account2 btn btn-success btn-lg" type="button" onclick="exportAccount();">Continue</button>
+                  <button class="button-cancel-account2 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+                </div>
+              </div>
+              <div class="col align-self-end">
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    function exportAccount() {
+      const pwd = document.querySelector(".export-password");
+
+      var prk = account.get_prk(pwd.value);
+      var config_json = config.read_default_config();
+      var response = account.test_prk(config_json.account.address, prk);
+
+      if(response) {
+          main.innerHTML = `
+          <h1 class="h1a">OneFi Crypto Account</h1>
+          <hr class="hr-header">
+          <p class="onefi-text-big">The private key is successfully exported!</p>
+
+          <div class="input-group input-group-sm">
+              <span class="input-group-text greenspan" id="inputGroup-sizing-default">Private Key:</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${prk}" readonly>
+              <button type="button" class="btn btn-success" onclick='copyToClipboardPrk("${prk}");'><i class="far fa-copy"></i></button>
+          </div>
+
+          <br />
+
+          <div class="copy-alert-prk alert alert-success alert-dismissible fade show" role="alert" hidden>
+            <strong>Success!</string> The private key has been copied to the clipboard!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlertPrk();" aria-label="Close"></button>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <button class="button-done-account4 btn btn-success btn-lg" type="button" onclick="accountTab();">Done</button>
+          </div>
+          `;
+      } else {
+              main.innerHTML = `
+          <h1 class="h1a">OneFi Crypto Account</h1>
+          <hr class="hr-header">
+          <p class="onefi-text-big">Oops. Could not decrypt the private key. It seems like you entered a wrong password.</p>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button class="button-done-account4 btn btn-secondary btn-lg" type="button" onclick="exportAccountDialog();">Try again</button>
+          </div>
+          `;
+      }
+    }
+
+    function copyToClipboardPrk(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+        const copy_alert = document.querySelector(".copy-alert-prk");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlertPrk() {
+      const copy_alert = document.querySelector(".copy-alert-prk");
+      copy_alert.setAttribute("hidden", "");
+    }
+
+    function generateAccountDialog() {
+        main.innerHTML = `
+          <h1 class="h1a">OneFi Crypto Account</h1>
+          <hr class="hr-header">
+          <p class="onefi-text-big">Generating a new crypto account.</p>
+          <p class="onefi-text-normal">To make account secure, we need a good random seed. For that, please type random letters, numbers or punctuation in the field below. You can type as many random symbols as you want, but not less than 16.</p>
+          <input class="input-seed" type="text" oninput="genInputValidityCheck();"/>
+
+          <p class="onefi-text-normal">Please create a good secret password that will be used to encrypt the private key stored at this computer. The password must be at least 8 symbols long. Please note that this password is used only locally, and it is not your account password.</p>
+
+          <div class="container">
+          <div class="row">
+            <div class="col-sm">
+              <div class="onefi-text-normal">Password:</div>
+              <input class="onefipwd accgen-password1" type="password" oninput="genInputValidityCheck();" />   
+            </div>
+            <div class="col-sm">
+              <div class="onefi-text-normal">Repeat password:</div>
+              <input class="onefipwd accgen-password2" type="password" oninput="genInputValidityCheck();" />    
+            </div>
+          </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 20px;">
+              <button class="button-gen-account2 btn btn-success btn-lg" type="button" disabled onclick="generateAccount();">Generate Account</button>
+              <button class="button-cancel-account2 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+          </div>
+        `;
+    }
+
+    function genInputValidityCheck() {
+        const button_gen_account2 = document.querySelector(".button-gen-account2");
+        var seed_check = validateSeed();
+        var pwd_check = accGenPasswordCheck();
+
+        if(pwd_check && seed_check) {
+            button_gen_account2.removeAttribute("disabled");
+        } else {
+            button_gen_account2.setAttribute("disabled", "");
+        }
+    }
+
+    function validateSeed() {
+        const input_seed = document.querySelector(".input-seed");
+
+        if(input_seed.value.length < 16) {
+            input_seed.setAttribute("class", "input-seed red-pwd");
+            return false;
+        } else {
+            input_seed.setAttribute("class", "input-seed green-pwd");
+            return true;
+        }
+    }
+
+    function accGenPasswordCheck() {
+        const pwd1 = document.querySelector(".accgen-password1");
+        const pwd2 = document.querySelector(".accgen-password2");
+
+        if(pwd1.value !== pwd2.value || pwd1.value.length < 8 || pwd2.value.length < 8) {
+            pwd1.setAttribute("class", "onefipwd accgen-password1 red-pwd");
+            pwd2.setAttribute("class", "onefipwd accgen-password2 red-pwd");
+            return false;
+        } else {
+            pwd1.setAttribute("class", "onefipwd accgen-password1 green-pwd");
+            pwd2.setAttribute("class", "onefipwd accgen-password2 green-pwd");
+            return true;
+        }
+    }
+
+    function generateAccount() {
+        const input_seed = document.querySelector(".input-seed");
+        const pwd1 = document.querySelector(".accgen-password1");
+        const pwd2 = document.querySelector(".accgen-password2");
+
+        var acc = account.generate_account(input_seed.value, pwd1.value);
+
+        main.innerHTML = `
+        <h1 class="h1a">OneFi Crypto Account</h1>
+        <hr class="hr-header">
+        <h2 style="color: white;">Address</h2>
+
+        <p class="onefi-text-big">Account confirmation.</p>
+        <p class="onefi-text-normal">Please make a backup of your private key and press <strong>Save Account</strong> button to finish account generation.</p>
+
+        <div class="input-group input-group">
+            <span class="input-group-text greenspan" id="inputGroup-sizing-default">Address:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${acc.address}" readonly>
+            <button type="button" class="btn btn-success btn" onclick='copyToClipboardGen("${acc.address}");'><i class="far fa-copy"></i></button>
+        </div>
+
+        <br />
+
+        <div class="copy-alert-gen alert alert-success alert-dismissible fade show" role="alert" hidden>
+            <strong>Success!</string> The address has been copied to the clipboard!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlertGen();" aria-label="Close"></button>
+        </div>
+
+        <div class="input-group input-group-sm">
+              <span class="input-group-text greenspan" id="inputGroup-sizing-default">Private Key:</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${acc.privateKey}" readonly>
+              <button type="button" class="btn btn-success" onclick='copyToClipboardPrkGen("${acc.privateKey}");'><i class="far fa-copy"></i></button>
+        </div>
+
+        <br />
+
+        <div class="copy-alert-prk-gen alert alert-success alert-dismissible fade show" role="alert" hidden>
+          <strong>Success!</string> The private key has been copied to the clipboard!
+          <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlertPrkGen();" aria-label="Close"></button>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="button-save-account3 btn btn-success btn-lg" type="button" onclick="saveAccount('${acc.address}', '${acc.privateKey}', '${acc.encryptedPrivateKey}');">Save Account</button>
+              <button class="button-cancel-account3 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+        </div>
+        `;
+    }
+
+    function copyToClipboardGen(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+        const copy_alert = document.querySelector(".copy-alert-gen");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlertGen() {
+        const copy_alert = document.querySelector(".copy-alert-gen");
+        copy_alert.setAttribute("hidden", "");
+    }
+
+    function copyToClipboardPrkGen(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+
+        const copy_alert = document.querySelector(".copy-alert-prk-gen");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlertPrkGen() {
+        const copy_alert = document.querySelector(".copy-alert-prk-gen");
+        copy_alert.setAttribute("hidden", "");
+    }
+
+    function saveAccount(address, privateKey, encryptedPrivateKey) {
+        var config_json = config.read_default_config();
+        //config.read_default_config_db((config_json) => {
+            config_json.account.address = address;
+            config_json.account.encrypted_prk = encryptedPrivateKey;
+            config_json.account_set = true;
+            var response = config.write_default_config(config_json);
+
+            //config.write_default_config_db(config_json, (response) => {
+                if(response) {
+                    main.innerHTML = `
+                <h1 class="h1a">OneFi Crypto Account</h1>
+                <hr class="hr-header">
+                <p class="onefi-text-big">The account has been encrypted and saved. You are all set!</p>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 20px;">
+                  <button class="button-done-account4 btn btn-success btn-lg" type="button" onclick="accountTab();">Done</button>
+                </div>
+                `;
+                } else {
+                    main.innerHTML = `
+                <h1 class="h1a">OneFi Crypto Account</h1>
+                <hr class="hr-header">
+                <p class="onefi-text-big">Sorry, something went wrong. Please contact the developer.</p>
+                <button class="button-done-account4 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Done</button>
+                `;
+                }
+    }
+
+    function importAccountDialog() {
+        main.innerHTML = `
+          <h1 class="h1a">OneFi Crypto Account</h1>
+          <hr class="hr-header">
+          <p class="onefi-text-big">Importing an existing account.</p>
+          <p class="onefi-text-normal">Please enter your existing account's private key below</p>
+          <input class="input-prk" type="text" oninput="importInputValidityCheck();" />
+
+          <p class="onefi-text-normal">Please create a good secret password that will be used to encrypt the private key stored at this computer. The password must be at least 8 symbols long. Please note that this password is used only locally, and it is not your account password.</p>
+
+          <div class="container">
+          <div class="row">
+            <div class="col-sm">
+              <div class="onefi-text-normal">Password:</div>
+              <input class="onefipwd accimport-password1" type="password" oninput="importInputValidityCheck();" />   
+            </div>
+            <div class="col-sm">
+              <div class="onefi-text-normal">Repeat password:</div>
+              <input class="onefipwd accimport-password2" type="password" oninput="importInputValidityCheck();" />    
+            </div>
+          </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 20px;">
+              <button class="button-import-account2 btn btn-success btn-lg" type="button" disabled onclick="importAccount();">Import Account</button>
+              <button class="button-import-cancel-account2 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+          </div>
+        `;
+    }
+
+    function importInputValidityCheck() {
+        const button_import_account2 = document.querySelector(".button-import-account2");
+
+        var prk_check = importValidatePrk();
+        var pwd_check = accImportPasswordCheck();
+
+        if(pwd_check && prk_check) {
+            button_import_account2.removeAttribute("disabled");
+        } else {
+            button_import_account2.setAttribute("disabled", "");
+        }
+    }
+
+    function importValidatePrk() {
+        const input_prk = document.querySelector(".input-prk");
+        let prk = input_prk.value;
+
+        if (!account.test_prk_format(prk)) {
+            input_prk.setAttribute("class", "input-prk red-pwd");
+            return false;
+        } else {
+            input_prk.setAttribute("class", "input-prk green-pwd");
+            return true;
+        }
+    }
+
+    function accImportPasswordCheck() {
+        const pwd1 = document.querySelector(".accimport-password1");
+        const pwd2 = document.querySelector(".accimport-password2");
+
+        if(pwd1.value !== pwd2.value || pwd1.value.length < 8 || pwd2.value.length < 8) {
+            pwd1.setAttribute("class", "onefipwd accimport-password1 red-pwd");
+            pwd2.setAttribute("class", "onefipwd accimport-password2 red-pwd");
+            return false;
+        } else {
+            pwd1.setAttribute("class", "onefipwd accimport-password1 green-pwd");
+            pwd2.setAttribute("class", "onefipwd accimport-password2 green-pwd");
+            return true;
+        }
+    }
+
+    function importAccount() {
+        const input_prk = document.querySelector(".input-prk");
+        const pwd1 = document.querySelector(".accimport-password1");
+        const pwd2 = document.querySelector(".accimport-password2");
+
+        var acc = account.import_account(input_prk.value, pwd1.value);
+
+        main.innerHTML = `
+        <h1 class="h1a">OneFi Crypto Account</h1>
+        <hr class="hr-header">
+
+        <p class="onefi-text-big">Account confirmation.</p>
+        <p class="onefi-text-normal">Press <strong>Save Account</strong> button to complete the import.</p>
+
+
+        <div class="input-group input-group">
+            <span class="input-group-text greenspan" id="inputGroup-sizing-default">Address:</span>
+            <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${acc.address}" readonly>
+            <button type="button" class="btn btn-success btn" onclick='copyToClipboardImport("${acc.address}");'><i class="far fa-copy"></i></button>
+        </div>
+
+        <br />
+
+        <div class="copy-alert-import alert alert-success alert-dismissible fade show" role="alert" hidden>
+            <strong>Success!</string> The address has been copied to the clipboard!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlertImport();" aria-label="Close"></button>
+        </div>
+
+
+        <div class="input-group input-group-sm">
+              <span class="input-group-text greenspan" id="inputGroup-sizing-default">Private Key:</span>
+              <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${acc.privateKey}" readonly>
+              <button type="button" class="btn btn-success" onclick='copyToClipboardPrkImport("${acc.privateKey}");'><i class="far fa-copy"></i></button>
+        </div>
+
+        <br />
+
+        <div class="copy-alert-prk-import alert alert-success alert-dismissible fade show" role="alert" hidden>
+          <strong>Success!</string> The private key has been copied to the clipboard!
+          <button type="button" class="btn-close" data-bs-dismiss="alert" onclick="hideCopyAlertPrkImport();" aria-label="Close"></button>
+        </div>
+
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <button class="button-save-account3 btn btn-success btn-lg" type="button" onclick="saveAccount('${acc.address}', '${acc.privateKey}', '${acc.encryptedPrivateKey}');">Save Account</button>
+              <button class="button-cancel-account3 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Cancel</button>
+        </div>
+        `;
+    }
+
+    function copyToClipboardImport(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+        const copy_alert = document.querySelector(".copy-alert-import");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlertImport() {
+        const copy_alert = document.querySelector(".copy-alert-import");
+        copy_alert.setAttribute("hidden", "");
+    }
+
+    function copyToClipboardPrkImport(data) {
+        const clipboardy = require('clipboardy');
+        clipboardy.writeSync(data);
+        const copy_alert = document.querySelector(".copy-alert-prk-import");
+        copy_alert.removeAttribute("hidden");
+    }
+
+    function hideCopyAlertPrkImport() {
+      const copy_alert = document.querySelector(".copy-alert-prk-import");
+      copy_alert.setAttribute("hidden", "");
+    }
+
+    // ============== CLIENT TAB ==============
+
+    function clientTab() {
+        linkstatus.setAttribute("class", "linkstatus");
+        linkaccount.setAttribute("class", "linkaccount");
+        linkclient.setAttribute("class", "linkclient active");
+        linkprovider.setAttribute("class", "linkprovider");
+        linksettings.setAttribute("class", "linksettings");
+        linkinfo.setAttribute("class", "linkinfo");
+
+        let client_on = client.get_client_status();
+        let payfordata_on = client.get_pay_for_data();
+        let payfortime_on = client.get_pay_for_time();
+        let private_on = client.get_private_client();
+        let max_ofi_mb = client.get_max_ofi_mb();
+        let max_ofi_hr = client.get_max_ofi_hr();
+        let client_max_pafren = pafren.get_client_max_pafren();
+
+        let client_switch_checked = "";
+        if(client_on) {
+            client_switch_checked = `checked`;
+        }
+
+        let pfd_checked = "";
+        if(payfordata_on) {
+            pfd_checked = `checked`;
+        }
+
+        let pft_checked = "";
+        if(payfortime_on) {
+            pft_checked = `checked`;
+        }
+
+        let priv_checked = "";
+        if(private_on) {
+            priv_checked = `checked`;
+        }
+
+        let provider_list = textifyList(privateaccess.get_priv_providers());
+
+        main.innerHTML = `
+                <h1 class="h1a">OneFi Client</h1>
+                <hr class="hr-header">
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="client-checkbox-onoff form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${client_switch_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable OneFi Client</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="payfordata-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${pfd_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Pay for data</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="payfortime-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${pft_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Pay for time</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="private-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${priv_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Private connection</label>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">Maximum price OneFi allowed to automatically pay for Internet</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text greenspan">points/Gb:</span>
+                  <input type="text" class="max-ofi-mb-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="maxOfiMbInputFormatControl()" value="${max_ofi_mb}" />
+                  <span class="input-group-text greenspan">OFi/hour:</span>
+                  <input type="text" class="max-ofi-hr-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="maxOfiHrInputFormatControl()" value="${max_ofi_hr}"/>
+                  <div class="invalid-feedback">The price should be a positive integer.</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">Maximum pre-payment allowed (as percentage of 1 Gb or 1 hr worth of traffic)</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text greenspan">Percentage of unit:</span>
+                  <input type="text" class="client-max-pafren form-control" placeholder="" aria-label="Percentage" oninput="clientMaxPafrenFormatControl()" value="${client_max_pafren}" />
+                  <div class="invalid-feedback">Input the maximum percentage of unit that must be pre-paid (for example: <b>200</b>). Range: 0..65535.</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">For private connections, list the identities of all the providers below:</label>
+                <div class="input-group" style="margin-top: 0px;">
+                  <span class="input-group-text greenspan">Private providers<br />(1 address per line)</span>
+                  <textarea class="private-providers-area form-control" placeholder="Please type one provider address per line" aria-label="With textarea" rows="4" oninput="privateProvidersFormatControl()" style="font-family: monospace;font-size: 1.3em;" spellcheck="false">${provider_list}</textarea>
+                  <div class="invalid-feedback">Please enter correct addresses, one per line, without punctuation.</div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 10px;">
+                    <button class="save-client-button btn btn-success me-md-2 btn-lg" type="button" onclick="saveClientChanges();">Save Changes</button>
+                </div>
+            `;
+    }
+
+    function clientMaxPafrenFormatControl() {
+        const pafren_input = document.querySelector(".client-max-pafren");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(pafren.valid_client_max_pafren(pafren_input.value)) {
+            pafren_input.setAttribute("class", "client-max-pafren form-control");
+            save_provider_button.removeAttribute("disabled");
+        } else {
+            pafren_input.setAttribute("class", "client-max-pafren form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        }
+    }
+
+    function textifyList(lst) {
+        let res = "";
+        for(let x of lst) {
+            res += (x + "\n");
+        }
+
+        return res.substr(0, Math.max(0, res.length-1));
+    }
+
+    function clientCheckbox(box) {
+        //client.set_client_status_db2(box.checked, () => { });
+        //client.set_client_status(box.checked);
+    }
+
+    function saveClientChanges() {
+        const client_checkbox_onoff = document.querySelector(".client-checkbox-onoff");
+        const payfordata_checkbox = document.querySelector(".payfordata-checkbox");
+        const payfortime_checkbox = document.querySelector(".payfortime-checkbox");
+        const private_checkbox = document.querySelector(".private-checkbox");
+        const max_ofi_mb_input = document.querySelector(".max-ofi-mb-input");
+        const max_ofi_hr_input = document.querySelector(".max-ofi-hr-input");
+        const private_providers_area = document.querySelector(".private-providers-area");
+        const pafren_input = document.querySelector(".client-max-pafren");
+
+
+        client.set_client_status(client_checkbox_onoff.checked);
+        client.set_pay_for_data(payfordata_checkbox.checked);
+        client.set_pay_for_time(payfortime_checkbox.checked);
+        client.set_private_client(private_checkbox.checked);
+        client.set_max_ofi_mb(max_ofi_mb_input.value);
+        client.set_max_ofi_hr(max_ofi_hr_input.value);
+        pafren.set_client_max_pafren(pafren_input.value);
+
+        let address_list = parseAddressList(private_providers_area.value);
+
+        if(address_list.length > 0) {
+            privateaccess.save_priv_providers(address_list);
+        }
+    }
+
+    function parseAddressList(input) {
+        let splittorama = input.split("\n");
+
+        let res = [];
+        for(let x of splittorama) {
+            let trimmo = x.trim();
+            if(trimmo === '') {
+                continue;
+            }
+
+            if(account.test_address(trimmo)) {
+                res.push(trimmo);
+            } else {
+                return [];
+            }
+        }
+
+        return res;
+    }
+
+    function maxOfiMbInputFormatControl() {
+        const max_ofi_mb_input = document.querySelector(".max-ofi-mb-input");
+        const save_client_button = document.querySelector(".save-client-button");
+
+        if(!isNaN(max_ofi_mb_input.value)
+            && !isNaN(parseFloat(max_ofi_mb_input.value))
+            && parseInt(max_ofi_mb_input.value) >= 0
+            && parseInt(max_ofi_mb_input.value) === parseFloat(max_ofi_mb_input.value)) {
+            max_ofi_mb_input.setAttribute("class", "max-ofi-mb-input form-control");
+            save_client_button.removeAttribute("disabled");
+
+        } else {
+            max_ofi_mb_input.setAttribute("class", "max-ofi-mb-input form-control is-invalid");
+            save_client_button.setAttribute("disabled", "");
+        }
+    }
+
+    function maxOfiHrInputFormatControl() {
+        const max_ofi_hr_input = document.querySelector(".max-ofi-hr-input");
+        const save_client_button = document.querySelector(".save-client-button");
+
+        if(!isNaN(max_ofi_hr_input.value)
+            && !isNaN(parseFloat(max_ofi_hr_input.value))
+            && parseInt(max_ofi_hr_input.value) >= 0
+            && parseInt(max_ofi_hr_input.value) === parseFloat(max_ofi_hr_input.value)) {
+            max_ofi_hr_input.setAttribute("class", "max-ofi-hr-input form-control");
+            save_client_button.removeAttribute("disabled");
+        } else {
+            max_ofi_hr_input.setAttribute("class", "max-ofi-hr-input form-control is-invalid");
+            save_client_button.setAttribute("disabled", "");
+        }
+    }
+
+    function privateProvidersFormatControl() {
+        const private_providers_area = document.querySelector(".private-providers-area");
+        const save_client_button = document.querySelector(".save-client-button");
+
+        if(parseAddressList(private_providers_area.value).length === 0) {
+            private_providers_area.setAttribute("class", "private-providers-area form-control is-invalid");
+            save_client_button.setAttribute("disabled", "");
+        } else {
+            private_providers_area.setAttribute("class", "private-providers-area form-control");
+            save_client_button.removeAttribute("disabled");
+        }
+    }
+
+    // ============== PROVIDER TAB ==============
+
+    function providerTab() {
+        linkstatus.setAttribute("class", "linkstatus");
+        linkaccount.setAttribute("class", "linkaccount");
+        linkclient.setAttribute("class", "linkclient");
+        linkprovider.setAttribute("class", "linkprovider active");
+        linksettings.setAttribute("class", "linksettings");
+        linkinfo.setAttribute("class", "linkinfo");
+
+        let provider_on = provider.get_provider_status();
+        let chargefordata_on = provider.get_charge_for_data();
+        let chargefortime_on = provider.get_charge_for_time();
+        let private_on = provider.get_private_provider();
+        let price_ofi_mb = provider.get_price_ofi_mb();
+        let price_ofi_hr = provider.get_price_ofi_hr();
+
+        let provider_switch_checked = "";
+        if(provider_on) {
+            provider_switch_checked = `checked`;
+        }
+
+        let cfd_checked = "";
+        if(chargefordata_on) {
+            cfd_checked = `checked`;
+        }
+
+        let cft_checked = "";
+        if(chargefortime_on) {
+            cft_checked = `checked`;
+        }
+
+        let priv_checked = "";
+        if(private_on) {
+            priv_checked = `checked`;
+        }
+
+        let client_list = textifyList(privateaccess.get_priv_clients());
+        let ip_address = ip.get_provider_ip();
+        let pafren_percentage = pafren.get_pafren_percentage();
+        let generated_ssid = ssid.generate_ssid();
+        let e2e_enabled_selected = "";
+        let e2e_disabled_selected = "";
+
+        if(e2e.get_e2e_status() === true) {
+            e2e_enabled_selected = "selected";
+            e2e_disabled_selected = "";
+        } else {
+            e2e_enabled_selected = "";
+            e2e_disabled_selected = "selected";
+        }
+
+        main.innerHTML = `
+                <h1 class="h1a">OneFi Provider</h1>
+                <hr class="hr-header">
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="provider-checkbox-onoff form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="providerCheckbox(this);" ${provider_switch_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable OneFi Provider</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="chargefordata-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="providerCheckbox(this);" ${cfd_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Charge for data</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="chargefortime-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="providerCheckbox(this);" ${cft_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Charge for time</label>
+                </div>
+
+                <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
+                    <input class="provider-private-checkbox form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${priv_checked}>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Provide Private Connection</label>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 5px;">Price for Internet in OneFi points</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text greenspan">points/Gb:</span>
+                  <input type="text" class="price-ofi-mb-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="priceOfiMbInputFormatControl()" value="${price_ofi_mb}" />
+                  <span class="input-group-text greenspan">OFi/hour:</span>
+                  <input type="text" class="price-ofi-hr-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="priceOfiHrInputFormatControl()" value="${price_ofi_hr}"/>
+                  <div class="invalid-feedback">The price should be a positive integer.</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">For private connections, list the identities of all the allowed clients below:</label>
+                <div class="input-group" style="margin-top: 0px;">
+                  <span class="input-group-text greenspan">Subscribed clients<br />(1 address per line)</span>
+                  <textarea class="private-clients-area form-control" placeholder="Please type one provider address per line" aria-label="With textarea" rows="4" oninput="privateClientsFormatControl()" style="font-family: monospace;font-size: 1.3em;" spellcheck="false">${client_list}</textarea>
+                  <div class="invalid-feedback">Please enter correct addresses, one per line, without punctuation.</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 15px;">OneFi server IP:</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text greenspan">IP Address:</span>
+                  <input type="text" class="ip-input form-control" placeholder="0.0.0.0" aria-label="IPv4 Address (For example: 192.168.0.2)" oninput="ipInputFormatControl()" value="${ip_address}" />
+                  <div class="invalid-feedback">The IP address must be in the form AAA.BBB.CCC.DDD (for example: <b>192.168.0.1</b>).</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 15px;">Prepayment requirement (as percentage of 1 gigabyte or one hour worth of traffic):</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text greenspan">Percentage of the unit price:</span>
+                  <input type="text" class="pafren-input form-control" placeholder="100" aria-label="Size of required pre-payment as percentage of the price of one unit (hour or Gb)" oninput="pafrenInputFormatControl()" value="${pafren_percentage}" />
+                  <div class="invalid-feedback">Input the percentage of unit that must be pre-paid (for example: <b>120</b>). Range: 0..65535.</div>
+                </div>
+
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 15px;">Connection mode:</label>
+                <div class="mode-input input-group mb-3">
+                  <select class="mode-select form-select" aria-label="Default select example">
+                      <option ${e2e_disabled_selected} value="1">Wi-Fi Mode: Provider controls Wi-Fi interface</option>
+                      <option ${e2e_enabled_selected} value="2">Middlebox Mode: Provider controls wired input of separate Wi-Fi router</option>
+                  </select>
+                </div>
+
+                <p class="onefi-text-big">Encoded OneFi SSID. Please rename your WiFi network as follows:</p>
+
+                <div class="input-group input-group">
+                  <span class="input-group-text greenspan" id="inputGroup-sizing-default">SSID:</span>
+                  <input type="text" class="ssid-field form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${ssid.generate_ssid()}" readonly>
+                  <button type="button" class="btn btn-success btn" onclick='copyToClipboard("${ssid.generate_ssid()}");'><i class="far fa-copy"></i></button>
+                </div>
+
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 10px;">
+                    <button class="save-provider-button btn btn-success me-md-2 btn-lg" type="button" onclick="saveProviderChanges();">Save Changes</button>
+                </div>
+            `;
+    }
+
+    // TODO: Finish this function.
+    function providerAfterSaveDialog() {
+        main.innerHTML = `
+        <h1 class="h1a">OneFi SSID</h1>
+        <hr class="hr-header">
+
+        <p class="onefi-text-big">Please use the following SSID string for your Wi-Fi network:</p>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+
+                <div class="input-group input-group">
+                  <span class="input-group-text greenspan" id="inputGroup-sizing-default">SSID:</span>
+                  <input type="text" class="ssid-field form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" value="${ssid.generate_ssid()}" readonly>
+                  <button type="button" class="btn btn-success btn" onclick='copyToClipboard("${ssid.generate_ssid()}");'><i class="far fa-copy"></i></button>
+                </div>
+
+        <button class="cancel-delete-button btn btn-secondary btn-lg" type="button" onclick="providerTab();">Close</button>
+        </div>
+        `;
+    }
+
+    function providerCheckbox(box) {
+        //provider.set_provider_status_db2(box.checked, () => {});
+        //provider.set_provider_status(box.checked);
+    }
+
+    function saveProviderChanges() {
+        const provider_checkbox_onoff = document.querySelector(".provider-checkbox-onoff");
+        const chargefordata_checkbox = document.querySelector(".chargefordata-checkbox");
+        const chargefortime_checkbox = document.querySelector(".chargefortime-checkbox");
+        const provider_private_checkbox = document.querySelector(".provider-private-checkbox");
+        const price_ofi_mb_input = document.querySelector(".price-ofi-mb-input");
+        const price_ofi_hr_input = document.querySelector(".price-ofi-hr-input");
+        const private_clients_area = document.querySelector(".private-clients-area");
+        const ip_input = document.querySelector(".ip-input");
+        const pafren_input = document.querySelector(".pafren-input");
+        const ssid_field = document.querySelector(".ssid-field");
+        const mode_select = document.querySelector(".mode-select");
+
+        let generated_ssid = ssid.generate_ssid();
+
+        ssid_field.setAttribute("value", generated_ssid);
+
+        provider.set_provider_status(provider_checkbox_onoff.checked);
+        provider.set_charge_for_data(chargefordata_checkbox.checked);
+        provider.set_charge_for_time(chargefortime_checkbox.checked);
+        provider.set_private_provider(provider_private_checkbox.checked);
+        provider.set_price_ofi_mb(price_ofi_mb_input.value);
+        provider.set_price_ofi_hr(price_ofi_hr_input.value);
+        ip.set_provider_ip(ip_input.value);
+        pafren.set_pafren_percentage(pafren_input.value);
+
+        if(mode_select.value === "1") {
+            e2e.set_e2e_status(false);
+        } else {
+            e2e.set_e2e_status(true);
+        }
+
+        let address_list = parseAddressList(private_clients_area.value);
+
+        if(address_list.length > 0) {
+            privateaccess.save_priv_clients(address_list);
+        }
+
+        providerAfterSaveDialog();
+    }
+
+    function priceOfiMbInputFormatControl() {
+        const price_ofi_mb_input = document.querySelector(".price-ofi-mb-input");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(!isNaN(price_ofi_mb_input.value)
+            && !isNaN(parseFloat(price_ofi_mb_input.value))
+            && parseInt(price_ofi_mb_input.value) >= 0
+            && parseInt(price_ofi_mb_input.value) === parseFloat(price_ofi_mb_input.value)) {
+            price_ofi_mb_input.setAttribute("class", "price-ofi-mb-input form-control");
+            save_provider_button.removeAttribute("disabled");
+        } else {
+            price_ofi_mb_input.setAttribute("class", "price-ofi-mb-input form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        }
+    }
+
+    function ipInputFormatControl() {
+        const ip_input = document.querySelector(".ip-input");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(ip.valid_ip(ip_input.value)) {
+            ip_input.setAttribute("class", "ip-input form-control");
+            save_provider_button.removeAttribute("disabled");
+        } else {
+            ip_input.setAttribute("class", "ip-input form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        }
+    }
+
+    function pafrenInputFormatControl() {
+        const pafren_input = document.querySelector(".pafren-input");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(pafren.valid_pafren_percentage(pafren_input.value)) {
+            pafren_input.setAttribute("class", "pafren-input form-control");
+            save_provider_button.removeAttribute("disabled");
+        } else {
+            pafren_input.setAttribute("class", "pafren-input form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        }
+    }
+
+    function priceOfiHrInputFormatControl() {
+        const price_ofi_hr_input = document.querySelector(".price-ofi-hr-input");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(!isNaN(price_ofi_hr_input.value)
+            && !isNaN(parseFloat(price_ofi_hr_input.value))
+            && parseInt(price_ofi_hr_input.value) >= 0
+            && parseInt(price_ofi_hr_input.value) === parseFloat(price_ofi_hr_input.value)) {
+            price_ofi_hr_input.setAttribute("class", "price-ofi-hr-input form-control");
+            save_provider_button.removeAttribute("disabled");
+        } else {
+            price_ofi_hr_input.setAttribute("class", "price-ofi-hr-input form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        }
+    }
+
+    function privateClientsFormatControl() {
+        const private_clients_area = document.querySelector(".private-clients-area");
+        const save_provider_button = document.querySelector(".save-provider-button");
+
+        if(parseAddressList(private_clients_area.value).length === 0) {
+            private_clients_area.setAttribute("class", "private-clients-area form-control is-invalid");
+            save_provider_button.setAttribute("disabled", "");
+        } else {
+            private_clients_area.setAttribute("class", "private-clients-area form-control");
+            save_provider_button.removeAttribute("disabled");
+        }
+    }
+
+    // ============== SETTINGS TAB ==============
+
+    function settingsTab() {
+        linkstatus.setAttribute("class", "linkstatus");
+        linkaccount.setAttribute("class", "linkaccount");
+        linkclient.setAttribute("class", "linkclient");
+        linkprovider.setAttribute("class", "linkprovider");
+        linksettings.setAttribute("class", "linksettings active");
+        linkinfo.setAttribute("class", "linkinfo");
+
+        var config_json = config.read_default_config();
+
+        networkSelectorOptions((options) => {
+
+            let infura_id = infura.get_infura_id();
+                  main.innerHTML = `
+                  <h1 class="h1a">OneFi Settings</h1>
+                  <hr class="hr-header">
+                  <p class="onefi-text-big">Blockchain Network</p>
+                  <p class="onefi-text-normal">If you are just testing OneFi, choose Ropsten or Kovan. If you are ready to use it, choose Mainnet.</p>
+
+
+                  <select class="select-bnet form-select form-select-sm" aria-label=".form-select-sm example" onchange="networkSelect();">
+                  ${options}
+                  </select>
+
+                  <br />
+
+                  <p class="onefi-text-big">Blockchain API</p>
+                  <p class="onefi-text-normal">If you want to become a OneFi provider, you need to provide your Infura API key. If you do not have one, you can registewr an account at <a href="#" onclick='require("electron").shell.openExternal("https://infura.io")'>infura.io</a> for free. Please enter your Infura API key below:</p>
+
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                  <input class="input-infura" type="text" style="width:100%;" value="${infura_id}"/>
+                  </div>
+
+
+                  <p class="onefi-text-big" style="margin-top: 15px;">Wireless Interface</p>
+                  <p class="onefi-text-normal">Please select the wireless adapter to be used for OneFi</p>
+                  ${wlan_interfaces.prepare_wlan_interfaces_html("wlan-select form-select", "", config_json.wlan_interface)}
+
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 20px;">
+                    <button class="btn btn-success me-md-2 btn-lg" type="button" onclick="saveSettings();">Save Settings</button>
+                  </div>
+                `;
+            });
+    }
+
+    function networkSelect() {
+    }
+
+    function saveSettings() {
+        const selector = document.querySelector(".select-bnet");
+        const input_infura = document.querySelector(".input-infura");
+        const wlan_select = document.querySelector(".wlan-select");
+
+        if(selector.value === "mainnet" || selector.value === "kovan" || selector.value === "ropsten") {
+            bnetwork.set_bnetwork(selector.value);
+            infura.save_infura_id(input_infura.value);
+        }
+
+        wlan_interfaces.set_wlan_interface(wlan_select.value);
+    }
+
+    function networkSelectorOptions(callback) {
+        var bnet = bnetwork.get_bnetwork();
+        var res = "";
+
+            if(bnet === "mainnet") {
+                res = `
+                <option>Select the network</option>
+                <option value="ropsten">Ropsten (testnet)</option>
+                <option value="kovan">Kovan (testnet)</option>
+                <option selected value="mainnet">Mainnet (production)</option>
+                `;
+            } else if(bnet === "kovan") {
+                res = `
+                <option>Select the network</option>
+                <option value="ropsten">Ropsten (testnet)</option>
+                <option selected value="kovan">Kovan (testnet)</option>
+                <option value="mainnet">Mainnet (production)</option>
+                `;
+            } else if(bnet === "ropsten") {
+                res = `
+                <option>Select the network</option>
+                <option selected value="ropsten">Ropsten (testnet)</option>
+                <option value="kovan">Kovan (testnet)</option>
+                <option value="mainnet">Mainnet (production)</option>
+                `;
+            } else {
+                res = `
+                <option selected>Select the network</option>
+                <option value="ropsten">Ropsten (testnet)</option>
+                <option value="kovan">Kovan (testnet)</option>
+                <option value="mainnet">Mainnet (production)</option>
+                `;
+            }
+
+            return callback(res);
+    }
+
+    // ============== INFO TAB ==============
+
+    function infoTab() {
+        linkstatus.setAttribute("class", "linkstatus");
+        linkaccount.setAttribute("class", "linkaccount");
+        linkclient.setAttribute("class", "linkclient");
+        linkprovider.setAttribute("class", "linkprovider");
+        linksettings.setAttribute("class", "linksettings");
+        linkinfo.setAttribute("class", "linkinfo active");
+
+        main.innerHTML = `
+          <h1 class="h1a">About OneFi</h1>
+          <hr class="hr-header">
+
+          <p class="onefi-text-normal" style="text-align: center">
+          <br />
+          <img src="logo.png" style="width: 150px;; border-radius: 10px; box-shadow: 0px 0px 10px 10px #aaaaaa;" />
+          <br /><br />
+          <span style="font-size: 1.2em;"><strong>OneFi &mdash; Internet Sharing Service</strong></span><br /><br />
+
+          Copyright &copy; OneFi 2019-2021<br />
+          <!--<i>Nikolay "Nick" Ivanov &lt;ivanovn1@msu.edu&gt;<br />
+          Jon Gorman &lt;gorman14@msu.edu&gt;<br />
+          Guangjing Wang &lt;wanggu22@msu.edu&gt;<br />
+          Qiben Yan &lt;qyan@msu.edu&gt;</i><br /><br/>
+
+          Website: <a href="#" onclick='require("electron").shell.openExternal("https://onefi.io")'>https://onefi.io</a><br/>-->
+          </p>
+        `;
+    }
+
+</script>
+  
+</body>
+</html> 
