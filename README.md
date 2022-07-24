@@ -1,7 +1,7 @@
 # OneFi - Global Decentralized Wireless Connectivity
 
 <p align="center">
-<img width="320" src="/app/logo-2.png">
+<img width="320" src="/app/logo-v3.png">
 </p>
 
 Connected seamlessly -- OneFi offers wireless connectivity, wherever you are, seamlessly. Become a OneFi provider or add your enterprise to OneFi.

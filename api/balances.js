@@ -19,7 +19,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 
 
 /**
- * Verify if the given Ethereum address has a proper Ethereum format.
+ * Return the ERC20 token balance of the current account measured in OFI.
  * @param {function(int)} callback - OFI balance of the current account or -1 if error occurs.
  */
 function get_account_balance(callback) {
