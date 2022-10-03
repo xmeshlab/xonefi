@@ -18,6 +18,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 function saveLastSacks(session_last_sacks) {
+    const data_file = "last_sacks.dat";
     const fs = require('fs');
     var serialized = "";
     for (const [key, value] of session_last_sacks.entries()) {
@@ -26,19 +27,20 @@ function saveLastSacks(session_last_sacks) {
     serialized = serialized.substring(2);
 
     try {
-        fs.writeFileSync("last_sacks.dat", serialized);
+        fs.writeFileSync(data_file, serialized);
     } catch (err) {
         console.error(err)
     }
 }
 
 function restoreLastSacks(session_last_sacks) {
+    const data_file = "last_sacks.dat";
     const fs = require('fs');
     session_last_sacks = new Map();
     var raw_data = "";
     if (fs.existsSync("last_sacks.dat")) {
         try {
-            raw_data = fs.readFileSync("last_sacks.dat", 'utf8');
+            raw_data = fs.readFileSync(data_file, 'utf8');
         } catch (err) {
             console.log("ERROR" + err);
         }
