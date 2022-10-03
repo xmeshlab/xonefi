@@ -19,6 +19,7 @@ import PaymentStackScreen from './src/navigation_stacks/PaymentStackScreen'
 
 const Tab = createBottomTabNavigator();
 
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -67,4 +68,3 @@ export default function App() {
     
   );
 }
-

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import Icon from 'react-native-vector-icons/Ionicons'
 import { globalStyles } from '../styles/globalStyle';
 
 import { GettingStarted } from '../screens/AccountScreens/GettingStarted';
+
 
 
 export default class Account extends Component{
