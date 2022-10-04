@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="bootstrap-5.0.0-beta2-dist/css/bootstrap.min.css">
 <script defer src="fa5/js/all.js"></script>
 <link rel="stylesheet" href="style.css">
-  <title>OneFi Manager</title>
+  <title>XOneFi Manager</title>
 </head>
 
 <body>
@@ -68,7 +68,7 @@
                 const provider_status_badge = get_provider_status_badge(config_json.ap_on);
 
                 main.innerHTML = `
-                <h1 class="h1a">OneFi Status &nbsp; <a href="#" onclick="statusTab();"><button type="button" class="btn btn-success btn-sm"><b>refresh</b></button></a></h1>
+                <h1 class="h1a">XOneFi Status &nbsp; <a href="#" onclick="statusTab();"><button type="button" class="btn btn-success btn-sm"><b>refresh</b></button></a></h1>
                 <hr class="hr-header">
 
                 <table class="table table-dark table-striped">
@@ -115,7 +115,7 @@
                     </tr>
 
                     <tr>
-                      <th>OneFi Access Points Available</th>
+                      <th>XOneFi Access Points Available</th>
                       <td style="text-align: right;"><span class="badge rounded-pill bg-primary">${ssid.filter_onefi_ssids(config_json.ssids).length}</span></td>
                     </tr>
 
@@ -202,10 +202,10 @@
 
       if(config_json.account_set === true) {
           main.innerHTML = `
-            <h1 class="h1a">OneFi Crypto Account</h1>
+            <h1 class="h1a">XOneFi Crypto Account</h1>
             <hr class="hr-header">
 
-            <p class="onefi-text-big">OneFi account is ready.</p>
+            <p class="onefi-text-big">XOneFi account is ready.</p>
 
             <div class="input-group input-group">
               <span class="input-group-text greenspan" id="inputGroup-sizing-default">Address:</span>
@@ -229,12 +229,12 @@
         `;
       } else {
           main.innerHTML = `
-              <h1 class="h1a">OneFi Crypto Account</h1>
+              <h1 class="h1a">XOneFi Crypto Account</h1>
               <hr class="hr-header">
 
               <p class="onefi-text-big">No account set up yet.</p>
 
-              <p class="onefi-text-normal">To use OneFi, you need a crypto account. Crypto accounts are <strong>different</strong> from traditional online accounts.</p>
+              <p class="onefi-text-normal">To use XOneFi, you need a crypto account. Crypto accounts are <strong>different</strong> from traditional online accounts.</p>
 
               <br />
               <br />
@@ -266,7 +266,7 @@
 
     function deleteAccountDialog() {
         main.innerHTML = `
-        <h1 class="h1a">OneFi Crypto Account</h1>
+        <h1 class="h1a">XOneFi Crypto Account</h1>
         <hr class="hr-header">
         
         <p class="onefi-text-big">If you have not saved your private key, this account will be lost forever with all funds stored in it. If you have your private key stored, you will be able to restore this account on any device. By confirming deletion of this account, you agree to permanently erase the stored private key from this computer.</p>
@@ -283,7 +283,7 @@
 
         if(res === true) {
             main.innerHTML = `
-            <h1 class="h1a">OneFi Crypto Account</h1>
+            <h1 class="h1a">XOneFi Crypto Account</h1>
             <hr class="hr-header">
 
             <p class="onefi-text-big">The account has been unlinked.</p>
@@ -294,7 +294,7 @@
             `;
         } else {
             main.innerHTML = `
-            <h1 class="h1a">OneFi Crypto Account</h1>
+            <h1 class="h1a">XOneFi Crypto Account</h1>
             <hr class="hr-header">
 
             <p class="onefi-text-big">Sorry, an error occurred. This is abnormal. Please contact the support.</p>
@@ -308,7 +308,7 @@
 
     function exportAccountDialog() {
       main.innerHTML = `
-        <h1 class="h1a">OneFi Crypto Account</h1>
+        <h1 class="h1a">XOneFi Crypto Account</h1>
         <hr class="hr-header">
         
         <p class="onefi-text-big">Export private key.</p>
@@ -355,7 +355,7 @@
 
       if(response) {
           main.innerHTML = `
-          <h1 class="h1a">OneFi Crypto Account</h1>
+          <h1 class="h1a">XOneFi Crypto Account</h1>
           <hr class="hr-header">
           <p class="onefi-text-big">The private key is successfully exported!</p>
 
@@ -378,7 +378,7 @@
           `;
       } else {
               main.innerHTML = `
-          <h1 class="h1a">OneFi Crypto Account</h1>
+          <h1 class="h1a">XOneFi Crypto Account</h1>
           <hr class="hr-header">
           <p class="onefi-text-big">Oops. Could not decrypt the private key. It seems like you entered a wrong password.</p>
 
@@ -403,7 +403,7 @@
 
     function generateAccountDialog() {
         main.innerHTML = `
-          <h1 class="h1a">OneFi Crypto Account</h1>
+          <h1 class="h1a">XOneFi Crypto Account</h1>
           <hr class="hr-header">
           <p class="onefi-text-big">Generating a new crypto account.</p>
           <p class="onefi-text-normal">To make account secure, we need a good random seed. For that, please type random letters, numbers or punctuation in the field below. You can type as many random symbols as you want, but not less than 16.</p>
@@ -478,7 +478,7 @@
         var acc = account.generate_account(input_seed.value, pwd1.value);
 
         main.innerHTML = `
-        <h1 class="h1a">OneFi Crypto Account</h1>
+        <h1 class="h1a">XOneFi Crypto Account</h1>
         <hr class="hr-header">
         <h2 style="color: white;">Address</h2>
 
@@ -554,7 +554,7 @@
             //config.write_default_config_db(config_json, (response) => {
                 if(response) {
                     main.innerHTML = `
-                <h1 class="h1a">OneFi Crypto Account</h1>
+                <h1 class="h1a">XOneFi Crypto Account</h1>
                 <hr class="hr-header">
                 <p class="onefi-text-big">The account has been encrypted and saved. You are all set!</p>
 
@@ -564,7 +564,7 @@
                 `;
                 } else {
                     main.innerHTML = `
-                <h1 class="h1a">OneFi Crypto Account</h1>
+                <h1 class="h1a">XOneFi Crypto Account</h1>
                 <hr class="hr-header">
                 <p class="onefi-text-big">Sorry, something went wrong. Please contact the developer.</p>
                 <button class="button-done-account4 btn btn-secondary btn-lg" type="button" onclick="accountTab();">Done</button>
@@ -574,7 +574,7 @@
 
     function importAccountDialog() {
         main.innerHTML = `
-          <h1 class="h1a">OneFi Crypto Account</h1>
+          <h1 class="h1a">XOneFi Crypto Account</h1>
           <hr class="hr-header">
           <p class="onefi-text-big">Importing an existing account.</p>
           <p class="onefi-text-normal">Please enter your existing account's private key below</p>
@@ -651,7 +651,7 @@
         var acc = account.import_account(input_prk.value, pwd1.value);
 
         main.innerHTML = `
-        <h1 class="h1a">OneFi Crypto Account</h1>
+        <h1 class="h1a">XOneFi Crypto Account</h1>
         <hr class="hr-header">
 
         <p class="onefi-text-big">Account confirmation.</p>
@@ -758,11 +758,11 @@
         let provider_list = textifyList(privateaccess.get_priv_providers());
 
         main.innerHTML = `
-                <h1 class="h1a">OneFi Client</h1>
+                <h1 class="h1a">XOneFi Client</h1>
                 <hr class="hr-header">
                 <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
                     <input class="client-checkbox-onoff form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="clientCheckbox(this);" ${client_switch_checked}>
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable OneFi Client</label>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable XOneFi Client</label>
                 </div>
 
                 <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
@@ -780,12 +780,12 @@
                     <label class="form-check-label" for="flexSwitchCheckChecked">Private connection</label>
                 </div>
 
-                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">Maximum price OneFi allowed to automatically pay for Internet</label>
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 0px;">Maximum price XOneFi allowed to automatically pay for Internet</label>
                 <div class="input-group mb-3">
                   <span class="input-group-text greenspan">points/Gb:</span>
-                  <input type="text" class="max-ofi-mb-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="maxOfiMbInputFormatControl()" value="${max_ofi_mb}" />
+                  <input type="text" class="max-ofi-mb-input form-control" placeholder="Amount in XOneFi Tokens" aria-label="Amount in XOneFi Tokens" oninput="maxOfiMbInputFormatControl()" value="${max_ofi_mb}" />
                   <span class="input-group-text greenspan">OFi/hour:</span>
-                  <input type="text" class="max-ofi-hr-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="maxOfiHrInputFormatControl()" value="${max_ofi_hr}"/>
+                  <input type="text" class="max-ofi-hr-input form-control" placeholder="Amount in XOneFi Tokens" aria-label="Amount in XOneFi Tokens" oninput="maxOfiHrInputFormatControl()" value="${max_ofi_hr}"/>
                   <div class="invalid-feedback">The price should be a positive integer.</div>
                 </div>
 
@@ -981,11 +981,11 @@
         }
 
         main.innerHTML = `
-                <h1 class="h1a">OneFi Provider</h1>
+                <h1 class="h1a">XOneFi Provider</h1>
                 <hr class="hr-header">
                 <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
                     <input class="provider-checkbox-onoff form-check-input bgswitch" type="checkbox" id="flexSwitchCheckChecked" onClick="providerCheckbox(this);" ${provider_switch_checked}>
-                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable OneFi Provider</label>
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Enable XOneFi Provider</label>
                 </div>
 
                 <div class="form-check form-switch form-switch" style="font-size: 1.5em; color: #fff; margin-top: 0px;">
@@ -1003,12 +1003,12 @@
                     <label class="form-check-label" for="flexSwitchCheckChecked">Provide Private Connection</label>
                 </div>
 
-                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 5px;">Price for Internet in OneFi points</label>
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 5px;">Price for Internet in XOneFi points</label>
                 <div class="input-group mb-3">
                   <span class="input-group-text greenspan">points/Gb:</span>
-                  <input type="text" class="price-ofi-mb-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="priceOfiMbInputFormatControl()" value="${price_ofi_mb}" />
+                  <input type="text" class="price-ofi-mb-input form-control" placeholder="Amount in XOneFi Tokens" aria-label="Amount in XOneFi Tokens" oninput="priceOfiMbInputFormatControl()" value="${price_ofi_mb}" />
                   <span class="input-group-text greenspan">OFi/hour:</span>
-                  <input type="text" class="price-ofi-hr-input form-control" placeholder="Amount in OneFi Tokens" aria-label="Amount in OneFi Tokens" oninput="priceOfiHrInputFormatControl()" value="${price_ofi_hr}"/>
+                  <input type="text" class="price-ofi-hr-input form-control" placeholder="Amount in XOneFi Tokens" aria-label="Amount in XOneFi Tokens" oninput="priceOfiHrInputFormatControl()" value="${price_ofi_hr}"/>
                   <div class="invalid-feedback">The price should be a positive integer.</div>
                 </div>
 
@@ -1019,7 +1019,7 @@
                   <div class="invalid-feedback">Please enter correct addresses, one per line, without punctuation.</div>
                 </div>
 
-                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 15px;">OneFi server IP:</label>
+                <label for="basic-url" class="form-label onefi-text-normal" style="margin-top: 15px;">XOneFi server IP:</label>
                 <div class="input-group mb-3">
                   <span class="input-group-text greenspan">IP Address:</span>
                   <input type="text" class="ip-input form-control" placeholder="0.0.0.0" aria-label="IPv4 Address (For example: 192.168.0.2)" oninput="ipInputFormatControl()" value="${ip_address}" />
@@ -1041,7 +1041,7 @@
                   </select>
                 </div>
 
-                <p class="onefi-text-big">Encoded OneFi SSID. Please rename your WiFi network as follows:</p>
+                <p class="onefi-text-big">Encoded XOneFi SSID. Please rename your WiFi network as follows:</p>
 
                 <div class="input-group input-group">
                   <span class="input-group-text greenspan" id="inputGroup-sizing-default">SSID:</span>
@@ -1059,7 +1059,7 @@
     // TODO: Finish this function.
     function providerAfterSaveDialog() {
         main.innerHTML = `
-        <h1 class="h1a">OneFi SSID</h1>
+        <h1 class="h1a">XOneFi SSID</h1>
         <hr class="hr-header">
 
         <p class="onefi-text-big">Please use the following SSID string for your Wi-Fi network:</p>
@@ -1210,10 +1210,10 @@
 
             let infura_id = infura.get_infura_id();
                   main.innerHTML = `
-                  <h1 class="h1a">OneFi Settings</h1>
+                  <h1 class="h1a">XOneFi Settings</h1>
                   <hr class="hr-header">
                   <p class="onefi-text-big">Blockchain Network</p>
-                  <p class="onefi-text-normal">If you are just testing OneFi, choose Ropsten or Kovan. If you are ready to use it, choose Mainnet.</p>
+                  <p class="onefi-text-normal">If you are just testing XOneFi, choose Ropsten or Kovan. If you are ready to use it, choose Mainnet.</p>
 
 
                   <select class="select-bnet form-select form-select-sm" aria-label=".form-select-sm example" onchange="networkSelect();">
@@ -1223,7 +1223,7 @@
                   <br />
 
                   <p class="onefi-text-big">Blockchain API</p>
-                  <p class="onefi-text-normal">If you want to become a OneFi provider, you need to provide your Infura API key. If you do not have one, you can registewr an account at <a href="#" onclick='require("electron").shell.openExternal("https://infura.io")'>infura.io</a> for free. Please enter your Infura API key below:</p>
+                  <p class="onefi-text-normal">If you want to become a XOneFi provider, you need to provide your Infura API key. If you do not have one, you can registewr an account at <a href="#" onclick='require("electron").shell.openExternal("https://infura.io")'>infura.io</a> for free. Please enter your Infura API key below:</p>
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                   <input class="input-infura" type="text" style="width:100%;" value="${infura_id}"/>
@@ -1231,7 +1231,7 @@
 
 
                   <p class="onefi-text-big" style="margin-top: 15px;">Wireless Interface</p>
-                  <p class="onefi-text-normal">Please select the wireless adapter to be used for OneFi</p>
+                  <p class="onefi-text-normal">Please select the wireless adapter to be used for XOneFi</p>
                   ${wlan_interfaces.prepare_wlan_interfaces_html("wlan-select form-select", "", config_json.wlan_interface)}
 
                   <div class="d-grid gap-2 d-md-flex justify-content-md-center" style="margin-top: 20px;">
@@ -1305,16 +1305,16 @@
         linkinfo.setAttribute("class", "linkinfo active");
 
         main.innerHTML = `
-          <h1 class="h1a">About OneFi</h1>
+          <h1 class="h1a">About XOneFi</h1>
           <hr class="hr-header">
 
           <p class="onefi-text-normal" style="text-align: center">
           <br />
           <img src="logo.png" style="width: 250px;; border-radius: 10px; box-shadow: 0px 0px 10px 10px #aaaaaa;" />
           <br /><br />
-          <span style="font-size: 1.2em;"><strong>OneFi &mdash; Internet Sharing Service</strong></span><br /><br />
+          <span style="font-size: 1.2em;"><strong>XOneFi &mdash; Internet Sharing Service</strong></span><br /><br />
 
-          Copyright &copy; OneFi 2019-2022<br />
+          Copyright &copy; XOneFi 2019-2022<br />
           <!--<i>Nikolay "Nick" Ivanov &lt;ivanovn1@msu.edu&gt;<br />
           Jon Gorman &lt;gorman14@msu.edu&gt;<br />
           Guangjing Wang &lt;wanggu22@msu.edu&gt;<br />
