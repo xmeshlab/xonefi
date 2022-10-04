@@ -64,7 +64,7 @@ function update_internet_restrictions(ips, table_type="ebtables") {
         for(let ip of ips) {
             console.log("NEXT IP: " + ip);
             console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            exec(`ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
+            exec(`sudo ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
                 function (error, stdout, stderr) {
                     if (error !== null) {
                         console.log('exec error: ' + error);
