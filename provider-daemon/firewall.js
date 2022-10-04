@@ -49,9 +49,9 @@ function update_internet_restrictions(ips, table_type="ebtables") {
                 });
         }
     } else {
-        console.log("Executing iptables");
+        console.log("Executing ebtables");
 
-        exec("sudo iptables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
+        exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
             function (error, stdout, stderr) {
                 // console.log('stdout: ' + stdout);
                 // console.log('stderr: ' + stderr);
@@ -64,7 +64,7 @@ function update_internet_restrictions(ips, table_type="ebtables") {
         for(let ip of ips) {
             console.log("NEXT IP: " + ip);
             console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            exec(`iptables -t filter -A FORWARD -p IPv4 -s ${ip} -j DROP`,
+            exec(`ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
                 function (error, stdout, stderr) {
                     if (error !== null) {
                         console.log('exec error: ' + error);
