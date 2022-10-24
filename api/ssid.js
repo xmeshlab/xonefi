@@ -32,7 +32,6 @@ function ssid_scan(iface, callback) {
     
     wifi.scan((error, networks) => {
         if (error) {
-            //console.log("ERROR [34c7bf655f]:" + error);
             console.log("Continue scanning...");
         } else {
             console.log(`Scan succeeded!`);
@@ -49,8 +48,6 @@ function ssid_scan(iface, callback) {
                     );
                 }
             }
-
-            //console.log(`[147aef5eaa]: ssids: '${ssids}', rssis: '${rssis}'`);
 
             return callback({ssids, rssis});
         }

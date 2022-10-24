@@ -20,7 +20,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 function main() {
     const account = require("../api/account");
     var prk = account.get_prk("hello12345");
-    console.log(`EXPORTED PRIVATE KEY: ${prk}`);
+    console.log(`Exported Private Key (Test): ${prk}`);
 }
 
 main();

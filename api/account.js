@@ -71,6 +71,7 @@ function get_prk(password) {
     let config_json = config.read_default_config();
     let prk = symcrypto.decrypt_aes256ctr(config_json.account.encrypted_prk, password);
 
+    // Some of them have prefix '0x', others go without prefix.
     if(prk.length !== 64 && prk.length !== 66) {
         return "";
     }

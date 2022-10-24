@@ -51,6 +51,55 @@ if(!process_mgmt.save_pid(process_mgmt.get_client_pid_path())) {
     process.exit(1);
 }
 
+async function main() {
+    config.config_init_if_absent();
+
+    scan_counter.set_scan_counter(0);
+    sack_number.set_sack_number(0);
+    sack_number.set_initiated_sack_number(0);
+
+    let config_json = config.read_default_config();
+
+    if(process.argv.length < 3) {
+        console.log("USAGE: node clientclient.js <PASSWORD>");
+        return;
+    }
+
+    console.log("Dropping previous sessions");
+    let session = config_json.client_session;
+    session.status = session_status.status.CLOSED;
+    client_session.set_client_session(session);
+
+    let user_password  = process.argv[2];
+    let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json.account.encrypted_prk, user_password);
+    console.log(`decrypted prk: ${decrypted_private_key}`);
+
+    while(true) {
+        try {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+        } catch(e) {
+            break;
+        }
+
+        config_json = config.read_default_config();
+
+        console.log(`config_json: ${JSON.stringify(config_json)}`);
+
+        if(config_json.client_on === true) {
+            worker.client_worker(config_json, user_password, decrypted_private_key, () => {
+                console.log(`${global_counter}: Client is on`);
+            });
+        } else {
+            console.log(`${global_counter}: Client is off`);
+        }
+
+        global_counter++;
+    }
+
+}
+
+main();
+
 
 
 // function send_next_sack(config_json, user_password, private_key) {
@@ -636,52 +685,3 @@ if(!process_mgmt.save_pid(process_mgmt.get_client_pid_path())) {
 //         return callback();
 //     });
 // }
-
-async function main() {
-    config.config_init_if_absent();
-
-    scan_counter.set_scan_counter(0);
-    sack_number.set_sack_number(0);
-    sack_number.set_initiated_sack_number(0);
-
-    let config_json = config.read_default_config();
-
-    if(process.argv.length < 3) {
-        console.log("USAGE: node clientclient.js <PASSWORD>");
-        return;
-    }
-
-    console.log("Dropping previous sessions");
-    let session = config_json.client_session;
-    session.status = session_status.status.CLOSED;
-    client_session.set_client_session(session);
-
-    let user_password  = process.argv[2];
-    let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json.account.encrypted_prk, user_password);
-    console.log(`decrypted prk: ${decrypted_private_key}`);
-
-    while(true) {
-        try {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-        } catch(e) {
-            break;
-        }
-
-        config_json = config.read_default_config();
-
-        console.log(`config_json: ${JSON.stringify(config_json)}`);
-
-        if(config_json.client_on === true) {
-            worker.client_worker(config_json, user_password, decrypted_private_key, () => {
-                console.log(`${global_counter}: Client is on`);
-            });
-        } else {
-            console.log(`${global_counter}: Client is off`);
-        }
-
-        global_counter++;
-    }
-
-}
-
-main();

@@ -21,5 +21,5 @@ const account = require("../api/account");
 
 let prefix = account.get_account_raw_prefix();
 
-console.log(`Raw prefix: ${prefix}`);
+console.log(`Raw account prefix: ${prefix}`);
 console.log(`Prefix length: ${prefix.length}`);

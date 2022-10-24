@@ -30,6 +30,7 @@ function save_infura_id(id) {
     return true;
 }
 
+
 /**
  * Read Infura API key (token) from the config
  * @returns {string} Infura API key.
