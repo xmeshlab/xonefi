@@ -34,7 +34,7 @@ cd install && ./install-rpi4.sh
 and answer affirmatively to all the questions.
 
 
-To install XOneFi on Ubuntu, run the following command:
+To install XOneFi on Ubuntu Linux (18.04 or later), run the following command:
 
 ```
 cd install && ./install-ubuntu.sh
