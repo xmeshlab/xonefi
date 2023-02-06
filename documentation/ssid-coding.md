@@ -26,7 +26,7 @@ Fields:
 
 * status: 0 = inactive, 1 = active
 * access method: 00 = free public, 01 = pay-for-time, 10 = pay for data, 11 = restricted (private or enterprise) with pre-approved users.
-* blockchain net: 00 - Mainnet, 01 = Ropsten, 10 = Kovan, 11 = reserved for future use; 
+* blockchain net: 00 - Mainnet, 01 = goerli, 10 = Kovan, 11 = reserved for future use; 
 * reserved bits: not in use at this time.
 
 
@@ -37,10 +37,10 @@ Fields:
 * 2: pay-for-time hotspot;
 * 3: pay-for-traffic hotspot;
 * 4: restricted (private or enterprise) hotspot;
-* 101: test (Ropsten) free public hotspot;
-* 102: test (Ropsten) pay-for-time hotspot;
-* 103: test (Ropsten) pay-for-traffic hotspot;
-* 104: test (Ropsten) restricted (private or enterprise) hotspot;
+* 101: test (goerli) free public hotspot;
+* 102: test (goerli) pay-for-time hotspot;
+* 103: test (goerli) pay-for-traffic hotspot;
+* 104: test (goerli) restricted (private or enterprise) hotspot;
 * 5..100 & 105..255: reserved for future use.
 
 
@@ -162,7 +162,7 @@ For the current version of the the protocol (0), 1 OneFi token is set to 10^12 w
 
 ***Description:*** This JSON is used to generate an SSID for the hotspot that informs the client (without connection) about the following:
 
-* The hotspot is paid, but it operates on Ropsten Testnet. So the payment is made with a test Ether.
+* The hotspot is paid, but it operates on goerli Testnet. So the payment is made with a test Ether.
 * The hotspot is paid per traffic.
 * The available downlink bandwidth of this hotspot is at least 4 Mbps.
 * The available uplink bandwidth of this hotspot is at least 1 Mbps.

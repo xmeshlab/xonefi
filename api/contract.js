@@ -26,15 +26,12 @@ function get_current_contract_config_json() {
     const config = require("./config");
     const config_json = config.read_default_config();
 
-    if(config_json.network === "ropsten") {
-        return config.read_config("../contract-ropsten.json");
+    if(config_json.network === "goerli") {
+        return config.read_config("../contract-goerli.json");
     } else if(config_json.network === "kovan") {
         return config.read_config("../contract-kovan.json");
     } else if(config_json.network === "mainnet") {
         return config.read_config("../contract-mainnet.json");
-    }
-    else if(config_json.network === "goerli") {
-            return config.read_config("../contract-goerli.json");
     } else {
         return {};
     }
@@ -48,15 +45,12 @@ function get_current_contract_config_json_db(callback) {
     const config = require("./config");
 
     config.read_default_config_db((config_json) => {
-        if(config_json.network === "ropsten") {
-            return callback(config.read_config("../contract-ropsten.json"));
+        if(config_json.network === "goerli") {
+            return callback(config.read_config("../contract-goerli.json"));
         } else if(config_json.network === "kovan") {
             return callback(config.read_config("../contract-kovan.json"));
         } else if(config_json.network === "mainnet") {
             return callback(config.read_config("../contract-mainnet.json"));
-        }
-        else if(config_json.network === "goerli") {
-            return callback(config.read_config("../contract-goerli.json"));
         } else {
             return callback({});
         }

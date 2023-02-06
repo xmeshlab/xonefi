@@ -19,8 +19,8 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 
 
 /**
- * Return currently selected blockchain network (i.e., Ropsten, Mainnet, Kovan, etc.)
- * @returns {string} Ethereum blockchain network: currently, "ropsten", "mainnet", or "kovan".
+ * Return currently selected blockchain network (i.e., goerli, Mainnet, Kovan, etc.)
+ * @returns {string} Ethereum blockchain network: currently, "goerli", "mainnet", or "kovan".
  */
 function get_bnetwork() {
     const config = require("./config");
@@ -31,7 +31,7 @@ function get_bnetwork() {
 
 /**
  * Set (save in configuration) the currently used Ethereum blockchain network.
- * @param {string} net - Ethereum blockchain network: "ropsten", "mainnet", or "kovan".
+ * @param {string} net - Ethereum blockchain network: "goerli", "mainnet", or "kovan".
  * @returns {boolean} true - success, false - failure.
  */
 function set_bnetwork(net) {
@@ -45,7 +45,7 @@ function set_bnetwork(net) {
 
 /**
  * Callback-driven version of get_bnetwork. Return current Ethereum blockchain network
- * @param {function(string)} callback - Set parameter to "ropsten", "mainnet", or "kovan".
+ * @param {function(string)} callback - Set parameter to "goerli", "mainnet", or "kovan".
  */
 function get_bnetwork_db(callback) {
     const config = require("./config");
@@ -60,7 +60,7 @@ function get_bnetwork_db(callback) {
 
 /**
  * Set (save in configuration) the currently used Ethereum blockchain network. Async version.
- * @param {string} net - Ethereum blockchain network: "ropsten", "mainnet", or "kovan".
+ * @param {string} net - Ethereum blockchain network: "goerli", "mainnet", or "kovan".
  * @param {function(boolean)} callback Return status: true - success, false - failure.
  */
 function set_bnetwork_db(net, callback) {
