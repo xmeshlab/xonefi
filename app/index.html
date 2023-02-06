@@ -93,7 +93,7 @@
 
                     <tr>
                       <th>Blockchain Network</th>
-                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary"><i class="fab fa-ethereum"></i> Ropsten</span></td>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary"><i class="fab fa-ethereum"></i> goerli</span></td>
                     </tr>
 
                   </tbody>
@@ -1249,7 +1249,7 @@
         const input_infura = document.querySelector(".input-infura");
         const wlan_select = document.querySelector(".wlan-select");
 
-        if(selector.value === "mainnet" || selector.value === "kovan" || selector.value === "ropsten") {
+        if(selector.value === "mainnet" || selector.value === "kovan" || selector.value === "goerli") {
             bnetwork.set_bnetwork(selector.value);
             infura.save_infura_id(input_infura.value);
         }
@@ -1264,28 +1264,28 @@
             if(bnet === "mainnet") {
                 res = `
                 <option>Select the network</option>
-                <option value="ropsten">Ropsten (testnet)</option>
+                <option value="goerli">goerli (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option selected value="mainnet">Mainnet (production)</option>
                 `;
             } else if(bnet === "kovan") {
                 res = `
                 <option>Select the network</option>
-                <option value="ropsten">Ropsten (testnet)</option>
+                <option value="goerli">goerli (testnet)</option>
                 <option selected value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;
-            } else if(bnet === "ropsten") {
+            } else if(bnet === "goerli") {
                 res = `
                 <option>Select the network</option>
-                <option selected value="ropsten">Ropsten (testnet)</option>
+                <option selected value="goerli">goerli (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;
             } else {
                 res = `
                 <option selected>Select the network</option>
-                <option value="ropsten">Ropsten (testnet)</option>
+                <option value="goerli">goerli (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;

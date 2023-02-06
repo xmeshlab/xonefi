@@ -32,6 +32,9 @@ function get_current_contract_config_json() {
         return config.read_config("../contract-kovan.json");
     } else if(config_json.network === "mainnet") {
         return config.read_config("../contract-mainnet.json");
+    }
+    else if(config_json.network === "goerli") {
+            return config.read_config("../contract-goerli.json");
     } else {
         return {};
     }
@@ -51,6 +54,9 @@ function get_current_contract_config_json_db(callback) {
             return callback(config.read_config("../contract-kovan.json"));
         } else if(config_json.network === "mainnet") {
             return callback(config.read_config("../contract-mainnet.json"));
+        }
+        else if(config_json.network === "goerli") {
+            return callback(config.read_config("../contract-goerli.json"));
         } else {
             return callback({});
         }

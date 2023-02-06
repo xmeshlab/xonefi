@@ -14,7 +14,7 @@
     "price_ofi_mb": 0,
     "price_ofi_hr": 0,
     "infura_api_key": "",
-    "network": "ropsten",
+    "network": "goerli",
     "account": {
         "name": "",
         "encrypted_prk": "",
@@ -33,11 +33,12 @@
     "gas_offer": {
         "mainnet": "121000000000",
         "ropsten": "7000000",
-        "kovan": "2000000"
+        "kovan": "2000000", 
+        "goerli": "7000000"
     },
     "gas_price": {
       "mainnet": "121000000000",
-      "ropsten": "7300000000",
+      "goerli": "7300000000",
       "kovan": "2000000"
     },
     "call_confirmation_threshold": 2,

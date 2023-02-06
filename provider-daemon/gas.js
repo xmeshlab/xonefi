@@ -21,8 +21,8 @@ function get_gas_offer(config_json_new) {
 
     var gas_offer = 0;
 
-    if(config_json_new.network === "ropsten") {
-        gas_offer = config_json_new.gas_offer.ropsten;
+    if(config_json_new.network === "goerli") {
+        gas_offer = config_json_new.gas_offer.goerli;
     }
 
     if(config_json_new.network === "kovan") {
@@ -42,8 +42,8 @@ function get_gas_price(config_json_new) {
 
     var gas_price = 0;
 
-    if(config_json_new.network === "ropsten") {
-        gas_price = config_json_new.gas_price.ropsten;
+    if(config_json_new.network === "goerli") {
+        gas_price = config_json_new.gas_price.goerli;
     }
 
     if(config_json_new.network === "kovan") {

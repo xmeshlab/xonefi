@@ -43,7 +43,7 @@ function calculate_hotspot_type(active) {
 
     if(config_json.network === "mainnet") {
         tmp = tmp | 0b00000000;
-    } else if(config_json.network === "ropsten") {
+    } else if(config_json.network === "goerli") {
         tmp = tmp | 0b00001000;
     } else if(config_json.network === "kovan") {
         tmp = tmp | 0b00010000;
@@ -98,7 +98,7 @@ function decode_hotspot_type(hotspot_type) {
     if(f3 === 0) {
         actual_blockchain_network = "mainnet";
     } else if(f3 === 1) {
-        actual_blockchain_network = "ropsten";
+        actual_blockchain_network = "goerli";
     } else if(f3 === 2) {
         actual_blockchain_network = "kovan";
     } else {
