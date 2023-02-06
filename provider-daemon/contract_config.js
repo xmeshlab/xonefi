@@ -34,6 +34,10 @@ function get_contract_config_json(config_json_new) {
         contract_file = "../contract-mainnet.json";
     }
 
+    if(config_json_new.network === "goerli") {
+        contract_file = "../contract-goerli.json";
+    }
+
 
     //console.log(`@DEBUG @get_contract_config_json contract_file: ${contract_file}`);
     let rawdata = "";
