@@ -89,7 +89,7 @@ Whether you use XOneFi in Client or Provider mode, you need to provide a few mor
 
 ## Finalizing XOneFi Setup
 
-To finalize XOneFi setup, please select the blockchain network that you would like to use. Before using Mainnet, we recommend getting accustomed to the system using one of the testnets, such as Ropsten. Then provide the Infura API, which you can obtain by creating a free account at [https://infura.io](). Finally, choose the WiFi interface (wireless device) for XOneFi.
+To finalize XOneFi setup, please select the blockchain network that you would like to use. Before using Mainnet, we recommend getting accustomed to the system using one of the testnets, such as Goerli. Then please provide the Infura API, which you can obtain by creating a free account at [https://infura.io](). Finally, choose the WiFi interface (wireless device) for XOneFi.
 
 <p align="center">
 <img width="460" src="/documentation/img/onefi5.png">
