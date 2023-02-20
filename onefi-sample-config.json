@@ -37,7 +37,7 @@
     },
     "gas_price": {
       "mainnet": "121000000000",
-      "goerli": "7300000000",
+      "goerli": "20000000000",
       "kovan": "2000000"
     },
     "call_confirmation_threshold": 2,
