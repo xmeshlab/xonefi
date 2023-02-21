@@ -3,15 +3,50 @@ NOTE: GIT STORES THE HISTORY, WHICH MAY NECESSITATE A BRAND NEW REPO
 =====================================================================
 
 Client:
-0x0221B57Cc38C0360f1CAf638e1671243870C0424
-c6c6e65b7a45f281c2a93a9e1bf6d7e705e79dd5aa5df32b122e95fb4d122e28
+Private Key: 0xc6c6e65b7a45f281c2a93a9e1bf6d7e705e79dd5aa5df32b122e95fb4d122e28
+Address: 0x0221B57Cc38C0360f1CAf638e1671243870C0424
 
 Infura:
 ef1ce1202d8248a69d1eacd3a6237f28
 
-Hotspot: 91fd81e7d3ed26c72ad904b89744f685f3dbbf358ff0ebd8f26c9747a178fb60
-(0xd1feB8D074bD32b89D91Ff4706dF6865BBD78940)
+Hotspot:
+Private Key: 0x91fd81e7d3ed26c72ad904b89744f685f3dbbf358ff0ebd8f26c9747a178fb60
+Address: 0xd1feB8D074bD32b89D91Ff4706dF6865BBD78940
 
-Deployer: 0x7C10cc6c37b081012429F075b43a507649c0288b
-PRK: 7cc08c9a6c83529ad5ff33bbc23e065516ce34db5d41722804ad49df51728953
+Other Test Accounts:
+------------------------------------------
+Private Key: 0x9c3b0bc08f664acfc7861b777d6229b04f99120d74d5aac4cb42291745f3dad5
+Address: 0xd83A6F2cf9F9E2e694934E155bFd51F06F049067
+------------------------------------------
+Private Key: 0x26e57cd920c023d8fcc0201e735322a87662e171f5e20021b4d0f1f1703ebda8
+Address: 0x9501F4BBb77b5b5b05b37ff9d50805631028DDe0
+------------------------------------------
+Private Key: 0x11754772b85ed3b859a728917ef444c4f819504313f1905b380b0dfd87e56953
+Address: 0x62c622FB9D69B6677005F56eacADE1C577b9d667
+------------------------------------------
+Private Key: 0xf4aecb84c2fb908d25f48a7a1c34df886872187d114364aea78cc79b8a77fcf9
+Address: 0x0F57C0504fbe3C4C998A87433B7a7cCe680b1DAf
+------------------------------------------
+Private Key: 0x0c5ea76d12d19aa9c73fac96b9914ce11e29fa4e956dc35d27ce58f9a22ddd5e
+Address: 0x9655E9584E07AdC6451c12BC3ac9f2431CfEEE4e
+------------------------------------------
+Private Key: 0x860ac28b30836c04e4161cd1143ebc3e8b3f98dbcb4bd9324157ace7b5962f0c
+Address: 0x265E89980e6333A9C5e4FAd11300B943138fFEd1
+------------------------------------------
+Private Key: 0xb21fc5fb1c89069e226dab8d6535b266e9b0d73a1da11a20d92a08a0970c9a9a
+Address: 0xD578C7625C496a94E1c0B0091ffE362BA0B5e180
+------------------------------------------
+Private Key: 0x21ef70e648a887b59dd88547e6ed44f2047616a3994f9413efe9ac7c177c4f5f
+Address: 0xBf577843306d21Ca4Fda86C4BD29CD0985487229
+------------------------------------------
+Private Key: 0x0488bbeeac5671cb4a122a47e5c8f6a188dd732daba45565e316542e482ee051
+Address: 0xdB41C5f971d304Cda38D1381C6aCb9ca4f7572DA
+------------------------------------------
+Private Key: 0xa1ad37e64bf715dd0768fa0b6ab2fc45c518996fb8745cbd472a9e42e222a73b
+Address: 0xe7AeE3078216Eb695BcdCC44b2BFaab4Ae87c17D
+
+
+Deployer:
+Address: 0x7C10cc6c37b081012429F075b43a507649c0288b
+Private Key: 7cc08c9a6c83529ad5ff33bbc23e065516ce34db5d41722804ad49df51728953
 
