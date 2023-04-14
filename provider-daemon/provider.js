@@ -135,24 +135,30 @@ if(cluster.isMaster) {
                 var myContract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                 let gas_offer = gas.get_gas_offer(config_json_new);
 
-                myContract.methods.claim(sack.client,
-                    sack.amount.toString(),
-                    sack.timestamp,
-                    sack.proof)
-                    .send({from: account.address, gas: gas_offer})
-                    .on('transactionHash', function(hash){
-                        console.log("TNX HASH IS READY: " + hash);
-                    }).on('confirmation', function(confirmationNumber, receipt) {
-                        if(confirmationNumber >= config_json_new.call_confirmation_threshold) {
-                            console.log("SACK CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
-                            console.log("SACK CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
-                        }
-                    }).on('receipt', function(receipt){
-                        console.log("RECEIPT IS READY: " + receipt);
-                    }).on('error', console.error)
-                    .catch(err => {
-                        console.log("ERROR: " + err.message);
-                    });
+                console.log("XLOG: Calling the claim() function of the smart contract.")
+                console.log(`XLOG: sack.client: ${sack.client}`);
+                console.log(`XLOG: sack.amount.toString(): ${sack.amount.toString()}`);
+                console.log(`XLOG: sack.timestamp: ${sack.timestamp}`);
+                console.log(`XLOG: sack.proof: ${sack.proof}`);
+
+                // myContract.methods.claim(sack.client,
+                //     sack.amount.toString(),
+                //     sack.timestamp,
+                //     sack.proof)
+                //     .send({from: account.address, gas: gas_offer})
+                //     .on('transactionHash', function(hash){
+                //         console.log("TNX HASH IS READY: " + hash);
+                //     }).on('confirmation', function(confirmationNumber, receipt) {
+                //         if(confirmationNumber >= config_json_new.call_confirmation_threshold) {
+                //             console.log("SACK CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
+                //             console.log("SACK CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
+                //         }
+                //     }).on('receipt', function(receipt){
+                //         console.log("RECEIPT IS READY: " + receipt);
+                //     }).on('error', console.error)
+                //     .catch(err => {
+                //         console.log("ERROR: " + err.message);
+                //     });
 
                 session_last_sacks.delete(key);
                 break;
@@ -469,95 +475,102 @@ if(cluster.isMaster) {
                         let gas_price = gas.get_gas_price(config_json_new);
 
                         if(sack_mgmt.sacks_needed(config_json_new)) {
-                            myContract.methods.freeze(json_object.command.arguments.pafren.client,
-                                json_object.command.arguments.pafren.amount.toString(),
-                                json_object.command.arguments.pafren.timestamp,
-                                //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
-                                json_object.command.arguments.pafren.proof)
-                                .send({from: account.address, gas: gas_offer, gasPrice: gas_price})
-                                .on('transactionHash', function (hash) {
-                                    console.log("TNX HASH IS READY: " + hash);
 
-                                    if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
-                                        response.command.arguments.answer = "PAFREN-OK";
-                                        session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                                        var signature_json = web3.eth.accounts.sign(
-                                            JSON.stringify(response.command),
-                                            decrypted_private_key
-                                        );
+                            console.log("XLOG: Calling the freeze() function of the smart contract.");
+                            console.log(`XLOG: json_object.command.arguments.pafren.client: ${json_object.command.arguments.pafren.client}`);
+                            console.log(`XLOG: json_object.command.arguments.pafren.amount.toString(): ${json_object.command.arguments.pafren.amount.toString()}`);
+                            console.log(`XLOG: json_object.command.arguments.pafren.timestamp: ${json_object.command.arguments.pafren.timestamp}`);
+                            console.log(`XLOG: json_object.command.arguments.pafren.proof: ${json_object.command.arguments.pafren.proof}`);
 
-                                        response.signature = signature_json.signature;
-                                        session_statuses.set(json_object.command.session, session_status.ACTIVE);
-                                        session_handshake_deadlines.set(json_object.command.session, 0);
-                                        session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                                        session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
-
-                                        console.log("JSON.stringify(response): " + JSON.stringify(response));
-                                        console.log("Remote.port: " + remote.port);
-                                        console.log("Remote.address: " + remote.address);
-
-                                        onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                                            if (err) throw err;
-                                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                                        });
-                                    }
-                                }).on('confirmation', function (confirmationNumber, receipt) {
-                                    console.log("CONF. #: " + confirmationNumber);
-                                    if (confirmationNumber >= config_json_new.call_confirmation_threshold
-                                        && session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
-                                        console.log("CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
-                                        console.log("CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
-
-
-                                    }
-                                }).on('receipt', function (receipt) {
-                                    console.log("RECEIPT IS READY: " + JSON.stringify(receipt_json));
-                                    console.log("session_statuses.get(json_object.command.session): " + session_statuses.get(json_object.command.session));
-
-                                    if (receipt.status === true) {
-                                        response.command.arguments.answer = "PAFREN-OK";
-                                        //session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-
-                                        var signature_json = web3.eth.accounts.sign(
-                                            JSON.stringify(response.command),
-                                            decrypted_private_key
-                                        );
-
-                                        response.signature = signature_json.signature;
-                                        session_statuses.set(json_object.command.session, session_status.ACTIVE);
-                                        session_handshake_deadlines.set(json_object.command.session, 0);
-                                        session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-
-                                        console.log("JSON.stringify(response): " + JSON.stringify(response));
-                                        console.log("Remote.port: " + remote.port);
-                                        console.log("Remote.address: " + remote.address);
-
-                                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                                            if (err) throw err;
-                                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                                        });
-                                    } else {
-                                        response.command.arguments.answer = "PAFREN-FAIL";
-                                        session_statuses.set(json_object.command.session, session_status.CLOSED);
-                                        session_handshake_deadlines.set(json_object.command.session, 0);
-                                        session_pafren_expirations.set(json_object.command.session, 0);
-
-                                        var signature_json = web3.eth.accounts.sign(
-                                            JSON.stringify(response.command),
-                                            decrypted_private_key
-                                        );
-
-                                        response.signature = signature_json.signature;
-
-                                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                                            if (err) throw err;
-                                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                                        });
-                                    }
-                                }).on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
-                                console.log(`NEW ERROR: ${error}`);
-                                console.log(`NEW RECEIPT: ${receipt}`);
-                            });
+                            // myContract.methods.freeze(json_object.command.arguments.pafren.client,
+                            //     json_object.command.arguments.pafren.amount.toString(),
+                            //     json_object.command.arguments.pafren.timestamp,
+                            //     //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
+                            //     json_object.command.arguments.pafren.proof)
+                            //     .send({from: account.address, gas: gas_offer, gasPrice: gas_price})
+                            //     .on('transactionHash', function (hash) {
+                            //         console.log("TNX HASH IS READY: " + hash);
+                            //
+                            //         if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
+                            //             response.command.arguments.answer = "PAFREN-OK";
+                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                            //             var signature_json = web3.eth.accounts.sign(
+                            //                 JSON.stringify(response.command),
+                            //                 decrypted_private_key
+                            //             );
+                            //
+                            //             response.signature = signature_json.signature;
+                            //             session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                            //             session_handshake_deadlines.set(json_object.command.session, 0);
+                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                            //             session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
+                            //
+                            //             console.log("JSON.stringify(response): " + JSON.stringify(response));
+                            //             console.log("Remote.port: " + remote.port);
+                            //             console.log("Remote.address: " + remote.address);
+                            //
+                            //             onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
+                            //                 if (err) throw err;
+                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+                            //             });
+                            //         }
+                            //     }).on('confirmation', function (confirmationNumber, receipt) {
+                            //         console.log("CONF. #: " + confirmationNumber);
+                            //         if (confirmationNumber >= config_json_new.call_confirmation_threshold
+                            //             && session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
+                            //             console.log("CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
+                            //             console.log("CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
+                            //
+                            //
+                            //         }
+                            //     }).on('receipt', function (receipt) {
+                            //         console.log("RECEIPT IS READY: " + JSON.stringify(receipt_json));
+                            //         console.log("session_statuses.get(json_object.command.session): " + session_statuses.get(json_object.command.session));
+                            //
+                            //         if (receipt.status === true) {
+                            //             response.command.arguments.answer = "PAFREN-OK";
+                            //             //session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                            //
+                            //             var signature_json = web3.eth.accounts.sign(
+                            //                 JSON.stringify(response.command),
+                            //                 decrypted_private_key
+                            //             );
+                            //
+                            //             response.signature = signature_json.signature;
+                            //             session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                            //             session_handshake_deadlines.set(json_object.command.session, 0);
+                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                            //
+                            //             console.log("JSON.stringify(response): " + JSON.stringify(response));
+                            //             console.log("Remote.port: " + remote.port);
+                            //             console.log("Remote.address: " + remote.address);
+                            //
+                            //             this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
+                            //                 if (err) throw err;
+                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+                            //             });
+                            //         } else {
+                            //             response.command.arguments.answer = "PAFREN-FAIL";
+                            //             session_statuses.set(json_object.command.session, session_status.CLOSED);
+                            //             session_handshake_deadlines.set(json_object.command.session, 0);
+                            //             session_pafren_expirations.set(json_object.command.session, 0);
+                            //
+                            //             var signature_json = web3.eth.accounts.sign(
+                            //                 JSON.stringify(response.command),
+                            //                 decrypted_private_key
+                            //             );
+                            //
+                            //             response.signature = signature_json.signature;
+                            //
+                            //             this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
+                            //                 if (err) throw err;
+                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+                            //             });
+                            //         }
+                            //     }).on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+                            //     console.log(`NEW ERROR: ${error}`);
+                            //     console.log(`NEW RECEIPT: ${receipt}`);
+                            //});
                         } else {
                             let gl = false;
                             if(config_json_new.private_provider) {
