@@ -482,6 +482,31 @@ if(cluster.isMaster) {
                             console.log(`XLOG: json_object.command.arguments.pafren.timestamp: ${json_object.command.arguments.pafren.timestamp}`);
                             console.log(`XLOG: json_object.command.arguments.pafren.proof: ${json_object.command.arguments.pafren.proof}`);
 
+
+                            if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
+                                response.command.arguments.answer = "PAFREN-OK";
+                                session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                                var signature_json = web3.eth.accounts.sign(
+                                    JSON.stringify(response.command),
+                                    decrypted_private_key
+                                );
+
+                                response.signature = signature_json.signature;
+                                session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                                session_handshake_deadlines.set(json_object.command.session, 0);
+                                session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                                session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
+
+                                console.log("JSON.stringify(response): " + JSON.stringify(response));
+                                console.log("Remote.port: " + remote.port);
+                                console.log("Remote.address: " + remote.address);
+
+                                onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
+                                    if (err) throw err;
+                                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+                                });
+                            }
+
                             // myContract.methods.freeze(json_object.command.arguments.pafren.client,
                             //     json_object.command.arguments.pafren.amount.toString(),
                             //     json_object.command.arguments.pafren.timestamp,
