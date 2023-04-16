@@ -29,7 +29,9 @@ function createWindow () {
         resizable: true,
         title: "OneFi Manager",
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+		contextIsolation: false,
+		enableRemoteModule: true,
         },
         icon: 'icon.png'
     })
@@ -51,3 +53,4 @@ app.on('activate', () => {
         createWindow();
     }
 })
+

@@ -1,0 +1,8 @@
+node_modules/
+api/node_modules/
+app/node_modules/
+mobile/node_modules/
+integration_tests/node_modules/
+provider-daemon/node_modules/
+client-daemon/node_modules/
+tests/node_modules/
