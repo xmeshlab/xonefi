@@ -661,9 +661,9 @@ if(cluster.isMaster) {
                             if(!session_last_sacks.has(json_object.command.session)) {
                                 previous_sack_amount = 0;
                             } else {
-                                previous_sack_amount = JSON.parse(
+                                previous_sack_amount = Number(JSON.parse(
                                     session_last_sacks.get(json_object.command.session)
-                                ).amount;
+                                ).amount);
                             }
                         } catch(e) {
                             console.log(`ERROR [4069a1bec9]: Unable to parse JSON: ${e}`);
