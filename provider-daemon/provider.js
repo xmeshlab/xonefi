@@ -683,10 +683,10 @@ if(cluster.isMaster) {
 
                         if(config_json_new.cft) {
                             console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
-                            expected_sack_amount = previous_sack_amount + ((cost / 60) * 1000000000000);
+                            expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 60) * 1000000000000));
                         } else if(config_json_new.cfd) {
                             console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
-                            expected_sack_amount = previous_sack_amount + ((cost / 64) * 1000000000000);
+                            expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 64) * 1000000000000));
                         } else {
                             expected_sack_amount = 0;
                         }
