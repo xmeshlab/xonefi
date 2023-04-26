@@ -484,11 +484,13 @@ if(cluster.isMaster) {
                                 // This code is running in the main thread
                                 //let __filename = ".";
                                 console.log(`XLOG: __filename: ${__filename}`);
-                                const worker = new Worker(__filename, {
-                                    // workerData: {
-                                    //     // Pass any data you need in the worker thread here
-                                    // },
-                                });
+
+                                const worker = new Worker(__filename);
+                                // const worker = new Worker(__filename, {
+                                //     // workerData: {
+                                //     //     // Pass any data you need in the worker thread here
+                                //     // },
+                                // });
 
                                 worker.on('message', (result) => {
                                     console.log('Result from worker thread:', result);
