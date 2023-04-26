@@ -482,7 +482,8 @@ if(cluster.isMaster) {
 
                             if (isMainThread) {
                                 // This code is running in the main thread
-                                let __filename = "hi";
+                                //let __filename = ".";
+                                console.log(`XLOG: __filename: ${__filename}`);
                                 const worker = new Worker(__filename, {
                                     workerData: {
                                         // Pass any data you need in the worker thread here
