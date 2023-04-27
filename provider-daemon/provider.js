@@ -34,20 +34,7 @@ const gas = require("./gas.js");
 const session_stat = require("../api/session-status");
 
 
-const workerpool = require('workerpool');
 
-function someExpensiveComputation(data) {
-    // Your CPU-intensive code here
-    console.log("XLOG: Workerpool computation.")
-    return 'result of the expensive computation';
-}
-
-// Create an inline worker factory function
-function workerFactory() {
-    return {
-        someExpensiveComputation,
-    };
-}
 
 //const pool = workerpool.pool(workerFactory);
 
@@ -544,6 +531,21 @@ if(cluster.isMaster) {
                             //     parentPort.postMessage(result); // Send the result back to the main thread
                             // }
 
+
+                            const workerpool = require('workerpool');
+
+                            function someExpensiveComputation(data) {
+                                // Your CPU-intensive code here
+                                console.log("XLOG: Workerpool computation.")
+                                return 'result of the expensive computation';
+                            }
+
+                            // Create an inline worker factory function
+                            function workerFactory() {
+                                return {
+                                    someExpensiveComputation,
+                                };
+                            }
 
                             const pool = workerpool.pool(workerFactory);
 
