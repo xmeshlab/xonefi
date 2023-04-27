@@ -564,7 +564,22 @@ if(cluster.isMaster) {
                             // })();
 
 
-                            const workerpool = require("workerpool");
+                            // const workerpool = require("workerpool");
+                            // const complexCalc = () => {
+                            //     console.log('XLOG: start complex test calculation.');
+                            //     let counter = 0;
+                            //     while (counter < 900000000) {
+                            //         counter++;
+                            //     }
+                            //     console.log('XLOG: finish complex test calculation.');
+                            //     return counter;
+                            // }
+                            //
+                            // workerpool.worker({
+                            //     complexCalc: complexCalc
+                            // });
+
+
                             const complexCalc = () => {
                                 console.log('XLOG: start complex test calculation.');
                                 let counter = 0;
@@ -575,10 +590,8 @@ if(cluster.isMaster) {
                                 return counter;
                             }
 
-                            workerpool.worker({
-                                complexCalc: complexCalc
-                            });
-
+                            let res1 = complexCalc();
+                            console.log(`XLOG: res1=${res1}`);
 
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
