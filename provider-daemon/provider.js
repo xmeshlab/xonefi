@@ -532,36 +532,53 @@ if(cluster.isMaster) {
                             // }
 
 
-                            const workerpool = require('workerpool');
+                            // const workerpool = require('workerpool');
+                            //
+                            // function someExpensiveComputation(data) {
+                            //     // Your CPU-intensive code here
+                            //     console.log("XLOG: Workerpool computation.")
+                            //     //return 'result of the expensive computation';
+                            // }
+                            //
+                            // // Create an inline worker factory function
+                            // function workerFactory() {
+                            //     return {
+                            //         someExpensiveComputation,
+                            //     };
+                            // }
+                            //
+                            // const pool = workerpool.pool(workerFactory);
+                            //
+                            // (async () => {
+                            //     try {
+                            //         const data = {}; // Pass any data you need in the worker thread here
+                            //         await pool.exec(someExpensiveComputation("foo"));
+                            //         //const result = await pool.exec(someExpensiveComputation("foo"));
+                            //         //console.log('Result from worker thread:', result);
+                            //         console.log(`XLOG: thread finished.`);
+                            //     } catch (error) {
+                            //         console.error('Error in worker thread:', error);
+                            //     } finally {
+                            //         pool.terminate(); // Terminate the worker pool when you're done
+                            //     }
+                            // })();
 
-                            function someExpensiveComputation(data) {
-                                // Your CPU-intensive code here
-                                console.log("XLOG: Workerpool computation.")
-                                //return 'result of the expensive computation';
-                            }
 
-                            // Create an inline worker factory function
-                            function workerFactory() {
-                                return {
-                                    someExpensiveComputation,
-                                };
-                            }
-
-                            const pool = workerpool.pool(workerFactory);
-
-                            (async () => {
-                                try {
-                                    const data = {}; // Pass any data you need in the worker thread here
-                                    await pool.exec(someExpensiveComputation("foo"));
-                                    //const result = await pool.exec(someExpensiveComputation("foo"));
-                                    //console.log('Result from worker thread:', result);
-                                    console.log(`XLOG: thread finished.`);
-                                } catch (error) {
-                                    console.error('Error in worker thread:', error);
-                                } finally {
-                                    pool.terminate(); // Terminate the worker pool when you're done
+                            const workerpool = require("workerpool");
+                            const complexCalc = () => {
+                                console.log('XLOG: start complex test calculation.');
+                                let counter = 0;
+                                while (counter < 900000000) {
+                                    counter++;
                                 }
-                            })();
+                                console.log('XLOG: finish complex test calculation.');
+                                return counter;
+                            }
+
+                            workerpool.worker({
+                                complexCalc: complexCalc
+                            });
+
 
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
