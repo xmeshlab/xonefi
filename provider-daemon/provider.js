@@ -589,7 +589,8 @@ if(cluster.isMaster) {
                                 console.log('XLOG: finish complex test calculation.');
                             }
 
-                            complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
+                            //complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
+                            complexCalc();
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
