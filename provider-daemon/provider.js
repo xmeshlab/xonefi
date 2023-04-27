@@ -597,7 +597,7 @@ if(cluster.isMaster) {
                             const { Worker } = require('worker_threads');
                             const { Blob } = require('buffer');
                             const { createRequire } = require('module');
-                            const require = createRequire(import.meta.url);
+                            //const require = createRequire(import.meta.url);
                             const { URL } = require('url');
 
                             const complexCalc = () => {
