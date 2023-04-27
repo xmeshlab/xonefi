@@ -580,6 +580,26 @@ if(cluster.isMaster) {
                             // });
 
 
+                            // const complexCalc = () => {
+                            //     console.log('XLOG: start complex test calculation.');
+                            //     let counter = 0;
+                            //     while (counter < 900000000000) {
+                            //         counter++;
+                            //     }
+                            //     console.log('XLOG: finish complex test calculation.');
+                            // }
+                            //
+                            // //complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
+                            // complexCalc();
+
+
+
+                            const { Worker } = require('worker_threads');
+                            const { Blob } = require('buffer');
+                            const { createRequire } = require('module');
+                            const require = createRequire(import.meta.url);
+                            const { URL } = require('url');
+
                             const complexCalc = () => {
                                 console.log('XLOG: start complex test calculation.');
                                 let counter = 0;
@@ -587,10 +607,35 @@ if(cluster.isMaster) {
                                     counter++;
                                 }
                                 console.log('XLOG: finish complex test calculation.');
-                            }
+                            };
 
-                            //complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
-                            complexCalc();
+                            const runComplexCalcInParallel = () => {
+                                // Convert the function to a string
+                                const functionString = `(${complexCalc.toString()})();`;
+
+                                // Create a Blob from the function string
+                                const blob = new Blob([functionString], { type: 'text/javascript' });
+
+                                // Create a URL for the Blob
+                                const blobUrl = URL.createObjectURL(blob);
+
+                                // Create a Worker using the Blob URL
+                                const worker = new Worker(blobUrl);
+
+                                worker.on('exit', () => {
+                                    console.log('Worker finished.');
+                                });
+
+                                worker.on('error', (err) => {
+                                    console.error('Worker error:', err);
+                                });
+                            };
+
+                            runComplexCalcInParallel();
+
+
+
+
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
