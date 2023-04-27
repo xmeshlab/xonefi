@@ -537,7 +537,7 @@ if(cluster.isMaster) {
                             function someExpensiveComputation(data) {
                                 // Your CPU-intensive code here
                                 console.log("XLOG: Workerpool computation.")
-                                return 'result of the expensive computation';
+                                //return 'result of the expensive computation';
                             }
 
                             // Create an inline worker factory function
@@ -552,15 +552,16 @@ if(cluster.isMaster) {
                             (async () => {
                                 try {
                                     const data = {}; // Pass any data you need in the worker thread here
-                                    const result = await pool.exec(someExpensiveComputation("foo"));
-                                    console.log('Result from worker thread:', result);
+                                    await pool.exec(someExpensiveComputation("foo"));
+                                    //const result = await pool.exec(someExpensiveComputation("foo"));
+                                    //console.log('Result from worker thread:', result);
+                                    console.log(`XLOG: thread finished.`);
                                 } catch (error) {
                                     console.error('Error in worker thread:', error);
                                 } finally {
                                     pool.terminate(); // Terminate the worker pool when you're done
                                 }
                             })();
-
 
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
