@@ -552,7 +552,7 @@ if(cluster.isMaster) {
                             (async () => {
                                 try {
                                     const data = {}; // Pass any data you need in the worker thread here
-                                    const result = await pool.exec('someExpensiveComputation', [data]);
+                                    const result = await pool.exec(someExpensiveComputation("foo"));
                                     console.log('Result from worker thread:', result);
                                 } catch (error) {
                                     console.error('Error in worker thread:', error);
