@@ -497,9 +497,7 @@ if(cluster.isMaster) {
 
                                 const worker = new Worker('./freeze.js', {
                                     workerData: {
-                                        myContract: myContract,
                                         json_object: json_object,
-                                        account: account,
                                         gas_offer: gas_offer,
                                         gas_price: gas_price,
                                         session_statuses: session_statuses,
@@ -508,7 +506,8 @@ if(cluster.isMaster) {
                                         decrypted_private_key: decrypted_private_key,
                                         session_handshake_deadlines: session_handshake_deadlines,
                                         session_sack_deadlines: session_sack_deadlines,
-                                        config_json_new: config_json_new
+                                        config_json_new: config_json_new,
+                                        contract_config_json: contract_config_json
                                     },
                                 });
 

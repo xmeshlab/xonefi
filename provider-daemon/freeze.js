@@ -1,5 +1,6 @@
 const callFreeze = () => {
     const { workerData } = require('worker_threads');
+    const Web3 = require('web3');
 
     console.log('XLOG: Data from main thread:', workerData);
     // let counter = 0;
@@ -8,13 +9,21 @@ const callFreeze = () => {
     // }
     // console.log('XLOG: finish complex test calculation.');
 
+    const timestamp = require("../api/timestamp");
 
-    workerData.myContract.methods.freeze(workerData.json_object.command.arguments.pafren.client,
+    var web3 = new Web3("wss://" + workerData.config_json_new.network + ".infura.io/ws/v3/" + workerData.config_json_new.infura_api_key);
+
+    var myContract = new web3.eth.Contract(workerData.contract_config_json.contract_abi, workerData.contract_config_json.smart_contract);
+
+    var account = web3.eth.accounts.privateKeyToAccount(workerData.decrypted_private_key);
+    web3.eth.accounts.wallet.add(account);
+
+    myContract.methods.freeze(workerData.json_object.command.arguments.pafren.client,
         workerData.json_object.command.arguments.pafren.amount.toString(),
         workerData.json_object.command.arguments.pafren.timestamp,
         //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
         workerData.json_object.command.arguments.pafren.proof)
-        .send({from: workerData.account.address, gas: workerData.gas_offer, gasPrice: workerData.gas_price})
+        .send({from: account.address, gas: workerData.gas_offer, gasPrice: workerData.gas_price})
         .on('transactionHash', function (hash) {
             console.log("TNX HASH IS READY: " + hash);
 
@@ -27,10 +36,10 @@ const callFreeze = () => {
                 );
 
                 response.signature = signature_json.signature;
-                workerData.session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                workerData.session_statuses.set(json_object.command.session, workerData.session_status.ACTIVE);
                 workerData.session_handshake_deadlines.set(json_object.command.session, 0);
-                workerData.session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                workerData.session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
+                workerData.session_pafren_expirations.set(json_object.command.session, workerData.json_object.command.arguments.pafren.timestamp);
+                workerData.session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + workerData.config_json_new.sack_period);
 
                 // console.log("JSON.stringify(response): " + JSON.stringify(response));
                 // console.log("Remote.port: " + remote.port);
