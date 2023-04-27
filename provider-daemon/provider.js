@@ -508,7 +508,6 @@ if(cluster.isMaster) {
                                         decrypted_private_key: decrypted_private_key,
                                         session_handshake_deadlines: session_handshake_deadlines,
                                         session_sack_deadlines: session_sack_deadlines,
-                                        onefi_server: onefi_server,
                                         config_json_new: config_json_new
                                     },
                                 });

@@ -32,14 +32,14 @@ const callFreeze = () => {
                 workerData.session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
                 workerData.session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
 
-                console.log("JSON.stringify(response): " + JSON.stringify(response));
-                console.log("Remote.port: " + remote.port);
-                console.log("Remote.address: " + remote.address);
-
-                workerData.onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
+                // console.log("JSON.stringify(response): " + JSON.stringify(response));
+                // console.log("Remote.port: " + remote.port);
+                // console.log("Remote.address: " + remote.address);
+                //
+                // workerData.onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
+                //     if (err) throw err;
+                //     console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+                // });
             }
         }).on('confirmation', function (confirmationNumber, receipt) {
             console.log("CONF. #: " + confirmationNumber);
