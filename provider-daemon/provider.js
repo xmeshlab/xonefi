@@ -33,6 +33,27 @@ const session_uuids = require("./session_uuids");
 const gas = require("./gas.js");
 const session_stat = require("../api/session-status");
 
+
+const workerpool = require('workerpool');
+
+function someExpensiveComputation(data) {
+    // Your CPU-intensive code here
+    console.log("XLOG: Workerpool computation.")
+    return 'result of the expensive computation';
+}
+
+// Create an inline worker factory function
+function workerFactory() {
+    return {
+        someExpensiveComputation,
+    };
+}
+
+//const pool = workerpool.pool(workerFactory);
+
+
+
+
 config.config_init_if_absent();
 
 let config_json_new = config.read_default_config();
@@ -478,50 +499,67 @@ if(cluster.isMaster) {
 
 
 
-                            const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+                            // const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
+                            //
+                            // if (isMainThread) {
+                            //     // This code is running in the main thread
+                            //     //let __filename = ".";
+                            //     console.log(`XLOG: __filename: ${__filename}`);
+                            //
+                            //     const worker = new Worker(__filename);
+                            //     // const worker = new Worker(__filename, {
+                            //     //     // workerData: {
+                            //     //     //     // Pass any data you need in the worker thread here
+                            //     //     // },
+                            //     // });
+                            //
+                            //     worker.on('message', (result) => {
+                            //         console.log('Result from worker thread:', result);
+                            //     });
+                            //
+                            //     worker.on('error', (error) => {
+                            //         console.error('Error in worker thread:', error);
+                            //     });
+                            //
+                            //     worker.on('exit', (code) => {
+                            //         if (code !== 0) {
+                            //             console.error(`Worker thread exited with code: ${code}`);
+                            //         }
+                            //     });
+                            // } else {
+                            //     // This code is running in the worker thread
+                            //     const someExpensiveComputation = () => {
+                            //         // Your CPU-intensive code here
+                            //
+                            //         console.log("XLOG: Calling the freeze() function of the smart contract.");
+                            //         console.log(`XLOG: json_object.command.arguments.pafren.client: ${json_object.command.arguments.pafren.client}`);
+                            //         console.log(`XLOG: json_object.command.arguments.pafren.amount.toString(): ${json_object.command.arguments.pafren.amount.toString()}`);
+                            //         console.log(`XLOG: json_object.command.arguments.pafren.timestamp: ${json_object.command.arguments.pafren.timestamp}`);
+                            //         console.log(`XLOG: json_object.command.arguments.pafren.proof: ${json_object.command.arguments.pafren.proof}`);
+                            //
+                            //         return 'result of the expensive computation';
+                            //     };
+                            //
+                            //     const result = someExpensiveComputation();
+                            //     parentPort.postMessage(result); // Send the result back to the main thread
+                            // }
 
-                            if (isMainThread) {
-                                // This code is running in the main thread
-                                //let __filename = ".";
-                                console.log(`XLOG: __filename: ${__filename}`);
 
-                                const worker = new Worker(__filename);
-                                // const worker = new Worker(__filename, {
-                                //     // workerData: {
-                                //     //     // Pass any data you need in the worker thread here
-                                //     // },
-                                // });
+                            const pool = workerpool.pool(workerFactory);
 
-                                worker.on('message', (result) => {
+                            (async () => {
+                                try {
+                                    const data = {}; // Pass any data you need in the worker thread here
+                                    const result = await pool.exec('someExpensiveComputation', [data]);
                                     console.log('Result from worker thread:', result);
-                                });
-
-                                worker.on('error', (error) => {
+                                } catch (error) {
                                     console.error('Error in worker thread:', error);
-                                });
+                                } finally {
+                                    pool.terminate(); // Terminate the worker pool when you're done
+                                }
+                            })();
 
-                                worker.on('exit', (code) => {
-                                    if (code !== 0) {
-                                        console.error(`Worker thread exited with code: ${code}`);
-                                    }
-                                });
-                            } else {
-                                // This code is running in the worker thread
-                                const someExpensiveComputation = () => {
-                                    // Your CPU-intensive code here
 
-                                    console.log("XLOG: Calling the freeze() function of the smart contract.");
-                                    console.log(`XLOG: json_object.command.arguments.pafren.client: ${json_object.command.arguments.pafren.client}`);
-                                    console.log(`XLOG: json_object.command.arguments.pafren.amount.toString(): ${json_object.command.arguments.pafren.amount.toString()}`);
-                                    console.log(`XLOG: json_object.command.arguments.pafren.timestamp: ${json_object.command.arguments.pafren.timestamp}`);
-                                    console.log(`XLOG: json_object.command.arguments.pafren.proof: ${json_object.command.arguments.pafren.proof}`);
-
-                                    return 'result of the expensive computation';
-                                };
-
-                                const result = someExpensiveComputation();
-                                parentPort.postMessage(result); // Send the result back to the main thread
-                            }
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
