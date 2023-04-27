@@ -484,158 +484,6 @@ if(cluster.isMaster) {
 
                         if(sack_mgmt.sacks_needed(config_json_new)) {
 
-
-
-                            // const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
-                            //
-                            // if (isMainThread) {
-                            //     // This code is running in the main thread
-                            //     //let __filename = ".";
-                            //     console.log(`XLOG: __filename: ${__filename}`);
-                            //
-                            //     const worker = new Worker(__filename);
-                            //     // const worker = new Worker(__filename, {
-                            //     //     // workerData: {
-                            //     //     //     // Pass any data you need in the worker thread here
-                            //     //     // },
-                            //     // });
-                            //
-                            //     worker.on('message', (result) => {
-                            //         console.log('Result from worker thread:', result);
-                            //     });
-                            //
-                            //     worker.on('error', (error) => {
-                            //         console.error('Error in worker thread:', error);
-                            //     });
-                            //
-                            //     worker.on('exit', (code) => {
-                            //         if (code !== 0) {
-                            //             console.error(`Worker thread exited with code: ${code}`);
-                            //         }
-                            //     });
-                            // } else {
-                            //     // This code is running in the worker thread
-                            //     const someExpensiveComputation = () => {
-                            //         // Your CPU-intensive code here
-                            //
-                            //         console.log("XLOG: Calling the freeze() function of the smart contract.");
-                            //         console.log(`XLOG: json_object.command.arguments.pafren.client: ${json_object.command.arguments.pafren.client}`);
-                            //         console.log(`XLOG: json_object.command.arguments.pafren.amount.toString(): ${json_object.command.arguments.pafren.amount.toString()}`);
-                            //         console.log(`XLOG: json_object.command.arguments.pafren.timestamp: ${json_object.command.arguments.pafren.timestamp}`);
-                            //         console.log(`XLOG: json_object.command.arguments.pafren.proof: ${json_object.command.arguments.pafren.proof}`);
-                            //
-                            //         return 'result of the expensive computation';
-                            //     };
-                            //
-                            //     const result = someExpensiveComputation();
-                            //     parentPort.postMessage(result); // Send the result back to the main thread
-                            // }
-
-
-                            // const workerpool = require('workerpool');
-                            //
-                            // function someExpensiveComputation(data) {
-                            //     // Your CPU-intensive code here
-                            //     console.log("XLOG: Workerpool computation.")
-                            //     //return 'result of the expensive computation';
-                            // }
-                            //
-                            // // Create an inline worker factory function
-                            // function workerFactory() {
-                            //     return {
-                            //         someExpensiveComputation,
-                            //     };
-                            // }
-                            //
-                            // const pool = workerpool.pool(workerFactory);
-                            //
-                            // (async () => {
-                            //     try {
-                            //         const data = {}; // Pass any data you need in the worker thread here
-                            //         await pool.exec(someExpensiveComputation("foo"));
-                            //         //const result = await pool.exec(someExpensiveComputation("foo"));
-                            //         //console.log('Result from worker thread:', result);
-                            //         console.log(`XLOG: thread finished.`);
-                            //     } catch (error) {
-                            //         console.error('Error in worker thread:', error);
-                            //     } finally {
-                            //         pool.terminate(); // Terminate the worker pool when you're done
-                            //     }
-                            // })();
-
-
-                            // const workerpool = require("workerpool");
-                            // const complexCalc = () => {
-                            //     console.log('XLOG: start complex test calculation.');
-                            //     let counter = 0;
-                            //     while (counter < 900000000) {
-                            //         counter++;
-                            //     }
-                            //     console.log('XLOG: finish complex test calculation.');
-                            //     return counter;
-                            // }
-                            //
-                            // workerpool.worker({
-                            //     complexCalc: complexCalc
-                            // });
-
-
-                            // const complexCalc = () => {
-                            //     console.log('XLOG: start complex test calculation.');
-                            //     let counter = 0;
-                            //     while (counter < 900000000000) {
-                            //         counter++;
-                            //     }
-                            //     console.log('XLOG: finish complex test calculation.');
-                            // }
-                            //
-                            // //complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
-                            // complexCalc();
-
-
-
-                            // const { Worker } = require('worker_threads');
-                            // const { Blob } = require('buffer');
-                            // const { createRequire } = require('module');
-                            // //const require = createRequire(import.meta.url);
-                            // const { URL } = require('url');
-                            //
-                            // const complexCalc = () => {
-                            //     console.log('XLOG: start complex test calculation.');
-                            //     let counter = 0;
-                            //     while (counter < 900000000000) {
-                            //         counter++;
-                            //     }
-                            //     console.log('XLOG: finish complex test calculation.');
-                            // };
-                            //
-                            // const runComplexCalcInParallel = () => {
-                            //     // Convert the function to a string
-                            //     const functionString = `(${complexCalc.toString()})();`;
-                            //
-                            //     // Create a Blob from the function string
-                            //     const blob = new Blob([functionString], { type: 'text/javascript' });
-                            //
-                            //     // Create a URL for the Blob
-                            //     const blobUrl = URL.createObjectURL(blob);
-                            //
-                            //     // Create a Worker using the Blob URL
-                            //     const worker = new Worker(blobUrl);
-                            //
-                            //     worker.on('exit', () => {
-                            //         console.log('Worker finished.');
-                            //     });
-                            //
-                            //     worker.on('error', (err) => {
-                            //         console.error('Worker error:', err);
-                            //     });
-                            // };
-                            //
-                            // runComplexCalcInParallel();
-
-
-
-
                             const { Worker } = require('worker_threads');
 
                             const runFreeze = () => {
@@ -649,10 +497,19 @@ if(cluster.isMaster) {
 
                                 const worker = new Worker('./freeze.js', {
                                     workerData: {
-                                        message: 'Hello from main thread',
-                                        number: 42,
-                                        config_json_new: config_json_new,
-                                        json_object: json_object
+                                        myContract: myContract,
+                                        json_object: json_object,
+                                        account: account,
+                                        gas_offer: gas_offer,
+                                        gas_price: gas_price,
+                                        session_statuses: session_statuses,
+                                        session_status: session_status,
+                                        session_pafren_expirations: session_pafren_expirations,
+                                        decrypted_private_key: decrypted_private_key,
+                                        session_handshake_deadlines: session_handshake_deadlines,
+                                        session_sack_deadlines: session_sack_deadlines,
+                                        onefi_server: onefi_server,
+                                        config_json_new: config_json_new
                                     },
                                 });
 
