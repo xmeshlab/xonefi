@@ -638,8 +638,21 @@ if(cluster.isMaster) {
 
                             const { Worker } = require('worker_threads');
 
-                            const runComplexCalcInParallel = () => {
-                                const worker = new Worker('./freeze.js');
+                            const runFreeze = () => {
+                                // const worker = new Worker('./freeze.js',
+                                //     workerData: {
+                                //         message: 'Hello from main thread',
+                                //         number: 42
+                                //     }
+                                // });
+                                //
+
+                                const worker = new Worker('./freeze.js', {
+                                    workerData: {
+                                        message: 'Hello from main thread',
+                                        number: 42
+                                    },
+                                });
 
                                 worker.on('exit', () => {
                                     console.log('Worker finished.');
@@ -650,7 +663,7 @@ if(cluster.isMaster) {
                                 });
                             };
 
-                            runComplexCalcInParallel();
+                            runFreeze();
 
 
 
