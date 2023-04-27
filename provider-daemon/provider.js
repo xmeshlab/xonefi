@@ -580,7 +580,7 @@ if(cluster.isMaster) {
                             // });
 
 
-                            const complexCalc = async () => {
+                            const complexCalc = () => {
                                 console.log('XLOG: start complex test calculation.');
                                 let counter = 0;
                                 while (counter < 900000000000) {
