@@ -580,19 +580,16 @@ if(cluster.isMaster) {
                             // });
 
 
-                            const complexCalc = () => {
+                            const complexCalc = async () => {
                                 console.log('XLOG: start complex test calculation.');
                                 let counter = 0;
-                                while (counter < 900000000) {
+                                while (counter < 900000000000) {
                                     counter++;
                                 }
                                 console.log('XLOG: finish complex test calculation.');
-                                return counter;
                             }
 
-                            let res1 = complexCalc();
-                            console.log(`XLOG: res1=${res1}`);
-
+                            complexCalc().then(r => { console.log("XLOG: After complexCalc.")});
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
