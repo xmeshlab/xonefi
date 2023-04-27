@@ -650,7 +650,9 @@ if(cluster.isMaster) {
                                 const worker = new Worker('./freeze.js', {
                                     workerData: {
                                         message: 'Hello from main thread',
-                                        number: 42
+                                        number: 42,
+                                        config_json_new: config_json_new,
+                                        json_object: json_object
                                     },
                                 });
 
