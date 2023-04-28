@@ -149,6 +149,42 @@ if(cluster.isMaster) {
                 console.log(`XLOG: sack.timestamp: ${sack.timestamp}`);
                 console.log(`XLOG: sack.proof: ${sack.proof}`);
 
+
+
+
+
+                const runClaim = () => {
+                    // const worker = new Worker('./freeze.js',
+                    //     workerData: {
+                    //         message: 'Hello from main thread',
+                    //         number: 42
+                    //     }
+                    // });
+                    //
+
+                    const worker1 = new Worker('./claim.js', {
+                        workerData: {
+                            gas_offer: gas_offer,
+                            decrypted_private_key: decrypted_private_key,
+                            config_json_new: config_json_new,
+                            contract_config_json: contract_config_json,
+                            sack: sack
+                        },
+                    });
+
+                    worker1.on('exit', () => {
+                        console.log('Worker finished.');
+                    });
+
+                    worker1.on('error', (err) => {
+                        console.error('Worker error:', err);
+                    });
+                };
+
+                runClaim();
+
+
+
                 // myContract.methods.claim(sack.client,
                 //     sack.amount.toString(),
                 //     sack.timestamp,
