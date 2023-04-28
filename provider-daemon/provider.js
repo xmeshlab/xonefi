@@ -507,7 +507,8 @@ if(cluster.isMaster) {
                                         session_handshake_deadlines: session_handshake_deadlines,
                                         session_sack_deadlines: session_sack_deadlines,
                                         config_json_new: config_json_new,
-                                        contract_config_json: contract_config_json
+                                        contract_config_json: contract_config_json,
+                                        response: response
                                     },
                                 });
 
