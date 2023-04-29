@@ -151,7 +151,7 @@ if(cluster.isMaster) {
 
 
 
-
+                const { Worker } = require('worker_threads');
 
                 const runClaim = () => {
                     // const worker = new Worker('./freeze.js',
