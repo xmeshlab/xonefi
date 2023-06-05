@@ -14,7 +14,7 @@
     "price_ofi_mb": 0,
     "price_ofi_hr": 0,
     "infura_api_key": "",
-    "network": "goerli",
+    "network": "sepolia",
     "account": {
         "name": "",
         "encrypted_prk": "",
@@ -31,11 +31,13 @@
     "min_uplink_tier": 9,
     "client_max_pafren": 200,
     "gas_offer": {
+        "sepolia": "1000000",
         "mainnet": "121000000000",
         "kovan": "2000000", 
         "goerli": "100000"
     },
     "gas_price": {
+      "sepolia": "2500000000",
       "mainnet": "121000000000",
       "goerli": "50000000000",
       "kovan": "2000000"

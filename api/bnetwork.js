@@ -19,7 +19,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 
 
 /**
- * Return currently selected blockchain network (i.e., goerli, Mainnet, Kovan, etc.)
+ * Return currently selected blockchain network (i.e., sepolia, goerli, Mainnet, Kovan, etc.)
  * @returns {string} Ethereum blockchain network: currently, "goerli", "mainnet", or "kovan".
  */
 function get_bnetwork() {
@@ -31,7 +31,7 @@ function get_bnetwork() {
 
 /**
  * Set (save in configuration) the currently used Ethereum blockchain network.
- * @param {string} net - Ethereum blockchain network: "goerli", "mainnet", or "kovan".
+ * @param {string} net - Ethereum blockchain network: "sepolia", "goerli", "mainnet", or "kovan".
  * @returns {boolean} true - success, false - failure.
  */
 function set_bnetwork(net) {

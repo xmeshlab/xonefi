@@ -93,7 +93,7 @@
 
                     <tr>
                       <th>Blockchain Network</th>
-                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary"><i class="fab fa-ethereum"></i> goerli</span></td>
+                      <td style="text-align: right;"><span class="badge rounded-pill bg-primary"><i class="fab fa-ethereum"></i> sepolia</span></td>
                     </tr>
 
                   </tbody>
@@ -1213,7 +1213,7 @@
                   <h1 class="h1a">XOneFi Settings</h1>
                   <hr class="hr-header">
                   <p class="onefi-text-big">Blockchain Network</p>
-                  <p class="onefi-text-normal">If you are just testing XOneFi, choose goerli or Kovan. If you are ready to use it, choose Mainnet.</p>
+                  <p class="onefi-text-normal">If you are just testing XOneFi, choose sepolia or Kovan. If you are ready to use it, choose Mainnet.</p>
 
 
                   <select class="select-bnet form-select form-select-sm" aria-label=".form-select-sm example" onchange="networkSelect();">
@@ -1249,7 +1249,7 @@
         const input_infura = document.querySelector(".input-infura");
         const wlan_select = document.querySelector(".wlan-select");
 
-        if(selector.value === "mainnet" || selector.value === "kovan" || selector.value === "goerli") {
+        if(selector.value === "mainnet" || selector.value === "kovan" || selector.value === "sepolia") {
             bnetwork.set_bnetwork(selector.value);
             infura.save_infura_id(input_infura.value);
         }
@@ -1264,28 +1264,28 @@
             if(bnet === "mainnet") {
                 res = `
                 <option>Select the network</option>
-                <option value="goerli">goerli (testnet)</option>
+                <option value="sepolia">sepolia (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option selected value="mainnet">Mainnet (production)</option>
                 `;
             } else if(bnet === "kovan") {
                 res = `
                 <option>Select the network</option>
-                <option value="goerli">goerli (testnet)</option>
+                <option value="sepolia">sepolia (testnet)</option>
                 <option selected value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;
-            } else if(bnet === "goerli") {
+            } else if(bnet === "sepolia") {
                 res = `
                 <option>Select the network</option>
-                <option selected value="goerli">goerli (testnet)</option>
+                <option selected value="sepolia">sepolia (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;
             } else {
                 res = `
                 <option selected>Select the network</option>
-                <option value="goerli">goerli (testnet)</option>
+                <option value="sepolia">sepolia (testnet)</option>
                 <option value="kovan">Kovan (testnet)</option>
                 <option value="mainnet">Mainnet (production)</option>
                 `;

@@ -22,8 +22,8 @@ function get_contract_config_json(config_json_new) {
 
     let contract_file = "";
 
-    if(config_json_new.network === "goerli") {
-        contract_file = "../contract-goerli.json";
+    if(config_json_new.network === "sepolia") {
+        contract_file = "../contract-sepolia.json";
     }
 
     if(config_json_new.network === "kovan") {

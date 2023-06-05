@@ -25,6 +25,10 @@ function get_gas_offer(config_json_new) {
         gas_offer = config_json_new.gas_offer.goerli;
     }
 
+    if(config_json_new.network === "sepolia") {
+        gas_offer = config_json_new.gas_offer.sepolia;
+    }
+
     if(config_json_new.network === "kovan") {
         gas_offer = config_json_new.gas_offer.kovan;
     }
@@ -44,6 +48,10 @@ function get_gas_price(config_json_new) {
 
     if(config_json_new.network === "goerli") {
         gas_price = config_json_new.gas_price.goerli;
+    }
+
+    if(config_json_new.network === "sepolia") {
+        gas_price = config_json_new.gas_price.sepolia;
     }
 
     if(config_json_new.network === "kovan") {

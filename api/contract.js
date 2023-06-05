@@ -18,6 +18,8 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
+const config = require("./config");
+
 /**
  * Thread/concurrency-safe procedure for reading smart contract-related configuration JSON object.
  * @returns {Object} JSON object with smart contract configuration parameters.
@@ -26,7 +28,9 @@ function get_current_contract_config_json() {
     const config = require("./config");
     const config_json = config.read_default_config();
 
-    if(config_json.network === "goerli") {
+    if(config_json.network === "sepolia") {
+        return config.read_config("../contract-sepolia.json");
+    } else if(config_json.network === "goerli") {
         return config.read_config("../contract-goerli.json");
     } else if(config_json.network === "kovan") {
         return config.read_config("../contract-kovan.json");
@@ -45,7 +49,9 @@ function get_current_contract_config_json_db(callback) {
     const config = require("./config");
 
     config.read_default_config_db((config_json) => {
-        if(config_json.network === "goerli") {
+        if(config_json.network === "sepolia") {
+            return callback(config.read_config("../contract-sepolia.json"));
+        else if(config_json.network === "goerli") {
             return callback(config.read_config("../contract-goerli.json"));
         } else if(config_json.network === "kovan") {
             return callback(config.read_config("../contract-kovan.json"));
