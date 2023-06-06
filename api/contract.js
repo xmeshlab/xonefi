@@ -51,7 +51,7 @@ function get_current_contract_config_json_db(callback) {
     config.read_default_config_db((config_json) => {
         if(config_json.network === "sepolia") {
             return callback(config.read_config("../contract-sepolia.json"));
-        else if(config_json.network === "goerli") {
+	} else if(config_json.network === "goerli") {
             return callback(config.read_config("../contract-goerli.json"));
         } else if(config_json.network === "kovan") {
             return callback(config.read_config("../contract-kovan.json"));
