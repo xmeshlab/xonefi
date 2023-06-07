@@ -14,7 +14,7 @@ async fn index(info: web::Path<Info>) -> Result<String> {
     
     println!("Will be checking for path...");
 
-    let homedir = dirs::home_dir().to_str().unwrap();
+    let homedir = dirs::home_dir().expect("Unable to read home directory").to_str().unwrap();
 
     let p = format!("{}/pings/{}/{}", homedir, info.provider_id, info.client_id);
 
