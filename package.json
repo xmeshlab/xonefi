@@ -16,7 +16,7 @@
     "main": "main.js",
     "scripts": {
         "app": "cd app && npm start",
-        "test": "jest tests",
+        "test": "jest tests --coverage",
         "doc": "jsdoc -d documentation/api-reference api/*.js"
     },
     "config": {
@@ -44,7 +44,7 @@
     "flat": true,
     "os": [
         "!win32",
-        "!darwin",
+        "darwin",
         "linux"
     ],
     "private": true
