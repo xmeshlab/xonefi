@@ -15,7 +15,7 @@ async fn index(info: web::Path<Info>) -> Result<String> {
     println!("Will be checking for path...");
 
     let homedir = match dirs::home_dir() {
-        Some(path) => return path,
+        Some(path) => return path.to_str(),
         None => return "/root"
     };
 
