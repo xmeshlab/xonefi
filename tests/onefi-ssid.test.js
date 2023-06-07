@@ -9,17 +9,16 @@ test('is_onefi_ssid() correctly identifies OneFi SSIDs', () => {
 });
 
 test('is_onefi_ssid() correctly identifies OneFi SSIDs', () => {
-    let networks = ["OFA4gMBUEDAgED6AAADawAeYchXEJL",
+    let networks = {ssids: ["OFA4gMBUEDAgED6AAADawAeYchXEJL",
         "Xfinity",
         "OFAMgNAn8AAAETiAAADhAAlochXEJL",
         "OFAGcMCsCoAG8MRQAAHtwAZIchXEJ",
         "OFtest",
         "OFAKgRDMCoAAMUUAAADtgA+ochXEJL"
-    ];
-
-    expect(ssid.filter_onefi_neworks(networks)[0]).toBe("OFA4gMBUEDAgED6AAADawAeYchXEJL");
-    expect(ssid.filter_onefi_ssids(networks)[1]).toBe("OFAMgNAn8AAAETiAAADhAAlochXEJL");
-    expect(ssid.filter_onefi_ssids(networks)[2]).toBe("OFAKgRDMCoAAMUUAAADtgA+ochXEJL");
+    ],rssis:[""]};
+    expect(ssid.filter_onefi_neworks(networks).ssids[0]).toBe("OFA4gMBUEDAgED6AAADawAeYchXEJL");
+    expect(ssid.filter_onefi_neworks(networks).ssids[1]).toBe("OFAMgNAn8AAAETiAAADhAAlochXEJL");
+    expect(ssid.filter_onefi_neworks(networks).ssids[2]).toBe("OFAKgRDMCoAAMUUAAADtgA+ochXEJL");
 });
 
 
