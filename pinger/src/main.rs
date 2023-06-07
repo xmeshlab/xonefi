@@ -13,8 +13,13 @@ struct Info {
 async fn index(info: web::Path<Info>) -> Result<String> {
     
     println!("Will be checking for path...");
-    
-    let p = format!("pings/{}/{}", info.provider_id, info.client_id);
+
+    let homedir = match dirs::home_dir() {
+        Some(path) => return path,
+        None => return "/root"
+    };
+
+    let p = format!("{}/pings/{}/{}", homedir, info.provider_id, info.client_id);
 
     let exists = Path::new(&p).exists();
         
