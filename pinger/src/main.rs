@@ -14,10 +14,7 @@ async fn index(info: web::Path<Info>) -> Result<String> {
     
     println!("Will be checking for path...");
 
-    let homedir = match dirs::home_dir() {
-        Some(path) => return path.to_str(),
-        None => return "/root"
-    };
+    let homedir = dirs::home_dir().to_str().unwrap();
 
     let p = format!("{}/pings/{}/{}", homedir, info.provider_id, info.client_id);
 
