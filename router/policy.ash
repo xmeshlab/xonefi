@@ -1,2 +1,3 @@
 #!/bin/ash
-echo "Downloaded policy has been executed"
+echo "Running new firewall rules."
+echo "Downloaded policy has been executed."
