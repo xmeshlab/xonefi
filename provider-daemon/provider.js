@@ -214,40 +214,59 @@ if(cluster.isMaster) {
         console.log("ACTIVE SESSIONS: " + active_sessions);
     });
 
-    var dgram = require('dgram'); // UDP socket datagram
-    var ONEFI_UDP_HOST = '0.0.0.0';
-    var ONEFI_UDP_PORT = config_json_new.port;
+    const app = express();
 
-    onefi_server = dgram.createSocket('udp4');
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json({ type: 'application/*+json' }));
 
-    onefi_server.on('error', (e) => {
-        console.log(`ERROR [d9ed13976d]: Unable to start the server: ${e}`);
-    });
+    //var dgram = require('dgram'); // UDP socket datagram
+    //var ONEFI_UDP_HOST = '0.0.0.0';
+    //var ONEFI_UDP_PORT = config_json_new.port;
 
-    onefi_server.on('listening', function () {
-        var address = this.address();
-        console.log('OneFi Communicator successfully launched. Address: ' + address.address + ", Port: " + address.port);
-    }.bind(onefi_server));
+    //onefi_server = dgram.createSocket('udp4');
 
-    onefi_server.on('close', function() {
-        console.log('connection to the client closed..');
-    });
 
-    onefi_server.on('message', function (request, remote) {
+    const CLOUD_HOST = '0.0.0.0';
+    const CLOUD_PORT = 3000;
+
+
+    // onefi_server.on('error', (e) => {
+    //     console.log(`ERROR [d9ed13976d]: Unable to start the server: ${e}`);
+    // });
+
+    // onefi_server.on('listening', function () {
+    //     var address = this.address();
+    //     console.log('OneFi Communicator successfully launched. Address: ' + address.address + ", Port: " + address.port);
+    // }.bind(onefi_server));
+
+    // onefi_server.on('close', function() {
+    //     console.log('connection to the client closed..');
+    // });
+
+
+
+    //onefi_server.on('message', function (request, remote) {
+
+
+    let jsonParser = bodyParser.json();
+
+
+    app.post('/client', jsonParser, (req, res) => {
         if(!config_json_new.ap_on) {
             console.log("Hotspot is off.");
             return;
         }
 
-        var response = new Object();
-        var json_object;
-        var valid_json = true;
+        let response = {version: "0.3"};
+        let json_object;
+        let valid_json = true;
 
-        console.log('Request: ' + request.toString())
-        console.log(`REMOTE OBJECT: ${JSON.stringify(remote)}`);
+        console.log(`Request: ${JSON.stringify(req.body)}`);
 
         try {
-            json_object = JSON.parse(request.toString());
+            //json_object = JSON.parse(request.toString());
+            json_object = req.body;
         } catch(e) {
             valid_json = false;
             console.log("ERROR[fe33e7d1ce80abe1]: Invalid JSON.");
@@ -370,10 +389,9 @@ if(cluster.isMaster) {
                         session_statuses[json_object.command.session] = session_status.CLOSED;
                         response.signature = signature_json.signature;
 
-                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                            if (err) throw err;
-                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                        });
+                        console.log(`XLOG: [1] sending response: ${JSON.stringify(response)}`);
+                        res.send(JSON.stringify(response));
+                        res.end();
                     } else {
                         response.command.arguments.answer = "HELLO-OK";
                         response.command.arguments.graceperiod = config_json_new.handshake_time;
@@ -391,20 +409,19 @@ if(cluster.isMaster) {
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                         session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
-                        session_ips.set(json_object.command.session, remote.address);
+                        session_ips.set(json_object.command.session, "AA:BB:CC:DD:EE:FF");
                         session_clients.set(json_object.command.session, json_object.command.from);
                         clients_sessions.set(json_object.command.from, json_object.command.session);
 
-                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                            if (err) throw err;
-                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                        });
+                        console.log(`XLOG: [2] sending response: ${JSON.stringify(response)}`);
+                        res.send(JSON.stringify(response));
+                        res.end();
                     }
                 } else {
                     response.command.arguments.answer = "HELLO-OK";
                     response.command.arguments.graceperiod = config_json_new.handshake_time;
                     response.command.arguments.sackperiod = config_json_new.sack_period;
-                    session_ips[json_object.command.session] = remote.address;
+                    session_ips[json_object.command.session] = "AA:BB:CC:DD:EE:FF";
 
                     var signature_json = web3.eth.accounts.sign(
                         JSON.stringify(response.command),
@@ -418,16 +435,18 @@ if(cluster.isMaster) {
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                     session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
-                    session_ips.set(json_object.command.session, remote.address);
+                    session_ips.set(json_object.command.session, "AA:BB:CC:DD:EE:FF");
                     session_clients.set(json_object.command.session, json_object.command.from);
                     clients_sessions.set(json_object.command.from, json_object.command.session);
 
-                    this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                        if (err) throw err;
-                        console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                    });
+                    console.log(`XLOG: [3] sending response: ${JSON.stringify(response)}`);
+                    res.send(JSON.stringify(response));
+                    res.end();
                 }
             }
+
+
+            console.log(`XLOG [3.1]`);
 
             if(json_object.command.op === "PAFREN") {
                 if(session_statuses[json_object.command.session] === session_statuses.HANDSHAKE
@@ -578,13 +597,9 @@ if(cluster.isMaster) {
                                 session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
 
                                 console.log("JSON.stringify(response): " + JSON.stringify(response));
-                                console.log("Remote.port: " + remote.port);
-                                console.log("Remote.address: " + remote.address);
-
-                                onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                                    if (err) throw err;
-                                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                                });
+                                console.log(`XLOG: [4] sending response: ${JSON.stringify(response)}`);
+                                res.send(JSON.stringify(response));
+                                res.end();
                             }
 
                             // myContract.methods.freeze(json_object.command.arguments.pafren.client,
@@ -703,13 +718,9 @@ if(cluster.isMaster) {
                                 session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + 3600 * 24 * 365);
 
                                 console.log("JSON.stringify(response): " + JSON.stringify(response));
-                                console.log("Remote.port: " + remote.port);
-                                console.log("Remote.address: " + remote.address);
-
-                                onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                                    if (err) throw err;
-                                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                                });
+                                console.log(`XLOG: [5] sending response: ${JSON.stringify(response)}`);
+                                res.send(JSON.stringify(response));
+                                res.end();
                             }
                         }
                     } else {
@@ -795,11 +806,9 @@ if(cluster.isMaster) {
                         );
 
                         response.signature = signature_json.signature;
-
-                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                            if (err) throw err;
-                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                        });
+                        console.log(`XLOG: [6] sending response: ${JSON.stringify(response)}`);
+                        res.send(JSON.stringify(response));
+                        res.end();
                     } else {
                         console.log("BOGUS SACK");
                     }
@@ -818,10 +827,9 @@ if(cluster.isMaster) {
 
                 response.signature = signature_json.signature;
 
-                this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
+                console.log(`XLOG: [7] sending response: ${JSON.stringify(response)}`);
+                res.send(JSON.stringify(response));
+                res.end();
             }
 
             if(json_object.command.op === "STATUS") {
@@ -834,10 +842,9 @@ if(cluster.isMaster) {
 
                 response.signature = signature_json.signature;
 
-                this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
+                console.log(`XLOG: [8] sending response: ${JSON.stringify(response)}`);
+                res.send(JSON.stringify(response));
+                res.end();
             }
 
             if(json_object.command.op === "DONE") {
@@ -849,11 +856,9 @@ if(cluster.isMaster) {
                 );
 
                 response.signature = signature_json.signature;
-
-                this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
+                console.log(`XLOG: [9 sending response: ${JSON.stringify(response)}`);
+                res.send(JSON.stringify(response));
+                res.end();
             }
 
             if(json_object.command.op === "HANDOVER") {
@@ -875,11 +880,9 @@ if(cluster.isMaster) {
                         );
 
                         response.signature = signature_json.signature;
-
-                        this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                            if (err) throw err;
-                            console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                        });
+                        console.log(`XLOG: [10] sending response: ${JSON.stringify(response)}`);
+                        res.send(JSON.stringify(response));
+                        res.end();
                     } else {
                         console.log(`ERROR: Wrong SACK-OK.`);
                     }
@@ -895,17 +898,23 @@ if(cluster.isMaster) {
 
             response.signature = signature_json.signature;
 
-            this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function(err, bytes) {
-                if (err) throw err;
-                console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-            });
+            console.log(`XLOG: [11] sending response: ${JSON.stringify(response)}`);
+            res.send(JSON.stringify(response));
+            res.end();
         }
-    }.bind(onefi_server));
+    });
+    //.bind(onefi_server));
 
-    onefi_server.bind(ONEFI_UDP_PORT, ONEFI_UDP_HOST);
+    app.listen(CLOUD_PORT, () => {
+        console.log(`Server is running on port ${CLOUD_PORT}`);
+    });
+
+    //onefi_server.bind(ONEFI_UDP_PORT, ONEFI_UDP_HOST);
 } else {
     while(true) {
         process.send({ chat: "Hey master, check the sacks (" + config_json_new.ip + ")" });
         sleep(10000);
     }
 }
+
+

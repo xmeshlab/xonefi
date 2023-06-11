@@ -9,6 +9,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
+
 // Define a simple route
 app.get('/', (req, res) => {
     res.send('Welcome to XOneFi Provider RESTful API!');
@@ -16,9 +18,16 @@ app.get('/', (req, res) => {
 
 // CRUD operations for a hypothetical resource "items"
 // Create item
-app.post('/request', (req, res) => {
+app.post('/client', (req, res) => {
     // Your logic for creating an item goes here
-    res.send(`Request received. Body: ${JSON.stringify(req.body)}`);
+    console.log(`REQUEST: ${req}`);
+    res.send(`${JSON.stringify(
+       {
+                from: "provider",
+                echo: req.body
+            }
+        )}`
+    );
 });
 
 // // Get item
