@@ -1,6 +1,16 @@
 
 const { TestScheduler } = require("jest");
 const account = require("../api/account");
+const config = require("../api/config")
+
+function saveAccount(address, privateKey, encryptedPrivateKey) {
+    var config_json = config.read_default_config();
+    //config.read_default_config_db((config_json) => {
+    config_json.account.address = address;
+    config_json.account.encrypted_prk = encryptedPrivateKey;
+    config_json.account_set = true;
+    var response = config.write_default_config(config_json);
+}
 
 describe('test_address', () => {
   test('should return true for a valid Ethereum address', () => {
@@ -18,7 +28,7 @@ describe('test_address', () => {
 
 
 test("test_prk_format() returns true for a valid private key", () => {
-    let prk = "c6c6e65b7a45f281c2a93a9e1bf6d7e705e79dd5aa5df32b122e95fb4d122e28";
+    let prk = "a1ad37e64bf715dd0768fa0b6ab2fc45c518996fb8745cbd472a9e42e222a73b";
     expect(account.test_prk_format(prk)).toBe(true);
 });
 
@@ -40,36 +50,35 @@ describe('generate_account', () => {
 
 describe('import_account', () => {
   test('should import an existing account', () => {
-    const privateKey = '0x91fd81e7d3ed26c72ad904b89744f685f3dbbf358ff0ebd8f26c9747a178fb60';
+    const privateKey = '0xa1ad37e64bf715dd0768fa0b6ab2fc45c518996fb8745cbd472a9e42e222a73b';
     const password = 'seitlab123!@';
-
     const acct = account.import_account(privateKey, password);
     expect(acct).toHaveProperty('address');
     expect(acct).toHaveProperty('privateKey');
     expect(acct).toHaveProperty('encryptedPrivateKey');
     expect(account.test_address(acct.address)).toBe(true);
     expect(account.test_prk(acct.address, acct.privateKey)).toBe(true);
+    saveAccount(acct.address,acct.privateKey,acct.encryptedPrivateKey)
   });
 });
 
 describe('get_prk', () => {
   test('should return the decrypted private key', () => {
     const password = 'seitlab123!@';
-
     const privateKey = account.get_prk(password);
-
     expect(account.test_prk_format(privateKey)).toBe(true);
-    expect(privateKey).toBe('0x91fd81e7d3ed26c72ad904b89744f685f3dbbf358ff0ebd8f26c9747a178fb60');
+    expect(privateKey).toBe('0xa1ad37e64bf715dd0768fa0b6ab2fc45c518996fb8745cbd472a9e42e222a73b');
   });
 });
 
 
 describe('get_account_raw_prefix', () => {
   test('should return the raw prefix of the current account', () => {
-    const rawPrefix = account.get_account_raw_prefix();
+
+     const rawPrefix = account.get_account_raw_prefix();
 
     expect(rawPrefix.length).toBe(10);
-    expect(rawPrefix).toBe('d1feb8d074')
+    expect(rawPrefix).toBe('e7aee30782')
   });
 });
 
