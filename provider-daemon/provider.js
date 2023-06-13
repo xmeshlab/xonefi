@@ -303,6 +303,11 @@ if(cluster.isMaster) {
                     console.log("ERROR[a809d735a2893d7b]: Invalid JSON.");
                 }
 
+                if(!json_object.command.hasOwnProperty("mac")) {
+                    valid_json = false;
+                    console.log("ERROR[9c73979537d02bb8]: Invalid JSON.");
+                }
+
                 if(!json_object.command.hasOwnProperty("arguments")) {
                     valid_json = false;
                     console.log("ERROR[556814bb82705883]: Invalid JSON.");
@@ -409,7 +414,7 @@ if(cluster.isMaster) {
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                         session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
-                        session_ips.set(json_object.command.session, "AA:BB:CC:DD:EE:FF");
+                        session_ips.set(json_object.command.session, json_object.command.mac);
                         session_clients.set(json_object.command.session, json_object.command.from);
                         clients_sessions.set(json_object.command.from, json_object.command.session);
 

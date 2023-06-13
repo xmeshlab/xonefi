@@ -18,58 +18,60 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 // TODO: Discuss whether IPs or MACs (or both) should be filtered. Implement changes, if any, based on the discussion results.
-function update_internet_restrictions(ips, table_type="ebtables") {
+function update_internet_restrictions(macs, table_type="ebtables") {
     const e2e = require("../api/e2e_mode");
     const exec = require('child_process').exec;   // Needed to call the firewall
 
     // Currently, supports only ebtables (OpenWrt)
     // TODO: Implement iptables
     if(e2e.get_e2e_status() === false){ // Linux Ethernet bridge firewalling, like iptables
-        exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
-            function (error, stdout, stderr) {
-                // console.log('stdout: ' + stdout);
-                // console.log('stderr: ' + stderr);
-                if (error !== null) {
-                    console.log('exec error: ' + error);
-                }
-            });
+        // exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
+        //     function (error, stdout, stderr) {
+        //         // console.log('stdout: ' + stdout);
+        //         // console.log('stderr: ' + stderr);
+        //         if (error !== null) {
+        //             console.log('exec error: ' + error);
+        //         }
+        //     });
 
-        console.log("Executing ebtables");
+        console.log("Executing firewall rules");
 
-        for(let ip of ips) {
-            console.log("NEXT IP: " + ip);
-            console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
-                function (error, stdout, stderr) {
-                    // console.log('stdout: ' + stdout);
-                    // console.log('stderr: ' + stderr);
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }
-                });
+        for(let mac of macs) {
+            console.log("NEXT MAC: " + mac);
+            console.log("Executing/adding firewall rule.");
+            //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
+            // exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
+            //     function (error, stdout, stderr) {
+            //         // console.log('stdout: ' + stdout);
+            //         // console.log('stderr: ' + stderr);
+            //         if (error !== null) {
+            //             console.log('exec error: ' + error);
+            //         }
+            //     });
         }
     } else {
-        console.log("Executing ebtables");
+        console.log("Executing firewall rules");
 
-        exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
-            function (error, stdout, stderr) {
-                // console.log('stdout: ' + stdout);
-                // console.log('stderr: ' + stderr);
-                if (error !== null) {
-                    console.log('exec error: ' + error);
-                }
-            });
+        // exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
+        //     function (error, stdout, stderr) {
+        //         // console.log('stdout: ' + stdout);
+        //         // console.log('stderr: ' + stderr);
+        //         if (error !== null) {
+        //             console.log('exec error: ' + error);
+        //         }
+        //     });
 
 
-        for(let ip of ips) {
-            console.log("NEXT IP: " + ip);
-            console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            exec(`sudo ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
-                function (error, stdout, stderr) {
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }
-                });
+        for(let mac of macs) {
+            console.log("NEXT MAC: " + mac);
+            console.log("Adding firewall rule.");
+            //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
+            // exec(`sudo ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
+            //     function (error, stdout, stderr) {
+            //         if (error !== null) {
+            //             console.log('exec error: ' + error);
+            //         }
+            //     });
         }
     }
 

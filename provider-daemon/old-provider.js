@@ -51,7 +51,7 @@ var web3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + c
 let session_status = session_stat.status;
 
 var session_statuses = new Map();               // Hash map of sessions.
-var session_ips = new Map();                    // IP addresses of clients associated with sessions.
+var session_macs = new Map();                    // MAC addresses of clients associated with sessions.
 var session_sack_deadlines = new Map();         // SACK deadlines (UNIX timestamp, seconds) for each session.
 var session_pafren_expirations = new Map();     // Expiration time (UNIX timestamp, seconds) for each session.
 var session_handshake_deadlines = new Map();    // UNIX timestamps (in seconds) for each session, until which a handshake is possible.
@@ -79,10 +79,10 @@ if(cluster.isMaster) {
             return;
         }
 
-        let restricted_ips = [];
+        let restricted_macs = [];
         active_sessions = 0;
         for (const [key, value] of session_statuses.entries()) {
-            console.log(`SESSION: UUID: ${key}, STATUS: ${session_statuses.get(key)}, IP: ${session_ips.get(key)}, SACK DUE: ${session_sack_deadlines.get(key)}, PAFREN DUE: ${session_pafren_expirations.get(key)}, HANDSHAKE DUE: ${session_handshake_deadlines.get(key)}, CLIENT: ${session_clients.get(key)}`);
+            console.log(`SESSION: UUID: ${key}, STATUS: ${session_statuses.get(key)}, MAC: ${session_macs.get(key)}, SACK DUE: ${session_sack_deadlines.get(key)}, PAFREN DUE: ${session_pafren_expirations.get(key)}, HANDSHAKE DUE: ${session_handshake_deadlines.get(key)}, CLIENT: ${session_clients.get(key)}`);
 
             if(Math.floor(new Date() / 1000) > session_sack_deadlines.get(key)) {
                 console.log("INFO: Session " + key + " missed a SACK.");
@@ -110,7 +110,7 @@ if(cluster.isMaster) {
                 || value === session_status.CLOSED) {
                 console.log("INFO: Session " + key + " is deleted.");
                 session_statuses.delete(key);
-                session_ips.delete(key);
+                session_macs.delete(key);
                 session_sack_deadlines.delete(key);
                 session_pafren_expirations.delete(key);
                 var addr = clients_sessions.get(key);
@@ -123,12 +123,12 @@ if(cluster.isMaster) {
             if(value === session_status.SLEEP
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
-                console.log("ADDING A RESTRICTED IP: " + session_ips.get(key));
-                restricted_ips.push(session_ips.get(key));
+                console.log("ADDING A RESTRICTED MAC: " + session_macs.get(key));
+                restricted_macs.push(session_macs.get(key));
             }
         }
 
-        firewall.update_internet_restrictions(restricted_ips);
+        firewall.update_internet_restrictions(restricted_macs);
         last_sacks.saveLastSacks(session_last_sacks);
 
         for (const [key, sack_str] of session_last_sacks.entries()) {
@@ -389,7 +389,7 @@ if(cluster.isMaster) {
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                         session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
-                        session_ips.set(json_object.command.session, remote.address);
+                        session_macs.set(json_object.command.session, remote.address);
                         session_clients.set(json_object.command.session, json_object.command.from);
                         clients_sessions.set(json_object.command.from, json_object.command.session);
 
@@ -402,7 +402,7 @@ if(cluster.isMaster) {
                     response.command.arguments.answer = "HELLO-OK";
                     response.command.arguments.graceperiod = config_json_new.handshake_time;
                     response.command.arguments.sackperiod = config_json_new.sack_period;
-                    session_ips[json_object.command.session] = remote.address;
+                    session_macs[json_object.command.session] = remote.address;
 
                     var signature_json = web3.eth.accounts.sign(
                         JSON.stringify(response.command),
@@ -416,7 +416,7 @@ if(cluster.isMaster) {
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                     session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
-                    session_ips.set(json_object.command.session, remote.address);
+                    session_macs.set(json_object.command.session, remote.address);
                     session_clients.set(json_object.command.session, json_object.command.from);
                     clients_sessions.set(json_object.command.from, json_object.command.session);
 
@@ -903,7 +903,7 @@ if(cluster.isMaster) {
     onefi_server.bind(ONEFI_UDP_PORT, ONEFI_UDP_HOST);
 } else {
     while(true) {
-        process.send({ chat: "Hey master, check the sacks (" + config_json_new.ip + ")" });
+        process.send({ chat: "Hey master, check the sacks" });
         sleep(10000);
     }
 }
