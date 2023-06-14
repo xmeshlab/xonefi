@@ -18,7 +18,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 // TODO: Discuss whether IPs or MACs (or both) should be filtered. Implement changes, if any, based on the discussion results.
-function update_internet_restrictions(macs, table_type="ebtables") {
+function update_internet_restrictions(ipids, table_type="ebtables") {
     const e2e = require("../api/e2e_mode");
     const exec = require('child_process').exec;   // Needed to call the firewall
 
@@ -36,8 +36,8 @@ function update_internet_restrictions(macs, table_type="ebtables") {
 
         console.log("Executing firewall rules");
 
-        for(let mac of macs) {
-            console.log("NEXT MAC: " + mac);
+        for(let ipid of ipids) {
+            console.log("NEXT IPID: " + ipid);
             console.log("Executing/adding firewall rule.");
             //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
             // exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
@@ -62,8 +62,8 @@ function update_internet_restrictions(macs, table_type="ebtables") {
         //     });
 
 
-        for(let mac of macs) {
-            console.log("NEXT MAC: " + mac);
+        for(let ipid of ipids) {
+            console.log("NEXT IPID: " + ipid);
             console.log("Adding firewall rule.");
             //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
             // exec(`sudo ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
