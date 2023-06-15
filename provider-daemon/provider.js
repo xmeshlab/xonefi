@@ -35,14 +35,6 @@ const session_stat = require("../api/session-status");
 const express = require('express');
 const bodyParser = require('body-parser');
 
-
-
-
-//const pool = workerpool.pool(workerFactory);
-
-
-
-
 config.config_init_if_absent();
 
 let config_json_new = config.read_default_config();
@@ -156,13 +148,6 @@ if(cluster.isMaster) {
                 const { Worker } = require('worker_threads');
 
                 const runClaim = () => {
-                    // const worker = new Worker('./freeze.js',
-                    //     workerData: {
-                    //         message: 'Hello from main thread',
-                    //         number: 42
-                    //     }
-                    // });
-                    //
 
                     const worker1 = new Worker('./claim.js', {
                         workerData: {
@@ -185,27 +170,6 @@ if(cluster.isMaster) {
 
                 runClaim();
 
-
-
-                // myContract.methods.claim(sack.client,
-                //     sack.amount.toString(),
-                //     sack.timestamp,
-                //     sack.proof)
-                //     .send({from: account.address, gas: gas_offer})
-                //     .on('transactionHash', function(hash){
-                //         console.log("TNX HASH IS READY: " + hash);
-                //     }).on('confirmation', function(confirmationNumber, receipt) {
-                //         if(confirmationNumber >= config_json_new.call_confirmation_threshold) {
-                //             console.log("SACK CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
-                //             console.log("SACK CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
-                //         }
-                //     }).on('receipt', function(receipt){
-                //         console.log("RECEIPT IS READY: " + receipt);
-                //     }).on('error', console.error)
-                //     .catch(err => {
-                //         console.log("ERROR: " + err.message);
-                //     });
-
                 session_last_sacks.delete(key);
                 break;
             }
@@ -220,34 +184,8 @@ if(cluster.isMaster) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json({ type: 'application/*+json' }));
 
-    //var dgram = require('dgram'); // UDP socket datagram
-    //var ONEFI_UDP_HOST = '0.0.0.0';
-    //var ONEFI_UDP_PORT = config_json_new.port;
-
-    //onefi_server = dgram.createSocket('udp4');
-
-
     const CLOUD_HOST = '0.0.0.0';
     const CLOUD_PORT = 3000;
-
-
-    // onefi_server.on('error', (e) => {
-    //     console.log(`ERROR [d9ed13976d]: Unable to start the server: ${e}`);
-    // });
-
-    // onefi_server.on('listening', function () {
-    //     var address = this.address();
-    //     console.log('OneFi Communicator successfully launched. Address: ' + address.address + ", Port: " + address.port);
-    // }.bind(onefi_server));
-
-    // onefi_server.on('close', function() {
-    //     console.log('connection to the client closed..');
-    // });
-
-
-
-    //onefi_server.on('message', function (request, remote) {
-
 
     let jsonParser = bodyParser.json();
 
@@ -549,13 +487,6 @@ if(cluster.isMaster) {
                             const { Worker } = require('worker_threads');
 
                             const runFreeze = () => {
-                                // const worker = new Worker('./freeze.js',
-                                //     workerData: {
-                                //         message: 'Hello from main thread',
-                                //         number: 42
-                                //     }
-                                // });
-                                //
 
                                 const worker = new Worker('./freeze.js', {
                                     workerData: {
