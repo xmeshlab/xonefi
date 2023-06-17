@@ -1,10 +1,11 @@
 #!/bin/ash
 
 SLEEP_SEC=10
-PINGER_ADDRESS=137.184.213.75
+PINGER_ADDRESS=XX.XX.XX.XX
 PROTOCOL=http
 PINGER_USER=d1feb8d074
-PINGER_PASSWORD=ec406fe475aa
+PINGER_TOKEN=ec406fe475aa
+ROUTER_NUMBER=3141
 
 while true; do
   if [ -f "update.dat" ]; then
@@ -16,7 +17,7 @@ while true; do
       echo "File 'update.dat' does not exist."
   fi
 
-  wget -q --user=$PINGER_USER --password=$PINGER_PASSWORD $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/update.dat
+  wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/update.dat
 
   content=$(cat "update.dat")
 
@@ -30,10 +31,9 @@ while true; do
   else
     echo "Pull and execute new policy."
     rm -f policy.ash
-    wget -q --user=$PINGER_USER --password=$PINGER_PASSWORD $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/policy.ash
+    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.ash
     ash policy.ash
   fi
 
 	sleep $SLEEP_SEC
 done
-
