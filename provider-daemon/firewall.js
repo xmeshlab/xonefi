@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// TODO: Discuss whether IPs or MACs (or both) should be filtered. Implement changes, if any, based on the discussion results.
+const firewall_rules = require('../api/firewall_rules');
+
+
 function update_internet_restrictions(ipids, table_type="ebtables") {
     const e2e = require("../api/e2e_mode");
     const exec = require('child_process').exec;   // Needed to call the firewall
@@ -39,7 +41,13 @@ function update_internet_restrictions(ipids, table_type="ebtables") {
         for(let ipid of ipids) {
             console.log("NEXT IPID: " + ipid);
             console.log("Executing/adding firewall rule.");
-            //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
+
+            let ip = ipid.split(";")[2];
+
+            let rule = firewall_rules.generate_restriction_rule(ip, "137.184.213.75");
+            console.log(`RULE:\n${rule}\n`);
+
+            //console.log(`EXEC STRING: s/udo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
             // exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
             //     function (error, stdout, stderr) {
             //         // console.log('stdout: ' + stdout);
