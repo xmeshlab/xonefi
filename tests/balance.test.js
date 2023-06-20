@@ -1,6 +1,13 @@
 //Test get_account_balance() function still needs work
 
-// const { TestScheduler } = require("jest");
+const { TestScheduler } = require("jest");
+
+
+test("need to figure out how to access balance", () => {
+    let bool = true
+    expect(bool).toBe(true);
+}
+);
 
 // const balances = require("../api/balances");
 // const account = require("../api/account")
