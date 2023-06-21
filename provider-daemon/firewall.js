@@ -18,6 +18,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 const firewall_rules = require('../api/firewall_rules');
+const fw_update_counter = require('../api/fw_update_counter');
 
 
 function update_internet_restrictions(ipids, table_type="ebtables") {
@@ -42,10 +43,15 @@ function update_internet_restrictions(ipids, table_type="ebtables") {
             console.log("NEXT IPID: " + ipid);
             console.log("Executing/adding firewall rule.");
 
-            let ip = ipid.split(";")[2];
+            let sp = ipid.split(";");
+            let prefix = sp[0];
+            let router_no = sp[1];
+            let ip = sp[2];
 
             let rule = firewall_rules.generate_restriction_rule(ip, "137.184.213.75");
             console.log(`RULE:\n${rule}\n`);
+
+            console.log(`increment_update_counter result: ${fw_update_counter.increment_update_counter(prefix, router_no)}`);
 
             //console.log(`EXEC STRING: s/udo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
             // exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
