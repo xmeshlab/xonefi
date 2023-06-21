@@ -31,8 +31,9 @@ while true; do
   else
     echo "Pull and execute new policy."
     rm -f policy.ash
-    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.ash
-    ash policy.ash
+    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw
+    cat firewall.orig policy.fw > /etc/config/firewall
+    /etc/init.d/firewall/restart
   fi
 
 	sleep $SLEEP_SEC
