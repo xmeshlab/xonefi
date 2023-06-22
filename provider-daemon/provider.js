@@ -56,6 +56,8 @@ var session_last_sacks = new Map();             // Stores last sacks received fr
 let user_password  = process.argv[2];
 let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.encrypted_prk, user_password);
 
+let restricted_sessions = new Set();
+
 last_sacks.restoreLastSacks(session_last_sacks);
 
 if(cluster.isMaster) {
@@ -73,19 +75,31 @@ if(cluster.isMaster) {
             return;
         }
 
+
         let restricted_ipids = [];
         active_sessions = 0;
+        let update_restrictions_flag = false;
+
         for (const [key, value] of session_statuses.entries()) {
             console.log(`SESSION: UUID: ${key}, STATUS: ${session_statuses.get(key)}, IPID: ${session_ipids.get(key)}, SACK DUE: ${session_sack_deadlines.get(key)}, PAFREN DUE: ${session_pafren_expirations.get(key)}, HANDSHAKE DUE: ${session_handshake_deadlines.get(key)}, CLIENT: ${session_clients.get(key)}`);
 
             if(Math.floor(new Date() / 1000) > session_sack_deadlines.get(key)) {
                 console.log("INFO: Session " + key + " missed a SACK.");
                 session_statuses.set(key, session_status.SLEEP);
+
+                if(!restricted_sessions.has(key)) {
+                    update_restrictions_flag = true;
+                    restricted_sessions.add(key);
+                }
             }
 
             if(Math.floor(new Date() / 1000) > session_pafren_expirations.get(key)) {
                 console.log("INFO: Session " + key + " is expired.");
                 session_statuses.set(key, session_status.EXPIRED);
+                if(!restricted_sessions.has(key)) {
+                    update_restrictions_flag = true;
+                    restricted_sessions.delete(key);
+                }
             }
 
             if(Math.floor(new Date() / 1000) > session_handshake_deadlines.get(key)
@@ -93,10 +107,18 @@ if(cluster.isMaster) {
             {
                 console.log("INFO: Session " + key + " missed a handshake.");
                 session_statuses.set(key, session_status.EXPIRED);
+                if(!restricted_sessions.has(key)) {
+                    update_restrictions_flag = true;
+                    restricted_sessions.add(key);
+                }
             }
 
             if(session_statuses.get(key) === session_status.ACTIVE) {
                 active_sessions++;
+                if(!restricted_sessions.has(key)) {
+                    update_restrictions_flag = true;
+                    restricted_sessions.delete(key);
+                }
             }
 
             if(value === session_status.UNDEFINED
@@ -122,7 +144,11 @@ if(cluster.isMaster) {
             }
         }
 
-        firewall.update_internet_restrictions(restricted_ipids);
+        if(update_restrictions_flag) {
+            firewall.update_internet_restrictions(restricted_ipids);
+            update_restrictions_flag = false;
+        }
+
         last_sacks.saveLastSacks(session_last_sacks);
 
         for (const [key, sack_str] of session_last_sacks.entries()) {
