@@ -29,7 +29,7 @@ function generate_restriction_rule(client_ip, cloud_ip) {
     res += `\toption src_ip\t${client_ip}\n`;
     res += `\toption dest_ip\t!${cloud_ip}\n`;
     res += `\toption dest\twan\n`;
-    res += `\toption proto\ttcp\n`;
+    res += `\toption proto\tall\n`;
     res += `\toption REJECT\n`;
     return res;
 }

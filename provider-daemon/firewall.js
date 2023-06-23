@@ -19,76 +19,45 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 
 const firewall_rules = require('../api/firewall_rules');
 const fw_update_counter = require('../api/fw_update_counter');
+const fw_write_policy = require('../api/fw_write_policy');
+const {router} = require("express/lib/application");
 
 
-function update_internet_restrictions(ipids, table_type="ebtables") {
-    const e2e = require("../api/e2e_mode");
-    const exec = require('child_process').exec;   // Needed to call the firewall
+function update_internet_restrictions(ipids) {
+    console.log("Executing firewall rules");
 
-    // Currently, supports only ebtables (OpenWrt)
-    // TODO: Implement iptables
-    if(e2e.get_e2e_status() === false){ // Linux Ethernet bridge firewalling, like iptables
-        // exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
-        //     function (error, stdout, stderr) {
-        //         // console.log('stdout: ' + stdout);
-        //         // console.log('stderr: ' + stderr);
-        //         if (error !== null) {
-        //             console.log('exec error: ' + error);
-        //         }
-        //     });
+    let rules_combined = new Map();
 
-        console.log("Executing firewall rules");
+    for(let ipid of ipids) {
+        console.log("NEXT IPID: " + ipid);
+        console.log("Executing/adding firewall rule.");
 
-        for(let ipid of ipids) {
-            console.log("NEXT IPID: " + ipid);
-            console.log("Executing/adding firewall rule.");
+        let sp = ipid.split(";");
+        let prefix = sp[0];
+        let router_no = sp[1];
+        let ip = sp[2];
 
-            let sp = ipid.split(";");
-            let prefix = sp[0];
-            let router_no = sp[1];
-            let ip = sp[2];
+        let rule = firewall_rules.generate_restriction_rule(ip, "137.184.213.75");
+        console.log(`RULE:\n${rule}\n`);
 
-            let rule = firewall_rules.generate_restriction_rule(ip, "137.184.213.75");
-            console.log(`RULE:\n${rule}\n`);
+        let update_count = fw_update_counter.increment_update_counter(prefix, router_no);
+        console.log(`increment_update_counter result: ${update_count}`);
 
-            console.log(`increment_update_counter result: ${fw_update_counter.increment_update_counter(prefix, router_no)}`);
-
-            //console.log(`EXEC STRING: s/udo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            // exec(`sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
-            //     function (error, stdout, stderr) {
-            //         // console.log('stdout: ' + stdout);
-            //         // console.log('stderr: ' + stderr);
-            //         if (error !== null) {
-            //             console.log('exec error: ' + error);
-            //         }
-            //     });
-        }
-    } else {
-        console.log("Executing firewall rules");
-
-        // exec("sudo ebtables -F", // Flush the selected chain. If no chain is selected, then every chain will beflushed.
-        //     function (error, stdout, stderr) {
-        //         // console.log('stdout: ' + stdout);
-        //         // console.log('stderr: ' + stderr);
-        //         if (error !== null) {
-        //             console.log('exec error: ' + error);
-        //         }
-        //     });
-
-
-        for(let ipid of ipids) {
-            console.log("NEXT IPID: " + ipid);
-            console.log("Adding firewall rule.");
-            //console.log(`EXEC STRING: sudo ebtables -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`);
-            // exec(`sudo ebtables -t filter -A FORWARD -p IPv4 --ip-source ${ip} -j DROP`,
-            //     function (error, stdout, stderr) {
-            //         if (error !== null) {
-            //             console.log('exec error: ' + error);
-            //         }
-            //     });
+        let router_id = `${prefix};${router_no}`;
+        if(rules_combined.has(router_id)) {
+            rules_combined.set(router_id, rules_combined.get(router_id) + rule + "\n\n");
         }
     }
 
+    let res = true;
+    for(let [key, value] of rules_combined) {
+        let spp = key.split(";");
+        let pref = spp[0];
+        let rno = spp[1];
+        res &= fw_write_policy.write_firewall_policy(pref, rno, value);
+    }
+
+    return res;
 }
 
 module.exports = { update_internet_restrictions };
