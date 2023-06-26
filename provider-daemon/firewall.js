@@ -50,6 +50,7 @@ function update_internet_restrictions(ipids) {
     }
 
     let res = true;
+    // res &= fw_write_policy.write_firewall_policy(pref, rno, "");
     for(let [key, value] of rules_combined) {
         let spp = key.split(";");
         let pref = spp[0];

@@ -34,6 +34,8 @@ const gas = require("./gas.js");
 const session_stat = require("../api/session-status");
 const express = require('express');
 const bodyParser = require('body-parser');
+const fw_write_policy = require('../api/fw_write_policy');
+
 
 config.config_init_if_absent();
 
@@ -96,10 +98,14 @@ if(cluster.isMaster) {
             if(Math.floor(new Date() / 1000) > session_pafren_expirations.get(key)) {
                 console.log("INFO: Session " + key + " is expired.");
                 session_statuses.set(key, session_status.EXPIRED);
-                if(!restricted_sessions.has(key)) {
-                    update_restrictions_flag = true;
-                    restricted_sessions.delete(key);
-                }
+
+                // restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
+                // firewall.update_internet_restrictions(restricted_ipids);
+
+                // if(!restricted_sessions.has(key)) {
+                //     update_restrictions_flag = true;
+                //     restricted_sessions.delete(key);
+                // }
             }
 
             if(Math.floor(new Date() / 1000) > session_handshake_deadlines.get(key)
@@ -115,16 +121,29 @@ if(cluster.isMaster) {
 
             if(session_statuses.get(key) === session_status.ACTIVE) {
                 active_sessions++;
-                if(!restricted_sessions.has(key)) {
-                    update_restrictions_flag = true;
-                    restricted_sessions.delete(key);
-                }
+                // if(restricted_sessions.has(key)) {
+                //     update_restrictions_flag = true;
+                //     restricted_sessions.delete(key);
+                // }
             }
 
             if(value === session_status.UNDEFINED
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
                 console.log("INFO: Session " + key + " is deleted.");
+
+                console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
+                restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
+                console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
+
+
+                let cipid = session_ipids.get(key);
+
+                let sss = cipid.split(";");
+
+                fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                //firewall.update_internet_restrictions(restricted_ipids);
+
                 session_statuses.delete(key);
                 session_ipids.delete(key);
                 session_sack_deadlines.delete(key);
@@ -140,11 +159,13 @@ if(cluster.isMaster) {
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
                 console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
+                firewall.update_internet_restrictions(restricted_ipids);
                 restricted_ipids.push(session_ipids.get(key));
             }
         }
 
         if(update_restrictions_flag) {
+            console.log("Executing update_internet_restrictions()");
             firewall.update_internet_restrictions(restricted_ipids);
             update_restrictions_flag = false;
         }

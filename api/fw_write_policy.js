@@ -35,7 +35,7 @@ function write_firewall_policy(provider_prefix, router_no, policy) {
             return false;
         }
 
-        fs.writeFile(policy_filename, `${intValue}`, 'utf8', (err) => {
+        fs.writeFile(policy_filename, policy, 'utf8', (err) => {
             if (err) {
                 return false;
             }
