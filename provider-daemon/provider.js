@@ -35,6 +35,7 @@ const session_stat = require("../api/session-status");
 const express = require('express');
 const bodyParser = require('body-parser');
 const fw_write_policy = require('../api/fw_write_policy');
+const fw_update_counter = require('../api/fw_update_counter');
 
 
 config.config_init_if_absent();
@@ -90,8 +91,13 @@ if(cluster.isMaster) {
                 session_statuses.set(key, session_status.SLEEP);
 
                 if(!restricted_sessions.has(key)) {
+                    console.log(`The restricted_sessions set does not have the key '${key}'`)
+                    console.log(`update_restrictions_flag: ${update_restrictions_flag}`);
                     update_restrictions_flag = true;
+                    console.log(`update_restrictions_flag: ${update_restrictions_flag}`);
+                    console.log(`restricted_sessions: ${restricted_sessions}`);
                     restricted_sessions.add(key);
+                    console.log(`restricted_sessions: ${restricted_sessions}`);
                 }
             }
 
@@ -121,8 +127,9 @@ if(cluster.isMaster) {
 
             if(session_statuses.get(key) === session_status.ACTIVE) {
                 active_sessions++;
-                // if(restricted_sessions.has(key)) {
+                // if(!restricted_sessions.has(key)) {
                 //     update_restrictions_flag = true;
+                // } else {
                 //     restricted_sessions.delete(key);
                 // }
             }
@@ -138,10 +145,15 @@ if(cluster.isMaster) {
 
 
                 let cipid = session_ipids.get(key);
-
                 let sss = cipid.split(";");
 
+                console.log(`cipid: ${cipid}, sss: ${sss}, sss[0]: ${sss[0]}, sss[1]: ${sss[1]}`);
+
                 fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+
+                let update_count = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                console.log(`increment_update_counter result: ${update_count}`);
+
                 //firewall.update_internet_restrictions(restricted_ipids);
 
                 session_statuses.delete(key);

@@ -45,18 +45,28 @@ function update_internet_restrictions(ipids) {
 
         let router_id = `${prefix};${router_no}`;
         if(rules_combined.has(router_id)) {
+            console.log(`True branch`);
             rules_combined.set(router_id, rules_combined.get(router_id) + rule + "\n\n");
+        } else {
+            console.log(`False branch`);
+            rules_combined.set(router_id, rule + "\n\n");
         }
     }
+
+    console.log(`Rules combined: ${JSON.stringify(rules_combined)}`);
 
     let res = true;
     // res &= fw_write_policy.write_firewall_policy(pref, rno, "");
     for(let [key, value] of rules_combined) {
+        console.log(`Processing pair: ${key}, ${value}`);
         let spp = key.split(";");
         let pref = spp[0];
         let rno = spp[1];
+        console.log(`pref: ${pref}, rno: ${rno}, value: ${value}`);
         res &= fw_write_policy.write_firewall_policy(pref, rno, value);
     }
+
+    console.log(`res: ${res}`);
 
     return res;
 }
