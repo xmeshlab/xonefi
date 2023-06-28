@@ -1,0 +1,4 @@
+AuthName "Protected by Token"
+AuthType Basic
+AuthUserFile /etc/apache2/.htpasswd
+Require user {{USER}}
