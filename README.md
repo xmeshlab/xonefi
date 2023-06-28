@@ -4,6 +4,8 @@
 <img width="320" src="/app/logo-v3.png">
 </p>
 
+
+
 Connected seamlessly -- XOneFi offers wireless connectivity, wherever you are, seamlessly. Become a XOneFi provider or add your enterprise to XOneFi.
 
 ## Mobile Apps
@@ -95,15 +97,9 @@ To finalize XOneFi setup, please select the blockchain network that you would li
 <img width="460" src="/documentation/img/onefi5.png">
 </p>
 
-Congratulations! XOneFi is ready!
-
 ## Additional information and developer documentation
 
-Please browse the `documentation/` folder for more information about XOneFi and details of its design.
+Please browse the `docs/` folder for more information about XOneFi and details of its design.
 
-## Frequently Asked Questions
 
-### Can I build an enterprise WiFi network with XOneFi?
-
-Yes. You can't imagine how easy it is :)
 
