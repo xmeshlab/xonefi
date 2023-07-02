@@ -60,6 +60,7 @@ let user_password  = process.argv[2];
 let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.encrypted_prk, user_password);
 
 let restricted_sessions = new Set();
+//let restricted_ipids = [];
 
 last_sacks.restoreLastSacks(session_last_sacks);
 
@@ -77,7 +78,6 @@ if(cluster.isMaster) {
             console.log("Hotspot is off.");
             return;
         }
-
 
         let restricted_ipids = [];
         active_sessions = 0;
@@ -104,14 +104,6 @@ if(cluster.isMaster) {
             if(Math.floor(new Date() / 1000) > session_pafren_expirations.get(key)) {
                 console.log("INFO: Session " + key + " is expired.");
                 session_statuses.set(key, session_status.EXPIRED);
-
-                // restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
-                // firewall.update_internet_restrictions(restricted_ipids);
-
-                // if(!restricted_sessions.has(key)) {
-                //     update_restrictions_flag = true;
-                //     restricted_sessions.delete(key);
-                // }
             }
 
             if(Math.floor(new Date() / 1000) > session_handshake_deadlines.get(key)
@@ -127,11 +119,6 @@ if(cluster.isMaster) {
 
             if(session_statuses.get(key) === session_status.ACTIVE) {
                 active_sessions++;
-                // if(!restricted_sessions.has(key)) {
-                //     update_restrictions_flag = true;
-                // } else {
-                //     restricted_sessions.delete(key);
-                // }
             }
 
             if(value === session_status.UNDEFINED
@@ -153,8 +140,6 @@ if(cluster.isMaster) {
 
                 let update_count = fw_update_counter.increment_update_counter(sss[0], sss[1]);
                 console.log(`increment_update_counter result: ${update_count}`);
-
-                //firewall.update_internet_restrictions(restricted_ipids);
 
                 session_statuses.delete(key);
                 session_ipids.delete(key);
@@ -552,6 +537,9 @@ if(cluster.isMaster) {
                         var myContract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                         let gas_offer = gas.get_gas_offer(config_json_new);
                         let gas_price = gas.get_gas_price(config_json_new);
+
+
+                        //console.log(`XLOG3: Currently restricted IPIDS: ${restricted_ipids}`);
 
                         if(sack_mgmt.sacks_needed(config_json_new)) {
 
