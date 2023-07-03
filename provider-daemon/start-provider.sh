@@ -26,6 +26,12 @@ echo -n "0" > /var/www/html/d1feb8d074/3143/update.dat
 touch /var/www/html/d1feb8d074/3143/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3143/policy.fw
 
+mkdir /var/www/html/d1feb8d074/3144
+chmod 755 /var/www/html/d1feb8d074/3144
+echo -n "0" > /var/www/html/d1feb8d074/3144/update.dat
+touch /var/www/html/d1feb8d074/3144/policy.fw
+chmod 755 /var/www/html/d1feb8d074/3144/policy.fw
+
 cp /var/www/index.html /var/www/html/
 
 mkdir /var/www/html/dist
