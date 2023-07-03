@@ -1,6 +1,6 @@
 {
   "network": "sepolia",
-  "smart_contract": "0x15Fa289aef65F26FA2DFd4D76E09D78585D27E16",
+  "smart_contract": "0xa6612Dbd99325714026413ebAFa20E1f2d822FB0",
   "contract_abi": [
     {
       "inputs": [],
