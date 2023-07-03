@@ -32,7 +32,6 @@ while true; do
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw
     cat firewall.orig policy.fw > /etc/config/firewall
     /etc/init.d/firewall restart
-    cat update.dat > current.dat
   fi
 
 	sleep $SLEEP_SEC
