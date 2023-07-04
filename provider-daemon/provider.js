@@ -62,6 +62,9 @@ let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.
 let restricted_sessions = new Set();
 //let restricted_ipids = [];
 
+let restored_sessions = [];
+
+
 last_sacks.restoreLastSacks(session_last_sacks);
 
 if(cluster.isMaster) {
@@ -118,6 +121,21 @@ if(cluster.isMaster) {
             }
 
             if(session_statuses.get(key) === session_status.ACTIVE) {
+
+                if(restored_sessions.length > 0) {
+                    console.log(`Found restored sessions.`);
+                    for(let rs of restored_sessions) {
+                        let cipid = session_ipids.get(key);
+                        let sss = cipid.split(";");
+                        console.log(`RESTORED_SESSION_INFO: cipid: ${cipid}, sss: ${sss}, sss[0]: ${sss[0]}, sss[1]: ${sss[1]}`);
+                        fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                        let update_count = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                        console.log(`update_count: ${update_count}`);
+                    }
+
+                    restored_sessions = [];
+                }
+
                 active_sessions++;
             }
 
@@ -788,6 +806,12 @@ if(cluster.isMaster) {
 
                     if(greenlight) {
                         console.log("LEGITIMATE SACK!");
+
+
+                        if(session_statuses.get(json_object.command.session) === session_status.SLEEP) {
+                            restored_sessions.push(json_object.command.session);
+                        }
+
                         response.command.arguments.answer = "SACK-OK";
                         response.command.arguments.pafren_expiration = session_pafren_expirations.get(json_object.command.session);
 
