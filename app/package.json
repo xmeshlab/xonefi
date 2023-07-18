@@ -12,13 +12,13 @@
   "license": "GPL3",
   "devDependencies": {
     "electron": "^23.0.0",
-    "electron-rebuild": "^2.3.5",
+    "electron-rebuild": "^3.2.9",
     "jsdoc": "^4.0.0"
   },
   "rebuild": "electron-rebuild -f -w better-sqlite3",
   "dependencies": {
     "better-sqlite3": "*",
     "clipboardy": "^2.3.0",
-    "web3": "^1.8.2"
+    "web3": "^4.0.2"
   }
 }
