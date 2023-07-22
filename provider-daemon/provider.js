@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Copyright (c) 2019-2021 OneFi <https://onefi.io>
+Copyright (c) 2019-2021 XOneFi
 
 OneFi is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -60,10 +60,7 @@ let user_password  = process.argv[2];
 let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.encrypted_prk, user_password);
 
 let restricted_sessions = new Set();
-//let restricted_ipids = [];
-
 let restored_sessions = [];
-
 
 last_sacks.restoreLastSacks(session_last_sacks);
 
@@ -78,7 +75,7 @@ if(cluster.isMaster) {
     worker.on('message', function(msg) {
         config_json_new = config.read_default_config();
         if(!config_json_new.ap_on) {
-            console.log("Hotspot is off.");
+            console.log("Cloud is off.");
             return;
         }
 
@@ -90,7 +87,7 @@ if(cluster.isMaster) {
             console.log(`SESSION: UUID: ${key}, STATUS: ${session_statuses.get(key)}, IPID: ${session_ipids.get(key)}, SACK DUE: ${session_sack_deadlines.get(key)}, PAFREN DUE: ${session_pafren_expirations.get(key)}, HANDSHAKE DUE: ${session_handshake_deadlines.get(key)}, CLIENT: ${session_clients.get(key)}`);
 
             if(Math.floor(new Date() / 1000) > session_sack_deadlines.get(key)) {
-                console.log("INFO: Session " + key + " missed a SACK.");
+                console.log(`INFO: Session key=${key} MISSED A SACK.`);
                 session_statuses.set(key, session_status.SLEEP);
 
                 if(!restricted_sessions.has(key)) {
@@ -105,7 +102,7 @@ if(cluster.isMaster) {
             }
 
             if(Math.floor(new Date() / 1000) > session_pafren_expirations.get(key)) {
-                console.log("INFO: Session " + key + " is expired.");
+                console.log(`INFO: Session key=${key} is EXPIRED.`);
                 session_statuses.set(key, session_status.EXPIRED);
             }
 
@@ -123,17 +120,23 @@ if(cluster.isMaster) {
             if(session_statuses.get(key) === session_status.ACTIVE) {
 
                 if(restored_sessions.length > 0) {
-                    console.log(`Found restored sessions.`);
+                    console.log(`Found restored sessions, key=${key}`);
                     for(let rs of restored_sessions) {
                         let cipid = session_ipids.get(key);
                         let sss = cipid.split(";");
-                        console.log(`RESTORED_SESSION_INFO: cipid: ${cipid}, sss: ${sss}, sss[0]: ${sss[0]}, sss[1]: ${sss[1]}`);
+                        
+                        console.log(`RESTORED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+
                         fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                        let update_count = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                        console.log(`update_count: ${update_count}`);
+                        let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                        
+                        console.log(`fw_update_counter.increment_update.counter ret_status=${ret_status}`);
                     }
 
                     restored_sessions = [];
+                    restricted_sessions.clear();
+                    restricted_ipids = [];
+                    update_restrictions_flag = false;
                 }
 
                 active_sessions++;
@@ -148,22 +151,21 @@ if(cluster.isMaster) {
                 restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
                 console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
 
-
                 let cipid = session_ipids.get(key);
                 let sss = cipid.split(";");
 
-                console.log(`cipid: ${cipid}, sss: ${sss}, sss[0]: ${sss[0]}, sss[1]: ${sss[1]}`);
+                console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
                 fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
 
-                let update_count = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                console.log(`increment_update_counter result: ${update_count}`);
+                let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                console.log(`increment_update_counter result: ${res_status}`);
 
                 session_statuses.delete(key);
                 session_ipids.delete(key);
                 session_sack_deadlines.delete(key);
                 session_pafren_expirations.delete(key);
-                var addr = clients_sessions.get(key);
+                let addr = clients_sessions.get(key);
                 clients_sessions.delete(addr);
                 session_clients.delete(key);
             }
@@ -204,8 +206,6 @@ if(cluster.isMaster) {
                 console.log(`XLOG: sack.amount.toString(): ${sack.amount.toString()}`);
                 console.log(`XLOG: sack.timestamp: ${sack.timestamp}`);
                 console.log(`XLOG: sack.proof: ${sack.proof}`);
-
-
 
                 const { Worker } = require('worker_threads');
 
@@ -250,7 +250,6 @@ if(cluster.isMaster) {
     const CLOUD_PORT = 3000;
 
     let jsonParser = bodyParser.json();
-
 
     app.post('/client', jsonParser, (req, res) => {
         if(!config_json_new.ap_on) {
@@ -462,9 +461,6 @@ if(cluster.isMaster) {
                 }
             }
 
-
-            console.log(`XLOG [3.1]`);
-
             if(json_object.command.op === "PAFREN") {
                 if(session_statuses[json_object.command.session] === session_statuses.HANDSHAKE
                     || session_statuses[json_object.command.session] === session_statuses.ACTIVE) {
@@ -556,9 +552,6 @@ if(cluster.isMaster) {
                         let gas_offer = gas.get_gas_offer(config_json_new);
                         let gas_price = gas.get_gas_price(config_json_new);
 
-
-                        //console.log(`XLOG3: Currently restricted IPIDS: ${restricted_ipids}`);
-
                         if(sack_mgmt.sacks_needed(config_json_new)) {
 
                             const { Worker } = require('worker_threads');
@@ -592,8 +585,6 @@ if(cluster.isMaster) {
                             };
 
                             runFreeze();
-
-
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
@@ -922,18 +913,14 @@ if(cluster.isMaster) {
             res.end();
         }
     });
-    //.bind(onefi_server));
 
     app.listen(CLOUD_PORT, () => {
         console.log(`Server is running on port ${CLOUD_PORT}`);
     });
-
-    //onefi_server.bind(ONEFI_UDP_PORT, ONEFI_UDP_HOST);
 } else {
     while(true) {
         process.send({ chat: "Hey master, check the sacks (" + config_json_new.ip + ")" });
         sleep(10000);
     }
 }
-
 

@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Copyright (c) 2019-2023 XOneFi <https://onefi.io>
+Copyright (c) 2019-2023 XOneFi
 
 XOneFi is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ along with XOneFi Router.  If not, see <https://www.gnu.org/licenses/>.
  * @param {string} policy - The fleeting (second part) firewall policy.
  * @returns {boolean} True if success, false otherwise.
  */
-function write_firewall_policy(provider_prefix, router_no, policy) {
+ function write_firewall_policy(provider_prefix, router_no, policy) {
     const fs = require('fs');
 
-    console.log(`write_firewall_policy(): provider_prefix=${provider_prefix}, router_no=${router_no}, policy=${policy}`);
+    console.log(`calling write_firewall_policy(): provider_prefix=${provider_prefix}, router_no=${router_no}, policy=${policy}`);
     let policy_filename = `/var/www/html/${provider_prefix}/${router_no}/policy.fw`;
 
     fs.truncate(policy_filename, 0, function(err) {

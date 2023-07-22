@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Copyright (c) 2019-2023 XOneFi <https://onefi.io>
+Copyright (c) 2019-2023 XOneFi
 
 XOneFi is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,15 +32,15 @@ function increment_update_counter(provider_prefix, router_no) {
             return false;
         }
 
-        let intValue = parseInt(data, 10);
+        let updateVersion = parseInt(data, 10);
 
-        if (isNaN(intValue)) {
+        if (isNaN(updateVersion)) {
             return false;
         }
 
-        intValue++;
+        updateVersion++;
 
-        fs.writeFile(`/var/www/html/${provider_prefix}/${router_no}/update.dat`, `${intValue}`, 'utf8', (err) => {
+        fs.writeFile(`/var/www/html/${provider_prefix}/${router_no}/update.dat`, `${updateVersion}`, 'utf8', (err) => {
             if(err) {
                 return false;
             }
