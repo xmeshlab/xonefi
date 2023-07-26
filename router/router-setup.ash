@@ -1,13 +1,24 @@
 #!/bin/ash
 
-PULL_ADDRESS=137.184.213.75
+PULL_ADDRESS=137.184.243.11
 PULL_PROTOCOL=http
 
-rm -f puller.ash firewall.orig
+rm -f xpuller.ash puller.ash firewall.orig
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/puller.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/xpuller.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/firewall.orig
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/start-router.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/stop-router.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/init.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/daemon.sh
 
-chmod +x puller.ash start-router.ash stop-router.ash init.ash
+
+chmod +x puller.ash xpuller.ash start-router.ash stop-router.ash init.ash
+
+
+# cat daemon.sh > /etc/init.d/xonefidaemon
+# /etc/init.d/xonefidaemon enable
+echo "ash /root/xonefi/start-router.ash" > /etc/rc.local
+echo "" >> /etc/rc.local
+echo "exit 0" >> /etc/rc.local
+
