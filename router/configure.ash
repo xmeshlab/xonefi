@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ash
 
 # Usage: ./configure.ash <SSID> <WPA2_Password> <PINGER_ADDRESS> <PINGER_USER> <PINGER_TOKEN> <ROUTER_NUMBER>
 # Example ./configure.ash "OFAKgKCQoDjQEMRwAAABkAZNH+uNB0" "d1feb8d074" "137.184.243.11" "d1feb8d074" "ec406fe475aa" "3143"
@@ -18,7 +18,7 @@ ROUTER_NUMBER="$6"
 uci set wireless.@wifi-iface[0].ssid="${SSID}"
 uci set wireless.@wifi-iface[0].mode="ap"
 uci set wireless.@wifi-iface[0].encryption="psk2"
-uci set wireless.@wifi-iface[0].key="${WPA2_Password}"
+uci set wireless.@wifi-iface[0].key="${WPA2_Password}"a
 uci commit wireless
 wifi
 
