@@ -12,8 +12,10 @@ wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/stop-router.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/init.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/daemon.sh
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/configure.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/start-vpn.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/stop-vpn.ash
 
-chmod +x puller.ash xpuller.ash start-router.ash stop-router.ash init.ash
+chmod +x puller.ash xpuller.ash start-router.ash stop-router.ash init.ash configure.ash start-vpn.ash stop-vpn.ash
 
 
 # cat daemon.sh > /etc/init.d/xonefidaemon

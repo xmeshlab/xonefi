@@ -83,6 +83,9 @@ cp ../router/firewall.orig /var/www/html/dist
 cp ../router/xpuller.ash /var/www/html/dist
 cp ../router/daemon.sh /var/www/html/dist
 cp ../router/configure.ash /var/www/html/dist
+cp ../router/start-vpn.ash /var/www/html/dist
+cp ../router/stop-vpn.ash /var/www/html/dist
+
 
 chmod 755 /var/www/html/dist/
 chmod 755 /var/www/html/dist/router-setup.ash
@@ -94,6 +97,9 @@ chmod 755 /var/www/html/dist/firewall.orig
 chmod 755 /var/www/html/dist/xpuller.ash
 chmod 755 /var/www/html/dist/daemon.sh
 chmod 755 /var/www/html/dist/configure.ash
+chmod 755 /var/www/html/dist/start-vpn.ash
+chmod 755 /var/www/html/dist/stop-vpn.ash
+
 
 nohup node provider.js 'seitlab123!@' >> ~/.onefi.log 2>&1 &
 
