@@ -8,6 +8,7 @@ rm -fr /var/www/html/*
 mkdir /var/www/html/d1feb8d074/
 chmod 755 /var/www/html/d1feb8d074/
 
+
 mkdir /var/www/html/d1feb8d074/3141
 chmod 755 /var/www/html/d1feb8d074/3141
 echo -n "0" > /var/www/html/d1feb8d074/3141/update.dat
@@ -43,6 +44,32 @@ touch /var/www/html/d1feb8d074/3144/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3144/policy.fw
 touch /var/www/html/d1feb8d074/3144/inject.ash
 chmod 755 /var/www/html/d1feb8d074/3144/inject.ash
+
+
+
+mkdir /var/www/html/497d9fa8d0/
+chmod 755 /var/www/html/497d9fa8d0/
+
+
+mkdir /var/www/html/497d9fa8d0/1000
+chmod 755 /var/www/html/497d9fa8d0/1000
+echo -n "0" > /var/www/html/497d9fa8d0/1000/update.dat
+echo -n "0" > /var/www/html/497d9fa8d0/1000/xupdate.dat
+touch /var/www/html/497d9fa8d0/1000/policy.fw
+chmod 755 /var/www/html/497d9fa8d0/1000/policy.fw
+touch /var/www/html/497d9fa8d0/1000/inject.ash
+chmod 755 /var/www/html/497d9fa8d0/1000/inject.ash
+
+
+mkdir /var/www/html/497d9fa8d0/1001
+chmod 755 /var/www/html/497d9fa8d0/1001
+echo -n "0" > /var/www/html/497d9fa8d0/1001/update.dat
+echo -n "0" > /var/www/html/497d9fa8d0/1001/xupdate.dat
+touch /var/www/html/497d9fa8d0/1001/policy.fw
+chmod 755 /var/www/html/497d9fa8d0/1001/policy.fw
+touch /var/www/html/497d9fa8d0/1001/inject.ash
+chmod 755 /var/www/html/497d9fa8d0/1001/inject.ash
+
 
 cp /var/www/index.html /var/www/html/
 
