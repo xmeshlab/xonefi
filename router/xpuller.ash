@@ -21,10 +21,11 @@ while true; do
 
   wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/xupdate.dat -O /root/xonefi/xupdate.dat
   content=$(cat "/root/xonefi/xupdate.dat")
+  ccontent=$(cat "/root/xonefi/xcurrent.dat")
   echo -n "xupdate.dat content: " >> $LOG_FILE
   echo "$content" >> $LOG_FILE
 
-  if [ "$content" = "0" ]; then
+  if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
       rm -f /root/xonefi/xcurrent.dat
       echo -n "0" > /root/xonefi/xcurrent.dat
       rm -f /root/xonefi/inject.ash

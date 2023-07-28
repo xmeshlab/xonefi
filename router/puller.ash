@@ -22,10 +22,11 @@ while true; do
 
   wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/update.dat -O /root/xonefi/update.dat
   content=$(cat "/root/xonefi/update.dat")
+  ccontent=$(cat "/root/xonefi/current.dat")
   echo -n "update.dat content: " >> $LOG_FILE
   echo "$content" >> $LOG_FILE
 
-  if [ "$content" = "0" ]; then
+  if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
       rm -f /root/xonefi/current.dat
       echo -n "0" > /root/xonefi/current.dat
       rm -f /root/xonefi/policy.fw
