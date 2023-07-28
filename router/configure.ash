@@ -18,7 +18,7 @@ ROUTER_NUMBER="$6"
 uci set wireless.@wifi-iface[0].ssid="${SSID}"
 uci set wireless.@wifi-iface[0].mode="ap"
 uci set wireless.@wifi-iface[0].encryption="psk2"
-uci set wireless.@wifi-iface[0].key="${WPA2_Password}"a
+uci set wireless.@wifi-iface[0].key="${WPA2_Password}"
 uci commit wireless
 wifi
 
