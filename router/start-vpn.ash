@@ -1,30 +1,14 @@
 #!/bin/ash
 
-opkg update
+# Read information from files
+mullvad_ip=$(cat wireguard_setup_info.txt | grep "Mullvad IP:" | cut -d ' ' -f 3)
+address=$(cat wireguard_setup_info.txt | grep "Address:" | cut -d ' ' -f 2)
+public_key=$(cat public_key.txt)
+private_key=$(cat private_key.txt)
 
-# Install required packages
-opkg install wireguard-tools luci-proto-wireguard curl
-
-echo "packages installed, starting wireguard setup..."
-
-# Load WireGuard kernel module
-modprobe wireguard
-
-# Enable WireGuard service
-# /etc/init.d/network restart
-
-# Generate WireGuard key pair
-private_key=$(wg genkey)
-public_key=$(echo "$private_key" | wg pubkey)
-
-mullvad_ip=$(curl -s -d "account=0129241754650412" --data-urlencode "pubkey=$public_key" https://api.mullvad.net/wg/)
-
-address=$(echo "$mullvad_ip" | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}')
-
-# Create WireGuard interface
 uci set network.WGINTERFACE=interface
 uci set network.WGINTERFACE.proto='wireguard'
-uci set network.WGINTERFACE.private_key=$private_key
+uci set network.WGINTERFACE.private_key="$private_key"
 uci set network.WGINTERFACE.addresses=$address
 uci set network.WGINTERFACE.force_link='1'
 
@@ -58,6 +42,8 @@ uci commit firewall
 uci set network.lan.ipaddr='192.168.99.1'
 
 uci set dhcp.lan.dhcp_option='6,10.64.0.1'
+uci set dhcp.@dnsmasq[0].server='10.64.0.1'
+uci commit dhcp
 
 uci set firewall.@zone[1].forward='WGZONE:WGINTERFACE'
 uci commit firewall
@@ -67,14 +53,10 @@ echo "Private Key: $private_key"
 echo "Public Key: $public_key"
 echo "Mullvad IP: $mullvad_ip"
 
-
 # Restart network service
 /etc/init.d/network restart
 
 # Restart firewall service
 /etc/init.d/firewall restart
 
-echo "WireGuard keys generated and interface configured:"
-echo "Private Key: $private_key"
-echo "Public Key: $public_key"
-echo "Mullvad IP: $mullvad_ip"
+echo "WireGuard keys generated and interface configured"
