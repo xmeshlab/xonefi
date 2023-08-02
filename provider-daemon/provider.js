@@ -61,6 +61,8 @@ let user_password  = process.argv[2];
 let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.encrypted_prk, user_password);
 
 let restricted_sessions = new Set();
+let unrestricted_sessions = new Set();
+
 let restored_sessions = [];
 
 last_sacks.restoreLastSacks(session_last_sacks);
