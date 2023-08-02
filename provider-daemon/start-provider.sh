@@ -80,6 +80,7 @@ cp ../router/start-router.ash /var/www/html/dist
 cp ../router/stop-router.ash /var/www/html/dist
 cp ../router/init.ash /var/www/html/dist
 cp ../router/firewall.orig /var/www/html/dist
+cp ../router/firewall-blocker.orig /var/www/html/dist
 cp ../router/xpuller.ash /var/www/html/dist
 cp ../router/daemon.sh /var/www/html/dist
 cp ../router/configure.ash /var/www/html/dist
@@ -94,6 +95,7 @@ chmod 755 /var/www/html/dist/stop-router.ash
 chmod 755 /var/www/html/dist/init.ash
 chmod 755 /var/www/html/dist/puller.ash
 chmod 755 /var/www/html/dist/firewall.orig
+chmod 755 /var/www/html/dist/firewall-blocker.orig
 chmod 755 /var/www/html/dist/xpuller.ash
 chmod 755 /var/www/html/dist/daemon.sh
 chmod 755 /var/www/html/dist/configure.ash

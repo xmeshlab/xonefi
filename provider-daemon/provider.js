@@ -36,6 +36,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fw_write_policy = require('../api/fw_write_policy');
 const fw_update_counter = require('../api/fw_update_counter');
+const firewall_rules = require('../api/firewall_rules');
 
 
 config.config_init_if_absent();
@@ -80,6 +81,7 @@ if(cluster.isMaster) {
         }
 
         let restricted_ipids = [];
+        let accepted_ipids = [];
         active_sessions = 0;
         let update_restrictions_flag = false;
 
@@ -131,6 +133,11 @@ if(cluster.isMaster) {
                         let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
                         
                         console.log(`fw_update_counter.increment_update.counter ret_status=${ret_status}`);
+                        
+                        // if(!(cipid in accepted_ipids)) {
+                        //     accepted_ipids.push(cipid);
+                        //     let ruleset = firewall_rules.generate_custom_ruleset("137.184.243.11", none);
+                        // }
                     }
 
                     restored_sessions = [];
