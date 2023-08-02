@@ -1,5 +1,6 @@
+#!/bin/bash
 
- "Stopping WireGuard VPN..."
+echo "Stopping WireGuard VPN..."
 
 # Delete the WireGuard interface and peer configuration
 uci -q delete network.WGINTERFACE
