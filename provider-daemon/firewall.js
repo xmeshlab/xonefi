@@ -45,10 +45,8 @@ function update_internet_restrictions(ipids) {
 
         let router_id = `${prefix};${router_no}`;
         if(rules_combined.has(router_id)) {
-            console.log(`True branch`);
             rules_combined.set(router_id, rules_combined.get(router_id) + rule + "\n\n");
         } else {
-            console.log(`False branch`);
             rules_combined.set(router_id, rule + "\n\n");
         }
     }
@@ -71,4 +69,51 @@ function update_internet_restrictions(ipids) {
     return res;
 }
 
-module.exports = { update_internet_restrictions };
+
+function update_internet_unrestrictions(ipids) {
+    console.log("Executing accepting firewall rules");
+
+    let rules_combined = new Map();
+
+    for(let ipid of ipids) {
+        console.log("NEXT IPID (acc): " + ipid);
+        console.log("Executing/adding accepting firewall rule.");
+
+        let sp = ipid.split(";");
+        let prefix = sp[0];
+        let router_no = sp[1];
+        let ip = sp[2];
+
+        let rule = firewall_rules.generate_accept_rule(ip, "137.184.213.75");
+        console.log(`ACCEPTING RULE:\n${rule}\n`);
+
+        let update_count = fw_update_counter.increment_update_counter(prefix, router_no);
+        console.log(`increment_update_counter result (acc): ${update_count}`);
+
+        let router_id = `${prefix};${router_no}`;
+        if(rules_combined.has(router_id)) {
+            rules_combined.set(router_id, rules_combined.get(router_id) + rule + "\n\n");
+        } else {
+            rules_combined.set(router_id, rule + "\n\n");
+        }
+    }
+
+    console.log(`Rules combined (acc): ${JSON.stringify(rules_combined)}`);
+
+    let res = true;
+    // res &= fw_write_policy.write_firewall_policy(pref, rno, "");
+    for(let [key, value] of rules_combined) {
+        console.log(`Processing pair: ${key}, ${value}`);
+        let spp = key.split(";");
+        let pref = spp[0];
+        let rno = spp[1];
+        console.log(`pref: ${pref}, rno: ${rno}, value: ${value}`);
+        res &= fw_write_policy.write_firewall_policy(pref, rno, value);
+    }
+
+    console.log(`res (acc): ${res}`);
+
+    return res;
+}
+
+module.exports = { update_internet_restrictions, update_internet_unrestrictions };
