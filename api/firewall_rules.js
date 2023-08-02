@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Copyright (c) 2019-2023 XOneFi <https://onefi.io>
+Copyright (c) 2019-2023 XOneFi
 
 XOneFi is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,6 +34,51 @@ function generate_restriction_rule(client_ip, cloud_ip) {
     return res;
 }
 
+
+function generate_custom_restriction_rule(client_ip, cloud_ip, rule) {
+    res = "config rule\n";
+    res += "\toption src\tlan\n";
+    res += `\toption src_ip\t${client_ip}\n`;
+    res += `\toption dest_ip\t!${cloud_ip}\n`;
+    res += `\toption dest\twan\n`;
+    res += `\toption proto\tall\n`; 
+    res += `\toption target ${rule}\n`;
+    return res;
+}
+
+
+function generate_initial_ruleset(cloud_ip) {
+    let res = `\n\n`;
+    for(let i = 1; i <= 254; i++) {
+        let rule = generate_restriction_rule(`192.168.1.${i}`, cloud_ip);
+        res += `${rule}\n\n`;
+    }
+    
+    return res;
+}
+
+function generate_custom_ruleset(cloud_ip, accept_ips) {
+    let res = `\n\n`;
+    let rule = "";
+    for(let i = 1; i <= 254; i++) {
+        let ip = `192.168.1.${i}`;
+        
+        if(ip in accept_ips) {
+            rule = generate_restriction_rule(ip, cloud_ip, "ACCEPT");
+        } else {
+            rule = generate_restriction_rule(ip, cloud_ip, "REJECT");
+        }
+        
+        res += `${rule}\n\n`;
+    }
+    
+    return res;
+}
+
+
 module.exports = {
-    generate_restriction_rule
+    generate_restriction_rule,
+    generate_initial_ruleset,
+    generate_custom_restriction_rule,
+    generate_custom_ruleset
 };

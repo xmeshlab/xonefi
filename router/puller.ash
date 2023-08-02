@@ -6,40 +6,42 @@ PROTOCOL=http
 PINGER_USER=
 PINGER_TOKEN=
 ROUTER_NUMBER=
+LOG_FILE=/root/xonefi.log
 
 while true; do
-  if [ -f "update.dat" ]; then
-      rm -f current.dat
-      mv update.dat current.dat
+  if [ -f "/root/xonefi/update.dat" ]; then
+      rm -f /root/xonefi/current.dat
+      mv /root/xonefi/update.dat /root/xonefi/current.dat
   else
-      echo -n "0" > current.dat
-      rm -f policy.fw
-      echo "# Empty policy" > policy.fw
-      cat firewall.orig policy.fw > /etc/config/firewall
+      echo -n "0" > /root/xonefi/current.dat
+      rm -f /root/xonefi/policy.fw
+      echo "# Empty policy" > /root/xonefi/policy.fw
+      cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
       /etc/init.d/firewall restart
   fi
 
-  wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/update.dat
-  content=$(cat "update.dat")
-  echo -n "update.dat content: "
-  echo "$content"
+  wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/update.dat -O /root/xonefi/update.dat
+  content=$(cat "/root/xonefi/update.dat")
+  ccontent=$(cat "/root/xonefi/current.dat")
+  echo -n "update.dat content: " >> $LOG_FILE
+  echo "$content" >> $LOG_FILE
 
-  if [ "$content" = "0" ]; then
-      rm -f current.dat
-      echo -n "0" > current.dat
-      rm -f policy.fw
-      echo "# Empty policy" > policy.fw
-      cat firewall.orig policy.fw > /etc/config/firewall
+  if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
+      rm -f /root/xonefi/current.dat
+      echo -n "0" > /root/xonefi/current.dat
+      rm -f /root/xonefi/policy.fw
+      echo "# Empty policy" > /root/xonefi/policy.fw
+      cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
       /etc/init.d/firewall restart
   fi
 
-  if cmp -s "update.dat" "current.dat"; then
-    echo "Stay put."
+  if cmp -s "/root/xonefi/update.dat" "/root/xonefi/current.dat"; then
+    echo "Stay put." >> $LOG_FILE
   else
-    echo "Pull and execute new policy."
-    rm -f policy.fw
-    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw
-    cat firewall.orig policy.fw > /etc/config/firewall
+    echo "Pull and execute new policy." >> $LOG_FILE
+    rm -f /root/xonefi/policy.fw
+    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw -O /root/xonefi/policy.fw
+    cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
     /etc/init.d/firewall restart
   fi
 
