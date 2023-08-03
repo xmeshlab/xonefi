@@ -131,15 +131,17 @@ if(cluster.isMaster) {
                         
                         console.log(`RESTORED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                        fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                        
+                        let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
+                        
+                        fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
+                        
                         let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
                         
                         console.log(`fw_update_counter.increment_update.counter ret_status=${ret_status}`);
                         
-                        // if(!(cipid in accepted_ipids)) {
-                        //     accepted_ipids.push(cipid);
-                        //     let ruleset = firewall_rules.generate_custom_ruleset("137.184.243.11", none);
-                        // }
+                        // delta01
+                        // accepted_ipids.push(cipid);
                     }
 
                     restored_sessions = [];
@@ -160,10 +162,20 @@ if(cluster.isMaster) {
                 restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
                 console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
 
+                
+                // delta01
+                console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
+                accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+                console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
+                
                 let cipid = session_ipids.get(key);
                 let sss = cipid.split(";");
 
                 console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+
+
+                // let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
+                // fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
 
                 fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
 
@@ -180,22 +192,55 @@ if(cluster.isMaster) {
             }
         }
 
+        // for (const [key, value] of session_statuses.entries()) {
+        //     if(value === session_status.SLEEP
+        //         || value === session_status.EXPIRED
+        //         || value === session_status.CLOSED) {
+        //         console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
+        //         firewall.update_internet_restrictions(restricted_ipids);
+        //         restricted_ipids.push(session_ipids.get(key));
+        //     }
+        // }
+
+        // if(update_restrictions_flag) {
+        //     console.log("Executing update_internet_restrictions()");
+        //     firewall.update_internet_restrictions(restricted_ipids);
+        //     update_restrictions_flag = false;
+        // }
+
+        
+        //delta01
+        
         for (const [key, value] of session_statuses.entries()) {
             if(value === session_status.SLEEP
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
                 console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
-                firewall.update_internet_restrictions(restricted_ipids);
+                //accepted_ipids.delete(session_ipids.get(key));
+
+
+                accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+
+
+                firewall.update_internet_unrestrictions(accepted_ipids);
                 restricted_ipids.push(session_ipids.get(key));
+            }
+
+            if(value === session_status.HANDSHAKE
+                || value === session_status.ACTIVE) {
+                console.log("ADDING AN ACTIVE IPID: " + session_ipids.get(key));
+                firewall.update_internet_unrestrictions(accepted_ipids);
+                accepted_ipids.push(session_ipids.get(key));
             }
         }
 
         if(update_restrictions_flag) {
-            console.log("Executing update_internet_restrictions()");
-            firewall.update_internet_restrictions(restricted_ipids);
+            console.log("Executing update_internet_unrestrictions()");
+            firewall.update_internet_unrestrictions(accepted_ipids);
             update_restrictions_flag = false;
         }
-
+        
+        
         last_sacks.saveLastSacks(session_last_sacks);
 
         for (const [key, sack_str] of session_last_sacks.entries()) {
@@ -463,6 +508,18 @@ if(cluster.isMaster) {
                     session_ipids.set(json_object.command.session, `${json_object.command.provider_prefix};${json_object.command.router_no};${json_object.command.client_ip}`);
                     session_clients.set(json_object.command.session, json_object.command.from);
                     clients_sessions.set(json_object.command.from, json_object.command.session);
+
+
+
+                    let cipid = `${json_object.command.provider_prefix};${json_object.command.router_no};${json_object.command.client_ip}`;
+                    let sss = cipid.split(";");
+
+                    let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
+                    fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
+                    let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                    console.log(`[3] fw_update_counter.increment_update.counter ret_status=${ret_status}`);
+
+
 
                     console.log(`XLOG: [3] sending response: ${JSON.stringify(response)}`);
                     res.send(JSON.stringify(response));
