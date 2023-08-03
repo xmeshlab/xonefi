@@ -219,10 +219,20 @@ if(cluster.isMaster) {
                 //accepted_ipids.delete(session_ipids.get(key));
 
 
+                let cipid = session_ipids.get(key);
+                let sss = cipid.split(";");
+
                 accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
 
 
-                firewall.update_internet_unrestrictions(accepted_ipids);
+                if(accepted_ipids.length === 0) {
+                    fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                    let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                    console.log(`[4] fw_update_counter.increment_update.counter ret_status=${ret_status}`);
+                } else {
+                    firewall.update_internet_unrestrictions(accepted_ipids);
+                }
+
                 restricted_ipids.push(session_ipids.get(key));
             }
 
