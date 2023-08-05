@@ -35,6 +35,17 @@ function generate_restriction_rule(client_ip, cloud_ip) {
 }
 
 
+function generate_accept_rule(client_ip, cloud_ip) {
+    res = "config rule\n";
+    res += "\toption src\tlan\n";
+    res += `\toption src_ip\t${client_ip}\n`;
+    res += `\toption dest_ip\t!${cloud_ip}\n`;
+    res += `\toption dest\twan\n`;
+    res += `\toption proto\tall\n`;
+    res += `\toption target ACCEPT\n`;
+    return res;
+}
+
 function generate_custom_restriction_rule(client_ip, cloud_ip, rule) {
     res = "config rule\n";
     res += "\toption src\tlan\n";
@@ -78,6 +89,7 @@ function generate_custom_ruleset(cloud_ip, accept_ips) {
 
 module.exports = {
     generate_restriction_rule,
+    generate_accept_rule,
     generate_initial_ruleset,
     generate_custom_restriction_rule,
     generate_custom_ruleset
