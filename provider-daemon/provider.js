@@ -61,8 +61,6 @@ let user_password  = process.argv[2];
 let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.encrypted_prk, user_password);
 
 let restricted_sessions = new Set();
-let unrestricted_sessions = new Set();
-
 let restored_sessions = [];
 
 last_sacks.restoreLastSacks(session_last_sacks);
@@ -131,17 +129,10 @@ if(cluster.isMaster) {
                         
                         console.log(`RESTORED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                        
                         let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
-                        
                         fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
-                        
                         let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                        
                         console.log(`fw_update_counter.increment_update.counter ret_status=${ret_status}`);
-                        
-                        // delta01
-                        // accepted_ipids.push(cipid);
                     }
 
                     restored_sessions = [];
@@ -173,12 +164,7 @@ if(cluster.isMaster) {
 
                 console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-
-                // let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
-                // fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
-
                 fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-
                 let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
                 console.log(`increment_update_counter result: ${res_status}`);
 
@@ -191,33 +177,12 @@ if(cluster.isMaster) {
                 session_clients.delete(key);
             }
         }
-
-        // for (const [key, value] of session_statuses.entries()) {
-        //     if(value === session_status.SLEEP
-        //         || value === session_status.EXPIRED
-        //         || value === session_status.CLOSED) {
-        //         console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
-        //         firewall.update_internet_restrictions(restricted_ipids);
-        //         restricted_ipids.push(session_ipids.get(key));
-        //     }
-        // }
-
-        // if(update_restrictions_flag) {
-        //     console.log("Executing update_internet_restrictions()");
-        //     firewall.update_internet_restrictions(restricted_ipids);
-        //     update_restrictions_flag = false;
-        // }
-
-        
-        //delta01
         
         for (const [key, value] of session_statuses.entries()) {
             if(value === session_status.SLEEP
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
                 console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
-                //accepted_ipids.delete(session_ipids.get(key));
-
 
                 let cipid = session_ipids.get(key);
                 let sss = cipid.split(";");
@@ -683,96 +648,6 @@ if(cluster.isMaster) {
                                 res.send(JSON.stringify(response));
                                 res.end();
                             }
-
-                            // myContract.methods.freeze(json_object.command.arguments.pafren.client,
-                            //     json_object.command.arguments.pafren.amount.toString(),
-                            //     json_object.command.arguments.pafren.timestamp,
-                            //     //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
-                            //     json_object.command.arguments.pafren.proof)
-                            //     .send({from: account.address, gas: gas_offer, gasPrice: gas_price})
-                            //     .on('transactionHash', function (hash) {
-                            //         console.log("TNX HASH IS READY: " + hash);
-                            //
-                            //         if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
-                            //             response.command.arguments.answer = "PAFREN-OK";
-                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                            //             var signature_json = web3.eth.accounts.sign(
-                            //                 JSON.stringify(response.command),
-                            //                 decrypted_private_key
-                            //             );
-                            //
-                            //             response.signature = signature_json.signature;
-                            //             session_statuses.set(json_object.command.session, session_status.ACTIVE);
-                            //             session_handshake_deadlines.set(json_object.command.session, 0);
-                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                            //             session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
-                            //
-                            //             console.log("JSON.stringify(response): " + JSON.stringify(response));
-                            //             console.log("Remote.port: " + remote.port);
-                            //             console.log("Remote.address: " + remote.address);
-                            //
-                            //             onefi_server.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                            //                 if (err) throw err;
-                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                            //             });
-                            //         }
-                            //     }).on('confirmation', function (confirmationNumber, receipt) {
-                            //         console.log("CONF. #: " + confirmationNumber);
-                            //         if (confirmationNumber >= config_json_new.call_confirmation_threshold
-                            //             && session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
-                            //             console.log("CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
-                            //             console.log("CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
-                            //
-                            //
-                            //         }
-                            //     }).on('receipt', function (receipt) {
-                            //         console.log("RECEIPT IS READY: " + JSON.stringify(receipt_json));
-                            //         console.log("session_statuses.get(json_object.command.session): " + session_statuses.get(json_object.command.session));
-                            //
-                            //         if (receipt.status === true) {
-                            //             response.command.arguments.answer = "PAFREN-OK";
-                            //             //session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                            //
-                            //             var signature_json = web3.eth.accounts.sign(
-                            //                 JSON.stringify(response.command),
-                            //                 decrypted_private_key
-                            //             );
-                            //
-                            //             response.signature = signature_json.signature;
-                            //             session_statuses.set(json_object.command.session, session_status.ACTIVE);
-                            //             session_handshake_deadlines.set(json_object.command.session, 0);
-                            //             session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                            //
-                            //             console.log("JSON.stringify(response): " + JSON.stringify(response));
-                            //             console.log("Remote.port: " + remote.port);
-                            //             console.log("Remote.address: " + remote.address);
-                            //
-                            //             this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                            //                 if (err) throw err;
-                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                            //             });
-                            //         } else {
-                            //             response.command.arguments.answer = "PAFREN-FAIL";
-                            //             session_statuses.set(json_object.command.session, session_status.CLOSED);
-                            //             session_handshake_deadlines.set(json_object.command.session, 0);
-                            //             session_pafren_expirations.set(json_object.command.session, 0);
-                            //
-                            //             var signature_json = web3.eth.accounts.sign(
-                            //                 JSON.stringify(response.command),
-                            //                 decrypted_private_key
-                            //             );
-                            //
-                            //             response.signature = signature_json.signature;
-                            //
-                            //             this.send(new Buffer(JSON.stringify(response)), remote.port, remote.address, function (err, bytes) {
-                            //                 if (err) throw err;
-                            //                 console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                            //             });
-                            //         }
-                            //     }).on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
-                            //     console.log(`NEW ERROR: ${error}`);
-                            //     console.log(`NEW RECEIPT: ${receipt}`);
-                            //});
                         } else {
                             let gl = false;
                             if(config_json_new.private_provider) {
@@ -1001,4 +876,3 @@ if(cluster.isMaster) {
         sleep(10000);
     }
 }
-
