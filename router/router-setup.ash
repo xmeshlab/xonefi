@@ -15,9 +15,13 @@ wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/daemon.sh
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/configure.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/start-vpn.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/stop-vpn.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/collect-file.ash
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/id_new
 
-chmod +x puller.ash xpuller.ash start-router.ash stop-router.ash init.ash configure.ash start-vpn.ash stop-vpn.ash
-
+chmod +x puller.ash xpuller.ash start-router.ash stop-router.ash init.ash configure.ash start-vpn.ash stop-vpn.ash collect-file.ash
+rm -f /root/.ssh/id_new
+mkdir -p /root/.ssh
+mv id_new /root/.ssh
 
 # cat daemon.sh > /etc/init.d/xonefidaemon
 # /etc/init.d/xonefidaemon enable
