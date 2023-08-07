@@ -16,7 +16,7 @@ PINGER_TOKEN="$5"
 ROUTER_NUMBER="$6"
 SIGNAL="$7"
 
-
+# radio0, radio1: order could be reversed [TOFIX]
 if [ "$SIGNAL" = "5G" ]; then
   wifi_iface=1  # Index for the 5GHz interface
 else
