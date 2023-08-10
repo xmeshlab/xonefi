@@ -50,61 +50,73 @@ const callFreeze = () => {
                 //     console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
                 // });
             }
-        }).on('confirmation', function (confirmationNumber, receipt) {
-            console.log("CONF. #: " + confirmationNumber);
-            if (confirmationNumber >= workerData.config_json_new.call_confirmation_threshold
-                && workerData.session_statuses.get(workerData.json_object.command.session) === workerData.session_status.HANDSHAKE) {
-                console.log("CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
-                console.log("CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
-            }
-        }).on('receipt', function (receipt) {
-            console.log("RECEIPT IS READY: " + JSON.stringify(receipt_json));
-            console.log("session_statuses.get(workerData.json_object.command.session): " + workerData.session_statuses.get(workerData.json_object.command.session));
+        })
+        // .on('confirmation', function (confirmationNumber, receipt) {
+        //     console.log("CONF. #: " + confirmationNumber);
+        //     if (confirmationNumber >= workerData.config_json_new.call_confirmation_threshold
+        //         && workerData.session_statuses.get(workerData.json_object.command.session) === workerData.session_status.HANDSHAKE) {
+        //         console.log("CONFIRMATION IS READY. CONFIRMATION NUMBER: " + confirmationNumber);
+        //         console.log("CONFIRMATION PRELIMINARY RECEIPT: " + JSON.stringify(receipt));
+        //         return;
+        //     } else {
+        //         return;
+        //     }
+        // })
+        // .on('receipt', function (receipt) {
+        //     console.log("RECEIPT IS READY: " + JSON.stringify(receipt_json));
+        //     console.log("session_statuses.get(workerData.json_object.command.session): " + workerData.session_statuses.get(workerData.json_object.command.session));
 
-            if (receipt.status === true) {
-                workerData.response.command.arguments.answer = "PAFREN-OK";
-                //session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+        //     if (receipt.status === true) {
+        //         workerData.response.command.arguments.answer = "PAFREN-OK";
+        //         //session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
 
-                var signature_json = web3.eth.accounts.sign(
-                    JSON.stringify(workerData.response.command),
-                    workerData.decrypted_private_key
-                );
+        //         var signature_json = web3.eth.accounts.sign(
+        //             JSON.stringify(workerData.response.command),
+        //             workerData.decrypted_private_key
+        //         );
 
-                workerData.response.signature = signature_json.signature;
-                workerData.session_statuses.set(workerData.json_object.command.session, session_status.ACTIVE);
-                workerData.session_handshake_deadlines.set(workerData.json_object.command.session, 0);
-                workerData.session_pafren_expirations.set(workerData.json_object.command.session, json_object.command.arguments.pafren.timestamp);
+        //         workerData.response.signature = signature_json.signature;
+        //         workerData.session_statuses.set(workerData.json_object.command.session, session_status.ACTIVE);
+        //         workerData.session_handshake_deadlines.set(workerData.json_object.command.session, 0);
+        //         workerData.session_pafren_expirations.set(workerData.json_object.command.session, json_object.command.arguments.pafren.timestamp);
 
-                console.log("JSON.stringify(workerData.response): " + JSON.stringify(workerData.response));
-                console.log("Remote.port: " + remote.port);
-                console.log("Remote.address: " + remote.address);
+        //         console.log("JSON.stringify(workerData.response): " + JSON.stringify(workerData.response));
+        //         console.log("Remote.port: " + remote.port);
+        //         console.log("Remote.address: " + remote.address);
 
-                this.send(new Buffer(JSON.stringify(workerData.response)), remote.port, remote.address, function (err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
-            } else {
-                workerData.response.command.arguments.answer = "PAFREN-FAIL";
-                workerData.session_statuses.set(workerData.json_object.command.session, session_status.CLOSED);
-                workerData.session_handshake_deadlines.set(workerData.json_object.command.session, 0);
-                workerData.session_pafren_expirations.set(workerData.json_object.command.session, 0);
+        //         this.send(new Buffer(JSON.stringify(workerData.response)), remote.port, remote.address, function (err, bytes) {
+        //             if (err) throw err;
+        //             console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+        //             return;
+        //         });
+        //         return;
+        //     } else {
+        //         workerData.response.command.arguments.answer = "PAFREN-FAIL";
+        //         workerData.session_statuses.set(workerData.json_object.command.session, session_status.CLOSED);
+        //         workerData.session_handshake_deadlines.set(workerData.json_object.command.session, 0);
+        //         workerData.session_pafren_expirations.set(workerData.json_object.command.session, 0);
 
-                var signature_json = web3.eth.accounts.sign(
-                    JSON.stringify(workerData.response.command),
-                    workerData.decrypted_private_key
-                );
+        //         var signature_json = web3.eth.accounts.sign(
+        //             JSON.stringify(workerData.response.command),
+        //             workerData.decrypted_private_key
+        //         );
 
-                workerData.response.signature = signature_json.signature;
+        //         workerData.response.signature = signature_json.signature;
 
-                this.send(new Buffer(JSON.stringify(workerData.response)), remote.port, remote.address, function (err, bytes) {
-                    if (err) throw err;
-                    console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
-                });
-            }
-        }).on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+        //         this.send(new Buffer(JSON.stringify(workerData.response)), remote.port, remote.address, function (err, bytes) {
+        //             if (err) throw err;
+        //             console.log(`Answer has been sent to ${remote.address}:${remote.port}`);
+        //             return;
+        //         });
+        //         return;
+        //     }
+        // })
+        .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
         console.log(`NEW ERROR: ${error}`);
         console.log(`NEW RECEIPT: ${receipt}`);
+        return;
     });
 }
 
+console.log("[55]: DEBUG: Calling freeze.");
 callFreeze();

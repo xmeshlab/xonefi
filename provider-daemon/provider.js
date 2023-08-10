@@ -45,6 +45,7 @@ let config_json_new = config.read_default_config();
 let worker;                                 // worker=cluster.fork();
 let active_sessions = 0;                    // Session tally.
 let contract_config_json = contract_config.get_contract_config_json(config_json_new);
+console.log("DEBUG: ping");
 var web3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
 let session_status = session_stat.status;
 
