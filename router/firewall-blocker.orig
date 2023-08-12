@@ -1,0 +1,12 @@
+
+
+
+config rule
+    option src  lan
+    option src_ip   192.168.1.2-192.168.1.254
+    option dest_ip  !137.184.243.11
+    option dest wan
+    option proto    all
+    option target   REJECT
+
+
