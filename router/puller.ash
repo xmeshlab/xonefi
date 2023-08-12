@@ -6,8 +6,23 @@ PROTOCOL=http
 PINGER_USER=
 PINGER_TOKEN=
 ROUTER_NUMBER=
+LOG_FILE=/root/xonefi.log
+LOG_CAP=100
+
+roll_log() {
+  log_size=$(wc -c < "$LOG_FILE")
+  if [ "$log_size" -gt "$LOG_CAP" ]; then
+    tail -c "$LOG_CAP" "$LOG_FILE" > "$LOG_FILE.temp"
+    mv "$LOG_FILE.temp" "$LOG_FILE"
+  fi
+}
+
+
 
 while true; do
+
+  roll_log
+  
   if [ -f "update.dat" ]; then
       rm -f current.dat
       mv update.dat current.dat
