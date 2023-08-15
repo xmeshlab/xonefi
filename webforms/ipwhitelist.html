@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whitelist IP</title>
+    <script>
+        async function sendRequest() {
+
+        var ip = document.getElementById('ip').value;
+        var token = document.getElementById('token').value;
+        var router = document.getElementById('router').value;
+        var prefix = document.getElementById('prefix').value;
+
+	    var url = `http://137.184.243.11:3000/quickservice?op=ipwhitelist&token=${encodeURIComponent(token)}&ip=${encodeURIComponent(ip)}&router=${encodeURIComponent(router)}&prefix=${encodeURIComponent(prefix)}`;
+
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('response').innerText = data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+<body>
+    <label for="ip">IP address:</label>
+    <input type="text" id="ip" name="ip"><br />
+
+    <label for="prefix">Provider ID:</label>
+    <input type="text" id="prefix" name="prefix"><br />
+
+    <label for="router">Router Number:</label>
+    <input type="text" id="router" name="router"><br />
+
+    <label for="token">Token:</label>
+    <input type="password" id="token" name="token"><br />
+
+    <button onclick="sendRequest()">Send Request</button>
+
+    <div id="response"></div>
+</body>
+</html>

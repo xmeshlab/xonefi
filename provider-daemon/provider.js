@@ -284,6 +284,7 @@ if(cluster.isMaster) {
     let jsonParser = bodyParser.json();
 
     app.get('/quickservice', (req, res) => {
+        console.log(`QUICKSERVICE req.query: ${JSON.stringify(req.query)}`);
         if("op" in req.query && "token" in req.query) {
             if(req.query.op === "test") {
                 if(config_json_new["quickservice_tokens"]["test"] === req.query.token) {
@@ -299,6 +300,8 @@ if(cluster.isMaster) {
                 } else {
                     res.send("ERROR: Wrong token!");
                 }
+            } else {
+                res.send("ERROR: wrong operation.");
             }
         } else {
             res.send("ERROR: Wrong command or wrong token.");
