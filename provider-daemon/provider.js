@@ -283,6 +283,51 @@ if(cluster.isMaster) {
 
     let jsonParser = bodyParser.json();
 
+    app.get('/quickservice', (req, res) => {
+        if("op" in req.query && "token" in req.query) {
+            if(req.query.op === "test") {
+                if(config_json_new["quickservice_tokens"]["test"] === req.query.token) {
+                    res.send("Test passed!");
+                }
+            } else if(req.query.op === "ipwhitelist") {
+                if(config_json_new["quickservice_tokens"]["ipwhitelist"] === req.query.token) {
+                    if("ip" in req.query && "prefix" in req.query && "router" in req.query) {
+                        res.send(`Whitelisted IP ${req.query.ip} on the router ${req.query.router} belonging to provider ${req.query.prefix}`);
+                    } else {
+                        res.send("ERROR: Wrong parameters.");
+                    }
+                } else {
+                    res.send("ERROR: Wrong token!");
+                }
+            }
+        } else {
+            res.send("ERROR: Wrong command or wrong token.");
+        }
+    });
+
+    // app.get('/util', jsonParser, (req, res) => {
+    //     if(!config_json_new.ap_on) {
+    //         console.log("Hotspot is off.");
+    //         return;
+    //     }
+
+    //     let response = {version: "0.3"};
+    //     let json_object;
+    //     let valid_json = true;
+
+    //     console.log(`Request: ${JSON.stringify(req.body)}`);
+
+    //     try {
+    //         //json_object = JSON.parse(request.toString());
+    //         json_object = req.body;
+    //     } catch(e) {
+    //         valid_json = false;
+    //         console.log("ERROR[fe33e7d1ce80abe1]: Invalid JSON.");
+    //         return;
+    //     }
+    // });
+
+
     app.post('/client', jsonParser, (req, res) => {
         if(!config_json_new.ap_on) {
             console.log("Hotspot is off.");
