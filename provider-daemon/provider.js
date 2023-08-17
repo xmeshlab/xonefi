@@ -331,6 +331,174 @@ if(cluster.isMaster) {
     // });
 
 
+    // ============== BEGINNING-OF-PROVIDER-POST-API ================
+
+    app.post('/provider', jsonParser, (req, res) => {
+        if(!config_json_new.ap_on) {
+            console.log("Hotspot is off.");
+            return;
+        }
+
+        let response = {version: "0.3"};
+        let json_object;
+        let valid_json = true;
+
+        console.log(`PROVIDER Request: ${JSON.stringify(req.body)}`);
+
+        try {
+            json_object = req.body;
+        } catch(e) {
+            valid_json = false;
+            console.log("ERROR[1835cdce3f2e79e7]: Invalid JSON.");
+            return;
+        }
+
+        if(valid_json) {
+            if(!json_object.hasOwnProperty("command")) {
+                valid_json = false;
+                console.log("ERROR[b5fdebc8dfd84473]: Invalid JSON.");
+            } else {
+                if(!json_object.command.hasOwnProperty("op")) {
+                    valid_json = false;
+                    console.log("ERROR[ebf75019617fc995]: Invalid JSON.");
+                }
+
+                if(!json_object.command.hasOwnProperty("uuid")) {
+                    valid_json = false;
+                    console.log("ERROR[1ff26d3018ae93fc]: Invalid JSON.");
+                }
+
+                if(!json_object.command.hasOwnProperty("timestamp")) {
+                    valid_json = false;
+                    console.log("ERROR[793320bc9c2d4072]: Invalid JSON.");
+                }
+
+                if(!json_object.command.hasOwnProperty("re")) {
+                    valid_json = false;
+                    console.log("ERROR[35b208d130ad32a8]: Invalid JSON.");
+                }
+
+                if(!json_object.command.hasOwnProperty("from")) {
+                    valid_json = false;
+                    console.log("ERROR[f51e952504b09a5d]: Invalid JSON.");
+                }
+
+                if(!json_object.command.hasOwnProperty("arguments")) {
+                    valid_json = false;
+                    console.log("ERROR[7cd0a88bb726851e]: Invalid JSON.");
+                }
+            }
+
+            if(!json_object.hasOwnProperty("signature")) {
+                valid_json = false;
+                console.log("ERROR[d5ee83af7c08896c]: Invalid JSON.");
+            }
+        }
+
+        if(valid_json) {
+            // EIP-55-agnostic
+            if(!web3.utils.isAddress(json_object.command.from)) {
+                valid_json = false;
+                console.log("ERROR[39301b0ef88fc9d5]: Invalid JSON.");
+            }
+
+            if(!["NEWPRICE"].includes(json_object.command.op)) {
+                valid_json = false;
+                console.log("ERROR[bd8494c409599ac5]: Invalid JSON.");
+            }
+
+            // We stipulate the canonical 8-4-4-4-12 UUID format
+            if(json_object.command.uuid.length === 36) {
+                if(!session_uuids.hz_uuid_unique(json_object.command.uuid, used_uuids)) {
+                    valid_json = false;
+                    console.log("ERROR[6bc7cd5072e60245]: Invalid JSON.");
+                }
+            } else {
+                valid_json = false;
+                console.log("ERROR[d39c6c146b36f913]: Invalid JSON.");
+            }
+
+            if(json_object.signature.length !== 132) {
+                valid_json = false;
+                console.log("ERROR[7f9bbca221f28820]: Invalid JSON.");
+            }
+
+            var recovered_address2 = web3.eth.accounts.recover(JSON.stringify(json_object.command), json_object.signature, false);
+
+            console.log("Expected address (provider): " + json_object.command.from);
+            console.log("Recovered address (provider): " + recovered_address2);
+
+            if(recovered_address2.toLowerCase() !== json_object.command.from.toLowerCase()) {
+                valid_json = false;
+                console.log("ERROR[22f4a65cfbe2ae87]: Invalid JSON.");
+            } else {
+                console.log("The message has been successfully verified! (provider)");
+            }
+        }
+
+        response.command = {};
+        response.command.op = json_object.command.op;
+        response.command.from = config_json_new.account.address;
+        response.command.uuid =  uuid.v4().toString();
+        response.command.timestamp = Math.floor(new Date() / 1000);
+        response.command.re = json_object.command.uuid;
+        response.command.arguments = {};
+
+        if(valid_json) {
+            if(json_object.command.op === "NEWPRICE") {
+                // Beware of EIP-55 capitalization!!!
+                if(config_json_new["registered_providers"].includes(json_object.command.from) && json_object.command.arguments.hasOwnProperty("price")) {
+                    console.log(`PROVIDER: SETTING NEW PRICE: ${json_object.command.arguments.price}`);
+
+                    response.command.arguments.answer = "NEWPRICE-OK";
+
+                    var signature_json = web3.eth.accounts.sign(
+                        JSON.stringify(response.command),
+                        decrypted_private_key
+                    );
+
+                    session_statuses[json_object.command.session] = session_status.CLOSED;
+                    response.signature = signature_json.signature;
+
+                    console.log(`XLOG: [488cc771cab5baf9] sending response: ${JSON.stringify(response)}`);
+                    res.send(JSON.stringify(response));
+                    res.end();
+                } else {
+                    response.command.arguments.answer = "NEWPRICE-FAIL";
+
+                    var signature_json = web3.eth.accounts.sign(
+                        JSON.stringify(response.command),
+                        decrypted_private_key
+                    );
+
+                    session_statuses[json_object.command.session] = session_status.CLOSED;
+                    response.signature = signature_json.signature;
+
+                    console.log(`XLOG: [f3355b59d67e2a83] sending response: ${JSON.stringify(response)}`);
+                    res.send(JSON.stringify(response));
+                    res.end();
+                }
+            }
+        } else {
+            response.command.arguments = "ERROR";
+
+            var signature_json = web3.eth.accounts.sign(
+                JSON.stringify(response.command),
+                decrypted_private_key
+            );
+
+            response.signature = signature_json.signature;
+
+            console.log(`XLOG: [131a3a0bb3ef0aae] sending response: ${JSON.stringify(response)}`);
+            res.send(JSON.stringify(response));
+            res.end();
+        }
+    });
+
+
+    // ============== END-OF-PROVIDER-POST-API ================
+
+
     app.post('/client', jsonParser, (req, res) => {
         if(!config_json_new.ap_on) {
             console.log("Hotspot is off.");
