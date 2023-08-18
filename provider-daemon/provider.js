@@ -1,7 +1,7 @@
 /*
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Copyright (c) 2019-2021 XOneFi
+Copyright (c) 2019-2023 XOneFi
 
 OneFi is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
