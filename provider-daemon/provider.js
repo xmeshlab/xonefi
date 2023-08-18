@@ -300,6 +300,28 @@ if(cluster.isMaster) {
                 } else {
                     res.send("ERROR: Wrong token!");
                 }
+            } else if(req.query.op === "ofibalance") {
+                if(config_json_new["quickservice_tokens"]["ofibalance"] === req.query.token) {
+                    if("address" in req.query) {
+                        const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+
+                        async function getTokenBalance(userAddress) {
+                            const result = await contract.methods.balanceOf(userAddress).call();
+                            console.log(result)
+                            return result
+                        }
+
+                        getTokenBalance(req.query.address).then((balance) => {
+                            res.send(`${balance}`);
+                        });
+                        
+                    } else {
+                        res.send("ERROR: Wrong parameters.");
+                    }
+                } else {
+                    res.send("ERROR: Wrong token!");
+                }
+
             } else {
                 res.send("ERROR: wrong operation.");
             }
@@ -307,6 +329,9 @@ if(cluster.isMaster) {
             res.send("ERROR: Wrong command or wrong token.");
         }
     });
+
+
+
 
     // app.get('/util', jsonParser, (req, res) => {
     //     if(!config_json_new.ap_on) {
