@@ -16,7 +16,11 @@ while true; do
       echo -n "0" > /root/xonefi/current.dat
       rm -f /root/xonefi/policy.fw
       echo "# Empty policy" > /root/xonefi/policy.fw
-      cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+      
+      rm -f /root/xonefi/wpolicy.fw
+      echo "# Empty whitelist" > /root/xonefi/wpolicy.fw
+
+      cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
       /etc/init.d/firewall restart
   fi
 
@@ -29,9 +33,14 @@ while true; do
   if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
       rm -f /root/xonefi/current.dat
       echo -n "0" > /root/xonefi/current.dat
+      
       rm -f /root/xonefi/policy.fw
       echo "# Empty policy" > /root/xonefi/policy.fw
-      cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+      
+      rm -f /root/xonefi/wpolicy.fw
+      echo "# Empty whitelist" > /root/xonefi/wpolicy.fw
+
+      cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
       /etc/init.d/firewall restart
   fi
 
@@ -40,8 +49,10 @@ while true; do
   else
     echo "Pull and execute new policy." >> $LOG_FILE
     rm -f /root/xonefi/policy.fw
+    rm -f /root/xonefi/wpolicy.fw
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw -O /root/xonefi/policy.fw
-    cat /root/xonefi/firewall.orig /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/wpolicy.fw -O /root/xonefi/wpolicy.fw
+    cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
     /etc/init.d/firewall restart
   fi
 

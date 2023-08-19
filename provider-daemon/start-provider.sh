@@ -14,6 +14,8 @@ echo -n "0" > /var/www/html/d1feb8d074/3141/update.dat
 echo -n "0" > /var/www/html/d1feb8d074/3141/xupdate.dat
 touch /var/www/html/d1feb8d074/3141/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3141/policy.fw
+touch /var/www/html/d1feb8d074/3141/wpolicy.fw
+chmod 755 /var/www/html/d1feb8d074/3141/wpolicy.fw
 touch /var/www/html/d1feb8d074/3141/inject.ash
 chmod 755 /var/www/html/d1feb8d074/3141/inject.ash
 
@@ -23,6 +25,8 @@ echo -n "0" > /var/www/html/d1feb8d074/3142/update.dat
 echo -n "0" > /var/www/html/d1feb8d074/3142/xupdate.dat
 touch /var/www/html/d1feb8d074/3142/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3142/policy.fw
+touch /var/www/html/d1feb8d074/3142/wpolicy.fw
+chmod 755 /var/www/html/d1feb8d074/3142/wpolicy.fw
 touch /var/www/html/d1feb8d074/3142/inject.ash
 chmod 755 /var/www/html/d1feb8d074/3142/inject.ash
 
@@ -32,6 +36,8 @@ echo -n "0" > /var/www/html/d1feb8d074/3143/update.dat
 echo -n "0" > /var/www/html/d1feb8d074/3143/xupdate.dat
 touch /var/www/html/d1feb8d074/3143/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3143/policy.fw
+touch /var/www/html/d1feb8d074/3143/wpolicy.fw
+chmod 755 /var/www/html/d1feb8d074/3143/wpolicy.fw
 touch /var/www/html/d1feb8d074/3143/inject.ash
 chmod 755 /var/www/html/d1feb8d074/3143/inject.ash
 
@@ -41,6 +47,8 @@ echo -n "0" > /var/www/html/d1feb8d074/3144/update.dat
 echo -n "0" > /var/www/html/d1feb8d074/3144/xupdate.dat
 touch /var/www/html/d1feb8d074/3144/policy.fw
 chmod 755 /var/www/html/d1feb8d074/3144/policy.fw
+touch /var/www/html/d1feb8d074/3144/wpolicy.fw
+chmod 755 /var/www/html/d1feb8d074/3144/wpolicy.fw
 touch /var/www/html/d1feb8d074/3144/inject.ash
 chmod 755 /var/www/html/d1feb8d074/3144/inject.ash
 
@@ -52,7 +60,9 @@ chmod 755 /var/www/html/497d9fa8d0/1000
 echo -n "0" > /var/www/html/497d9fa8d0/1000/update.dat
 echo -n "0" > /var/www/html/497d9fa8d0/1000/xupdate.dat
 touch /var/www/html/497d9fa8d0/1000/policy.fw
+touch /var/www/html/497d9fa8d0/1000/wpolicy.fw
 chmod 755 /var/www/html/497d9fa8d0/1000/policy.fw
+chmod 755 /var/www/html/497d9fa8d0/1000/wpolicy.fw
 touch /var/www/html/497d9fa8d0/1000/inject.ash
 chmod 755 /var/www/html/497d9fa8d0/1000/inject.ash
 
@@ -61,7 +71,9 @@ chmod 755 /var/www/html/497d9fa8d0/1001
 echo -n "0" > /var/www/html/497d9fa8d0/1001/update.dat
 echo -n "0" > /var/www/html/497d9fa8d0/1001/xupdate.dat
 touch /var/www/html/497d9fa8d0/1001/policy.fw
+touch /var/www/html/497d9fa8d0/1001/wpolicy.fw
 chmod 755 /var/www/html/497d9fa8d0/1001/policy.fw
+chmod 755 /var/www/html/497d9fa8d0/1001/wpolicy.fw
 touch /var/www/html/497d9fa8d0/1001/inject.ash
 chmod 755 /var/www/html/497d9fa8d0/1001/inject.ash
 

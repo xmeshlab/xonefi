@@ -37,6 +37,7 @@ const bodyParser = require('body-parser');
 const fw_write_policy = require('../api/fw_write_policy');
 const fw_update_counter = require('../api/fw_update_counter');
 const firewall_rules = require('../api/firewall_rules');
+const sessions_db = require('../api/sessions_db');
 
 
 config.config_init_if_absent();
@@ -53,6 +54,7 @@ var session_statuses = new Map();               // Hash map of sessions.
 var session_ipids = new Map();                    // IP addresses of clients associated with sessions.
 var session_sack_deadlines = new Map();         // SACK deadlines (UNIX timestamp, seconds) for each session.
 var session_pafren_expirations = new Map();     // Expiration time (UNIX timestamp, seconds) for each session.
+var session_pafren_amounts = new Map();
 var session_handshake_deadlines = new Map();    // UNIX timestamps (in seconds) for each session, until which a handshake is possible.
 var session_clients = new Map();                // Establishes links between sessions and clients.
 var used_uuids = [];                            // The list of used UUIDs. Each UUID has to be new (unique).
@@ -63,6 +65,8 @@ let decrypted_private_key = symcrypto.decrypt_aes256ctr(config_json_new.account.
 
 let restricted_sessions = new Set();
 let restored_sessions = [];
+
+let databased_sessions = new Set();
 
 last_sacks.restoreLastSacks(session_last_sacks);
 
@@ -148,34 +152,85 @@ if(cluster.isMaster) {
             if(value === session_status.UNDEFINED
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
-                console.log("INFO: Session " + key + " is deleted.");
 
-                console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
-                restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
-                console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
+                databased_sessions.add(key);
 
-                
-                // delta01
-                console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
-                accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
-                console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
-                
-                let cipid = session_ipids.get(key);
-                let sss = cipid.split(";");
+                const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
-                console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+                async function getTokenBalance(userAddress) {
+                    const result = await contract.methods.balanceOf(userAddress).call();
+                    console.log(result)
+                    return result
+                }
 
-                fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                console.log(`increment_update_counter result: ${res_status}`);
+                console.log(`address1: ${config_json_new.account.address}`);
+                console.log(`address2: ${session_clients.get(key)}`);
 
-                session_statuses.delete(key);
-                session_ipids.delete(key);
-                session_sack_deadlines.delete(key);
-                session_pafren_expirations.delete(key);
-                let addr = clients_sessions.get(key);
-                clients_sessions.delete(addr);
-                session_clients.delete(key);
+                getTokenBalance(config_json_new.account.address).then((balance) => {
+                    getTokenBalance(session_clients.get(key)).then((balance1) => {
+                        let cipid = session_ipids.get(key);
+                        let sss = cipid.split(";");
+                                
+                        console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+
+                        var sack = JSON.parse(session_last_sacks.get(key));
+        
+                        let current_unix_timestamp = Math.floor(new Date() / 1000);
+                        sessions_db.insert_session(
+                            config_json_new,
+                            key,
+                            sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key)),
+                            'unsupported',
+                            sss[1],
+                            '137.184.243.11',
+                            3000,
+                            sss[0],
+                            balance - sack.amount,
+                            balance,
+                            Math.floor(parseInt(session_pafren_amounts.get(key)) / 60),
+                            sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key) - 70),
+                            sessions_db.unix_timestamp_to_iso_string(current_unix_timestamp),
+                            '1 hour',
+                            session_clients.get(key),
+                            balance1 + sack.amount,
+                            balance1,
+                            0,
+                            0
+                        );
+                        
+                        console.log("INFO: Session " + key + " is deleted.");
+
+                        console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
+                        restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
+                        console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
+
+                        
+                        // delta01
+                        console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
+                        accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+                        console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
+                        
+                        cipid = session_ipids.get(key);
+                        sss = cipid.split(";");
+
+                        console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+
+                        fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                        let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                        console.log(`increment_update_counter result: ${res_status}`);
+
+
+                        session_last_sacks.delete(key);
+                        session_statuses.delete(key);
+                        session_ipids.delete(key);
+                        session_sack_deadlines.delete(key);
+                        session_pafren_expirations.delete(key);
+                        let addr = clients_sessions.get(key);
+                        clients_sessions.delete(addr);
+                        session_clients.delete(key);
+                        
+                    });
+                }); 
             }
         }
         
@@ -264,7 +319,7 @@ if(cluster.isMaster) {
 
                 runClaim();
 
-                session_last_sacks.delete(key);
+                // session_last_sacks.delete(key);
                 break;
             }
         }
@@ -293,11 +348,16 @@ if(cluster.isMaster) {
             } else if(req.query.op === "ipwhitelist") {
                 if(config_json_new["quickservice_tokens"]["ipwhitelist"] === req.query.token) {
                     if("ip" in req.query && "prefix" in req.query && "router" in req.query) {
+                        console.log(`QUICKSERVICE: Whitelisted IP ${req.query.ip} on the router ${req.query.router} belonging to provider ${req.query.prefix}`)
+                        let pol = firewall_rules.generate_accept_rule(req.query.ip, "137.184.243.11");
+                        fw_write_policy.write_firewall_whitelist_policy(req.query.prefix, req.query.router, pol);
                         res.send(`Whitelisted IP ${req.query.ip} on the router ${req.query.router} belonging to provider ${req.query.prefix}`);
                     } else {
+                        console.log("QUICKSERVICE: Wrong parameters.");
                         res.send("ERROR: Wrong parameters.");
                     }
                 } else {
+                    console.log("QUICKSERVICE: ERROR: Wrong token!");
                     res.send("ERROR: Wrong token!");
                 }
             } else if(req.query.op === "ofibalance") {
@@ -482,7 +542,6 @@ if(cluster.isMaster) {
                         decrypted_private_key
                     );
 
-                    session_statuses[json_object.command.session] = session_status.CLOSED;
                     response.signature = signature_json.signature;
 
                     console.log(`XLOG: [488cc771cab5baf9] sending response: ${JSON.stringify(response)}`);
@@ -882,6 +941,8 @@ if(cluster.isMaster) {
                                 response.signature = signature_json.signature;
                                 session_statuses.set(json_object.command.session, session_status.ACTIVE);
                                 session_handshake_deadlines.set(json_object.command.session, 0);
+                                console.log(`SESSION_PAFREN_AMOUNTS set key=${json_object.command.session}, value=${json_object.command.arguments.pafren.amount}`);
+                                session_pafren_amounts.set(json_object.command.session, json_object.command.arguments.pafren.amount);
                                 session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
                                 session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
 
@@ -914,6 +975,8 @@ if(cluster.isMaster) {
                                 session_statuses.set(json_object.command.session, session_status.ACTIVE);
                                 session_handshake_deadlines.set(json_object.command.session, 0);
                                 session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                                console.log(`SESSION_PAFREN_AMOUNTS set key=${json_object.command.session}, value=${json_object.command.arguments.pafren.amount}`);
+                                session_pafren_amounts.set(json_object.command.session, json_object.command.arguments.pafren.amount);
                                 session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + 3600 * 24 * 365);
 
                                 console.log("JSON.stringify(response): " + JSON.stringify(response));

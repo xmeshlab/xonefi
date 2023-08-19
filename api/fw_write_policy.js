@@ -25,7 +25,7 @@ along with XOneFi Router.  If not, see <https://www.gnu.org/licenses/>.
  * @param {string} policy - The fleeting (second part) firewall policy.
  * @returns {boolean} True if success, false otherwise.
  */
- function write_firewall_policy(provider_prefix, router_no, policy) {
+function write_firewall_policy(provider_prefix, router_no, policy) {
     const fs = require('fs');
 
     console.log(`calling write_firewall_policy(): provider_prefix=${provider_prefix}, router_no=${router_no}, policy=${policy}`);
@@ -46,6 +46,28 @@ along with XOneFi Router.  If not, see <https://www.gnu.org/licenses/>.
     });
 }
 
+function write_firewall_whitelist_policy(provider_prefix, router_no, policy) {
+    const fs = require('fs');
+
+    console.log(`calling write_firewall_whitelist_policy(): provider_prefix=${provider_prefix}, router_no=${router_no}, policy=${policy}`);
+    let policy_filename = `/var/www/html/${provider_prefix}/${router_no}/wpolicy.fw`;
+
+    // fs.truncate(policy_filename, 0, function(err) {
+    //     if (err) {
+    //         return false;
+    //     }
+
+        fs.appendFile(policy_filename, policy, 'utf8', (err) => {
+            if (err) {
+                return false;
+            }
+
+            return true;
+        });
+    //});
+}
+
 module.exports = {
-    write_firewall_policy
+    write_firewall_policy,
+    write_firewall_whitelist_policy
 };

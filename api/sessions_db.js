@@ -114,7 +114,6 @@ function insert_session_test(config_json) {
     let session_id = uuid.v4().toString();
 
     let current_unix_timestamp = Math.floor(new Date() / 1000);
-
     insert_session(
         config_json,
         session_id,
@@ -140,5 +139,6 @@ function insert_session_test(config_json) {
 
 module.exports = {
     insert_session,
-    insert_session_test
+    insert_session_test,
+    unix_timestamp_to_iso_string
 };
