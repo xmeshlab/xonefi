@@ -40,14 +40,25 @@ function insert_session(
 ) {
     const pgp = require('pg-promise')();
 
+    // const connection = {
+    //     host: 'localhost',
+    //     port: 54320,
+    //     database: 'postgres',
+    //     user: 'postgres',
+    //     password: config_json.db.password
+    // };    
+    
     const connection = {
-        host: 'localhost',
-        port: 54320,
-        database: 'postgres',
-        user: 'postgres',
-        password: config_json.db.password
+        host: 'db-xonefi-nyc1-do-user-13283037-0.b.db.ondigitalocean.com',
+        port: 25060,
+        database: 'defaultdb',
+        user: 'doadmin',
+        password: config_json.db.password,
+        ssl: {
+            rejectUnauthorized: false
+          }
     };
-
+    
     const db = pgp(connection);
 
     let dehyphenated_session_id = SessionID.replace(/-/g, '');

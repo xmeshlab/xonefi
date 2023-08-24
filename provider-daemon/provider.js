@@ -166,6 +166,7 @@ if(cluster.isMaster) {
                 console.log(`address1: ${config_json_new.account.address}`);
                 console.log(`address2: ${session_clients.get(key)}`);
 
+                
                 getTokenBalance(config_json_new.account.address).then((balance) => {
                     getTokenBalance(session_clients.get(key)).then((balance1) => {
                         let cipid = session_ipids.get(key);
