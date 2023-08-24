@@ -367,9 +367,20 @@ if(cluster.isMaster) {
                         const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                         async function getTokenBalance(userAddress) {
-                            const result = await contract.methods.balanceOf(userAddress).call();
-                            console.log(result)
-                            return result
+                            //const result = await contract.methods.balanceOf(userAddress).call();
+                            
+                            
+                            return contract.methods.balanceOf(userAddress).call({}, function(error, result){
+                                if(error !== null) {
+                                    console.log("getTokenBalance error");
+                                }
+                                
+                                return result;
+                            });
+                            
+                            
+                            // console.log(result)
+                            // return result
                         }
 
                         getTokenBalance(req.query.address).then((balance) => {
