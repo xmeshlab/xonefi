@@ -1,6 +1,8 @@
 #!/bin/ash
 
-SLEEP_SEC=60
+# Updated: 8/25/2023 ver. 2
+
+SLEEP_SEC=180
 PINGER_ADDRESS=
 PROTOCOL=http
 PINGER_USER=
@@ -25,7 +27,7 @@ while true; do
   echo -n "xupdate.dat content: " >> $LOG_FILE
   echo "$content" >> $LOG_FILE
 
-  if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
+  if [ "$content" = "0" ] && [ "$ccontent" != "0" ]; then
       rm -f /root/xonefi/xcurrent.dat
       echo -n "0" > /root/xonefi/xcurrent.dat
       rm -f /root/xonefi/inject.ash

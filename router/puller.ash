@@ -1,5 +1,7 @@
 #!/bin/ash
 
+# Updated: 8/25/2023 ver. 2
+
 SLEEP_SEC=10
 PINGER_ADDRESS=
 PROTOCOL=http
@@ -30,7 +32,7 @@ while true; do
   echo -n "update.dat content: " >> $LOG_FILE
   echo "$content" >> $LOG_FILE
 
-  if [ "$content" = "0" ] && ["$ccontent" != "0"]; then
+  if [ "$content" = "0" ] && [ "$ccontent" != "0" ]; then
       rm -f /root/xonefi/current.dat
       echo -n "0" > /root/xonefi/current.dat
       

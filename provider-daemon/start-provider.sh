@@ -93,6 +93,7 @@ cp ../router/configure.ash /var/www/html/dist
 cp ../router/start-vpn.ash /var/www/html/dist
 cp ../router/stop-vpn.ash /var/www/html/dist
 cp ../router/collect-file.ash /var/www/html/dist
+cp ../router/update-router.ash /var/www/html/dist
 cp /home/collector/id_new /var/www/html/dist
 
 mkdir /var/www/html/quickservice
@@ -112,6 +113,7 @@ chmod 755 /var/www/html/dist/configure.ash
 chmod 755 /var/www/html/dist/start-vpn.ash
 chmod 755 /var/www/html/dist/stop-vpn.ash
 chmod 755 /var/www/html/dist/collect-file.ash
+chmod 755 /var/www/html/dist/update-router.ash
 chmod 755 /var/www/html/dist/id_new
 chmod 755 /var/www/html/quickservice/ipwhitelist.html
 
