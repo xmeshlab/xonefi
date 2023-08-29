@@ -366,26 +366,60 @@ if(cluster.isMaster) {
                     if("address" in req.query) {
                         const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
-                        async function getTokenBalance(userAddress) {
-                            //const result = await contract.methods.balanceOf(userAddress).call();
-                            
-                            
-                            return contract.methods.balanceOf(userAddress).call({}, function(error, result){
-                                if(error !== null) {
-                                    console.log("getTokenBalance error");
-                                }
-                                
-                                return result;
-                            });
-                            
-                            
-                            // console.log(result)
-                            // return result
-                        }
 
-                        getTokenBalance(req.query.address).then((balance) => {
-                            res.send(`${balance}`);
+                        contract.methods.balanceOf(req.query.address).call({from: config_json_new.account.address}, function (error, result) {
+                            if(error !== null) {
+                                console.log(`balanceOf ERROR: ${error}`);
+                            }
+
+                            if(result === undefined) {
+                                res.send(`-1`);
+                            } else {
+                                res.send(result);
+                            }
                         });
+
+                        
+
+                        // async function getTokenBalance(userAddress) {
+                        //     //const result = await contract.methods.balanceOf(userAddress).call();
+                            
+                        //     try {
+                        //         return contract.methods.balanceOf(userAddress).call({}, function(error, result){
+
+
+
+                        //             console.log(`Error [2]: ${error}`);
+                        //             if(error !== null) {
+                        //                 console.log("getTokenBalance error");
+                        //                 return -1;
+                        //             }
+                                    
+                        //             return result;
+                        //         });
+                        //     } catch {
+                        //         console.log("ERROR: getTokenBalance() failed [1].")
+                        //     }
+                            
+                            
+                            
+                        //     // console.log(result)
+                        //     // return result
+                        // }
+
+                        // try {
+                        //     getTokenBalance(req.query.address).then((balance) => {
+                        //         if(balance === -1) {
+                        //             console.log("ERROR: balance failed.");
+                        //         } else {
+                        //             res.send(`${balance}`);
+                        //         }
+                                
+                        //     });
+                        // } catch {
+                        //     console.log(`ERROR: getTokenBalance() failed.`);
+                        // }
+                        
                         
                     } else {
                         res.send("ERROR: Wrong parameters.");
