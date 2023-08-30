@@ -205,7 +205,6 @@ if(cluster.isMaster) {
                         restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
                         console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
 
-                        
                         // delta01
                         console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
                         accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
@@ -364,10 +363,10 @@ if(cluster.isMaster) {
             } else if(req.query.op === "ofibalance") {
                 if(config_json_new["quickservice_tokens"]["ofibalance"] === req.query.token) {
                     if("address" in req.query) {
-                        const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-
-
-                        contract.methods.balanceOf(req.query.address).call({from: config_json_new.account.address}, function (error, result) {
+                        var web31 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                        const contract = new web31.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                        //called balanceOf using address from config from: config_json_new.account.address 
+                        contract.methods.balanceOf(req.query.address).call({}, function (error, result) {
                             if(error !== null) {
                                 console.log(`balanceOf ERROR: ${error}`);
                             }
@@ -378,49 +377,6 @@ if(cluster.isMaster) {
                                 res.send(result);
                             }
                         });
-
-                        
-
-                        // async function getTokenBalance(userAddress) {
-                        //     //const result = await contract.methods.balanceOf(userAddress).call();
-                            
-                        //     try {
-                        //         return contract.methods.balanceOf(userAddress).call({}, function(error, result){
-
-
-
-                        //             console.log(`Error [2]: ${error}`);
-                        //             if(error !== null) {
-                        //                 console.log("getTokenBalance error");
-                        //                 return -1;
-                        //             }
-                                    
-                        //             return result;
-                        //         });
-                        //     } catch {
-                        //         console.log("ERROR: getTokenBalance() failed [1].")
-                        //     }
-                            
-                            
-                            
-                        //     // console.log(result)
-                        //     // return result
-                        // }
-
-                        // try {
-                        //     getTokenBalance(req.query.address).then((balance) => {
-                        //         if(balance === -1) {
-                        //             console.log("ERROR: balance failed.");
-                        //         } else {
-                        //             res.send(`${balance}`);
-                        //         }
-                                
-                        //     });
-                        // } catch {
-                        //     console.log(`ERROR: getTokenBalance() failed.`);
-                        // }
-                        
-                        
                     } else {
                         res.send("ERROR: Wrong parameters.");
                     }
