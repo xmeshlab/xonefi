@@ -288,6 +288,53 @@ function generate_ssid() {
     return serialize_ssid(ssid_json);
 }
 
+
+function generate_ssid_ng(cloud_ip, router_no, cost, prefix) {
+    const hotspot_type = require("./hotspot-type");
+
+    // var cost = 0;
+
+    // if(config_json.cft) {
+    //     cost = config_json.price_ofi_hr;
+    // } else if(config_json.cfd) {
+    //     cost = config_json.price_ofi_mb;
+    // } else {
+    //     cost = 0;
+    // }
+
+    // let ssid_json = compile_ssid_json(
+    //     0,
+    //     hotspot_type.calculate_hotspot_type(true),
+    //     config_json.min_downlink_tier,
+    //     config_json.min_uplink_tier,
+    //     config_json.provider_ip,
+    //     config_json.port,
+    //     cost,
+    //     config_json.pafren_percentage,
+    //     account.get_account_raw_prefix()
+    // );
+
+    
+    let ssid_json = compile_ssid_json(
+        0,
+        168,
+        10,
+        9,
+        cloud_ip,
+        router_no,
+        cost,
+        100,
+        prefix
+    );
+
+    /*
+{"protocol_version":0,"hotspot_type":168,"downlink":10,"uplink":9,"ip":"10.3.141.1","port":3141,"cost":25,"pafren":100,"prefix":"d1feb8d074"}
+    */
+
+    return serialize_ssid(ssid_json);
+}
+
+
 /**
  * Check if the given SSID matches the OneFi format.
  * @param {string} ssid - SSID candidate
@@ -358,5 +405,6 @@ module.exports = {
     compile_ssid_json,
     generate_ssid,
     is_onefi_ssid,
-    filter_onefi_neworks
+    filter_onefi_neworks,
+    generate_ssid_ng
 };

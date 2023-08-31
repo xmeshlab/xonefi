@@ -35,9 +35,12 @@ const session_stat = require("../api/session-status");
 const express = require('express');
 const bodyParser = require('body-parser');
 const fw_write_policy = require('../api/fw_write_policy');
+const router_write_ssid = require('../api/router_write_ssid');
 const fw_update_counter = require('../api/fw_update_counter');
+const ssid_update_counter = require('../api/ssid_update_counter');
 const firewall_rules = require('../api/firewall_rules');
 const sessions_db = require('../api/sessions_db');
+const ssid = require('../api/ssid');
 
 
 config.config_init_if_absent();
@@ -489,7 +492,7 @@ if(cluster.isMaster) {
                 console.log("ERROR[39301b0ef88fc9d5]: Invalid JSON.");
             }
 
-            if(!["NEWPRICE"].includes(json_object.command.op)) {
+            if(!["NEWPRICE", "UPDATE"].includes(json_object.command.op)) {
                 valid_json = false;
                 console.log("ERROR[bd8494c409599ac5]: Invalid JSON.");
             }
@@ -579,7 +582,79 @@ if(cluster.isMaster) {
             res.send(JSON.stringify(response));
             res.end();
         }
-    });
+
+
+    if(valid_json) {
+        if(json_object.command.op === "UPDATE") {
+            // Beware of EIP-55 capitalization!!!
+            if(config_json_new["registered_providers"].includes(json_object.command.from) 
+            && json_object.command.arguments.hasOwnProperty("cloud_ip")
+            && json_object.command.arguments.hasOwnProperty("router_no")
+            && json_object.command.arguments.hasOwnProperty("cost")
+            && json_object.command.arguments.hasOwnProperty("prefix")
+            ) {
+                console.log(`PROVIDER UPDATE: SETTING NEW CLOUD IP: ${json_object.command.arguments.cloud_ip}`);
+                console.log(`PROVIDER UPDATE: SETTING NEW ROUTER NUMBER: ${json_object.command.arguments.router_no}`);
+                console.log(`PROVIDER UPDATE: SETTING NEW COST: ${json_object.command.arguments.cost}`);
+                console.log(`PROVIDER UPDATE: SETTING NEW PREFIX: ${json_object.command.arguments.prefix}`);
+
+
+                let upd_ssid = ssid.generate_ssid_ng(
+                    json_object.command.arguments.cloud_ip,
+                    json_object.command.arguments.router_no,
+                    json_object.command.arguments.cost,
+                    json_object.command.arguments.prefix
+                )
+
+                console.log(`upd_ssid: ${upd_ssid}`);
+
+                router_write_ssid.write_ssid(json_object.command.arguments.prefix, json_object.command.arguments.router_no, upd_ssid);
+                ssid_update_counter.increment_ssid_counter(json_object.command.arguments.prefix, json_object.command.arguments.router_no);
+
+                response.command.arguments.answer = "UPDATE-OK";
+
+                var signature_json = web3.eth.accounts.sign(
+                    JSON.stringify(response.command),
+                    decrypted_private_key
+                );
+
+                response.signature = signature_json.signature;
+
+                console.log(`XLOG: [0a8a7d58c62d0787] sending response: ${JSON.stringify(response)}`);
+                res.send(JSON.stringify(response));
+                res.end();
+            } else {
+                response.command.arguments.answer = "UPDATE-FAIL";
+
+                var signature_json = web3.eth.accounts.sign(
+                    JSON.stringify(response.command),
+                    decrypted_private_key
+                );
+
+                session_statuses[json_object.command.session] = session_status.CLOSED;
+                response.signature = signature_json.signature;
+
+                console.log(`XLOG: [d73044e30d5a10b1] sending response: ${JSON.stringify(response)}`);
+                res.send(JSON.stringify(response));
+                res.end();
+            }
+        }
+    } else {
+        response.command.arguments = "ERROR";
+
+        var signature_json = web3.eth.accounts.sign(
+            JSON.stringify(response.command),
+            decrypted_private_key
+        );
+
+        response.signature = signature_json.signature;
+
+        console.log(`XLOG: [131a3a0bb3ef0aae] sending response: ${JSON.stringify(response)}`);
+        res.send(JSON.stringify(response));
+        res.end();
+    }
+});
+
 
 
     // ============== END-OF-PROVIDER-POST-API ================
