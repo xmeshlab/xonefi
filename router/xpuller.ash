@@ -32,7 +32,7 @@ while true; do
       echo -n "0" > /root/xonefi/xcurrent.dat
       rm -f /root/xonefi/inject.ash
       echo "# Empty injection" > /root/xonefi/inject.ash
-      ash root/xonefi/inject.ash >> $LOG_FILE
+      ash /root/xonefi/inject.ash >> $LOG_FILE
   fi
 
   if cmp -s "/root/xonefi/xupdate.dat" "/root/xonefi/xcurrent.dat"; then
