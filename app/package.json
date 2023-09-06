@@ -11,7 +11,7 @@
   "author": "Nick Ivanov <ivanovn1@msu.edu>",
   "license": "GPL3",
   "devDependencies": {
-    "electron": "^23.0.0",
+    "electron": "^23.3.13",
     "electron-rebuild": "^3.2.9",
     "jsdoc": "^4.0.0"
   },
