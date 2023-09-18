@@ -174,64 +174,65 @@ if(cluster.isMaster) {
                     getTokenBalance(session_clients.get(key)).then((balance1) => {
                         let cipid = session_ipids.get(key);
                         let sss = cipid.split(";");
-                                
-                        console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
-
-                        var sack = JSON.parse(session_last_sacks.get(key));
-        
-                        let current_unix_timestamp = Math.floor(new Date() / 1000);
-                        sessions_db.insert_session(
-                            config_json_new,
-                            key,
-                            sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key)),
-                            'unsupported',
-                            sss[1],
-                            '137.184.243.11',
-                            3000,
-                            sss[0],
-                            balance - sack.amount,
-                            balance,
-                            Math.floor(parseInt(session_pafren_amounts.get(key)) / 60),
-                            sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key) - 70),
-                            sessions_db.unix_timestamp_to_iso_string(current_unix_timestamp),
-                            '1 hour',
-                            session_clients.get(key),
-                            balance1 + sack.amount,
-                            balance1,
-                            0,
-                            0
-                        );
                         
-                        console.log("INFO: Session " + key + " is deleted.");
+                        if(session_last_sacks.has(key)) {
+                            console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                        console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
-                        restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
-                        console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
-
-                        // delta01
-                        console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
-                        accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
-                        console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
-                        
-                        cipid = session_ipids.get(key);
-                        sss = cipid.split(";");
-
-                        console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
-
-                        fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                        let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                        console.log(`increment_update_counter result: ${res_status}`);
-
-
-                        session_last_sacks.delete(key);
-                        session_statuses.delete(key);
-                        session_ipids.delete(key);
-                        session_sack_deadlines.delete(key);
-                        session_pafren_expirations.delete(key);
-                        let addr = clients_sessions.get(key);
-                        clients_sessions.delete(addr);
-                        session_clients.delete(key);
-                        
+                            var sack = JSON.parse(session_last_sacks.get(key));
+            
+                            let current_unix_timestamp = Math.floor(new Date() / 1000);
+                            sessions_db.insert_session(
+                                config_json_new,
+                                key,
+                                sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key)),
+                                'unsupported',
+                                sss[1],
+                                '137.184.243.11',
+                                3000,
+                                sss[0],
+                                balance - sack.amount,
+                                balance,
+                                Math.floor(parseInt(session_pafren_amounts.get(key)) / 60),
+                                sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key) - 70),
+                                sessions_db.unix_timestamp_to_iso_string(current_unix_timestamp),
+                                '1 hour',
+                                session_clients.get(key),
+                                balance1 + sack.amount,
+                                balance1,
+                                0,
+                                0
+                            );
+                            
+                            console.log("INFO: Session " + key + " is deleted.");
+    
+                            console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
+                            restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
+                            console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
+    
+                            // delta01
+                            console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
+                            accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+                            console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
+                            
+                            cipid = session_ipids.get(key);
+                            sss = cipid.split(";");
+    
+                            console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+    
+                            fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                            let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                            console.log(`increment_update_counter result: ${res_status}`);
+    
+    
+                            session_last_sacks.delete(key);
+                            session_statuses.delete(key);
+                            session_ipids.delete(key);
+                            session_sack_deadlines.delete(key);
+                            session_pafren_expirations.delete(key);
+                            let addr = clients_sessions.get(key);
+                            clients_sessions.delete(addr);
+                            session_clients.delete(key);
+                        }
                     });
                 }); 
             }
