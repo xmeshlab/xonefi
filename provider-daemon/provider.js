@@ -162,7 +162,7 @@ if(cluster.isMaster) {
 
                 async function getTokenBalance(userAddress) {
                     const result = await contract.methods.balanceOf(userAddress).call();
-                    console.log(result)
+                    //console.log(result)
                     return result
                 }
 
