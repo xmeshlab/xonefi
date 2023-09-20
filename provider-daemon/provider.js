@@ -356,6 +356,8 @@ if(cluster.isMaster) {
                         let pol = firewall_rules.generate_accept_rule(req.query.ip, "137.184.243.11");
                         fw_write_policy.write_firewall_whitelist_policy(req.query.prefix, req.query.router, pol);
                         res.send(`Whitelisted IP ${req.query.ip} on the router ${req.query.router} belonging to provider ${req.query.prefix}`);
+                        let res_status = fw_update_counter.increment_update_counter(req.query.prefix, req.query.router);
+                        console.log(`increment_update_counter result: ${res_status}`);
                     } else {
                         console.log("QUICKSERVICE: Wrong parameters.");
                         res.send("ERROR: Wrong parameters.");
