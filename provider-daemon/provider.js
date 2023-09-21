@@ -179,6 +179,7 @@ if(cluster.isMaster) {
                             console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
                             var sack = JSON.parse(session_last_sacks.get(key));
+                            session_last_sacks.delete(key);
             
                             let current_unix_timestamp = Math.floor(new Date() / 1000);
                             sessions_db.insert_session(
@@ -224,7 +225,6 @@ if(cluster.isMaster) {
                             console.log(`increment_update_counter result: ${res_status}`);
     
     
-                            session_last_sacks.delete(key);
                             session_statuses.delete(key);
                             session_ipids.delete(key);
                             session_sack_deadlines.delete(key);
@@ -323,7 +323,7 @@ if(cluster.isMaster) {
 
                 runClaim();
 
-                // session_last_sacks.delete(key);
+                //session_last_sacks.delete(key);
                 break;
             }
         }
