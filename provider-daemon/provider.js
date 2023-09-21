@@ -169,19 +169,19 @@ if(cluster.isMaster) {
                 console.log(`address1: ${config_json_new.account.address}`);
                 console.log(`address2: ${session_clients.get(key)}`);
 
-                
-                getTokenBalance(config_json_new.account.address).then((balance) => {
-                    getTokenBalance(session_clients.get(key)).then((balance1) => {
-                        let cipid = session_ipids.get(key);
-                        let sss = cipid.split(";");
-                        
-                        if(session_last_sacks.has(key)) {
+                if(session_last_sacks.has(key)) {
+                    var sack = JSON.parse(session_last_sacks.get(key));
+                    session_last_sacks.delete(key);
+
+                    let current_unix_timestamp = Math.floor(new Date() / 1000);
+
+                    getTokenBalance(config_json_new.account.address).then((balance) => {
+                        getTokenBalance(session_clients.get(key)).then((balance1) => {
+                            let cipid = session_ipids.get(key);
+                            let sss = cipid.split(";");
+
                             console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                            var sack = JSON.parse(session_last_sacks.get(key));
-                            session_last_sacks.delete(key);
-            
-                            let current_unix_timestamp = Math.floor(new Date() / 1000);
                             sessions_db.insert_session(
                                 config_json_new,
                                 key,
@@ -203,28 +203,28 @@ if(cluster.isMaster) {
                                 0,
                                 0
                             );
-                            
+
                             console.log("INFO: Session " + key + " is deleted.");
-    
+
                             console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
                             restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
                             console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
-    
+
                             // delta01
                             console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
                             accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
                             console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
-                            
+
                             cipid = session_ipids.get(key);
                             sss = cipid.split(";");
-    
+
                             console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
-    
+
                             fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
                             let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
                             console.log(`increment_update_counter result: ${res_status}`);
-    
-    
+
+
                             session_statuses.delete(key);
                             session_ipids.delete(key);
                             session_sack_deadlines.delete(key);
@@ -232,9 +232,9 @@ if(cluster.isMaster) {
                             let addr = clients_sessions.get(key);
                             clients_sessions.delete(addr);
                             session_clients.delete(key);
-                        }
+                        });
                     });
-                }); 
+                }
             }
         }
         
