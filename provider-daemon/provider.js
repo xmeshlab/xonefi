@@ -18,6 +18,16 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 const Web3 = require('web3');                 // Library to work with Etheretum smart contracts
+
+var options = {
+    reconnect: {
+        auto: true,
+        delay: 5000, // ms
+        maxAttempts: 5,
+        onTimeout: false
+    }
+};
+
 const sleep = require('thread-sleep');        // Thread-safe sleep functionality. Don't use single-thread methods here.
 const uuid = require('uuid');                 // For generating properly random uuid v.4
 const cluster = require('cluster');           // For threads (master-worker)
@@ -158,12 +168,18 @@ if(cluster.isMaster) {
 
                 databased_sessions.add(key);
 
-                const contract = new web3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                var web3_bal = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                const contract = new web3_bal.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                 async function getTokenBalance(userAddress) {
-                    const result = await contract.methods.balanceOf(userAddress).call();
-                    //console.log(result)
-                    return result
+                    try {
+                        const result = await contract.methods.balanceOf(userAddress).call();
+                        //console.log(result)
+                        return result;
+                    } catch (error) {
+                        console.log(`getTokenBalance ERROR: ${error}`);
+                        return `-1`;
+                    }
                 }
 
                 console.log(`address1: ${config_json_new.account.address}`);
