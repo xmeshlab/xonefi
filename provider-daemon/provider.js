@@ -1090,79 +1090,107 @@ if(cluster.isMaster) {
             }
 
             if(json_object.command.op === "SACK") {
-                if(session_statuses.get(json_object.command.session) === session_status.ACTIVE
-                    || session_statuses.get(json_object.command.session) === session_status.SLEEP) {
-                    var hash = web3.utils.soliditySha3(
-                        {t: 'bytes', v: '0x53'},
-                        {t: 'address', v: json_object.command.arguments.sack.client},
-                        {t: 'address', v: config_json_new.account.address},
-                        {t: 'uint256', v: json_object.command.arguments.sack.amount.toString()},
-                        {t: 'uint32', v: json_object.command.arguments.sack.timestamp}
-                    );
+                if(session_statuses.has(json_object.command.session)) {
+                    if (session_statuses.get(json_object.command.session) === session_status.ACTIVE
+                        || session_statuses.get(json_object.command.session) === session_status.SLEEP) {
+                        var hash = web3.utils.soliditySha3(
+                            {t: 'bytes', v: '0x53'},
+                            {t: 'address', v: json_object.command.arguments.sack.client},
+                            {t: 'address', v: config_json_new.account.address},
+                            {t: 'uint256', v: json_object.command.arguments.sack.amount.toString()},
+                            {t: 'uint32', v: json_object.command.arguments.sack.timestamp}
+                        );
 
-                    key2 = web3.eth.accounts.recover(hash, json_object.command.arguments.sack.proof, false).toLowerCase();
-                    var greenlight = false;
+                        key2 = web3.eth.accounts.recover(hash, json_object.command.arguments.sack.proof, false).toLowerCase();
+                        var greenlight = false;
 
-                    if(json_object.command.arguments.sack.client.toLowerCase() === key2.toLowerCase() && key2.toLowerCase() === json_object.command.from.toLowerCase()) {
-                        let previous_sack_amount;
+                        if (json_object.command.arguments.sack.client.toLowerCase() === key2.toLowerCase() && key2.toLowerCase() === json_object.command.from.toLowerCase()) {
+                            let previous_sack_amount;
 
-                        try {
-                            if(!session_last_sacks.has(json_object.command.session)) {
-                                previous_sack_amount = 0;
-                            } else {
-                                previous_sack_amount = Number(JSON.parse(
-                                    session_last_sacks.get(json_object.command.session)
-                                ).amount);
+                            try {
+                                if (!session_last_sacks.has(json_object.command.session)) {
+                                    previous_sack_amount = 0;
+                                } else {
+                                    previous_sack_amount = Number(JSON.parse(
+                                        session_last_sacks.get(json_object.command.session)
+                                    ).amount);
+                                }
+                            } catch (e) {
+                                console.log(`ERROR [4069a1bec9]: Unable to parse JSON: ${e}`);
                             }
-                        } catch(e) {
-                            console.log(`ERROR [4069a1bec9]: Unable to parse JSON: ${e}`);
+
+                            let cost;
+
+                            if (config_json_new.cft) {
+                                cost = config_json_new.price_ofi_hr;
+                            } else if (config_json_new.cfd) {
+                                cost = config_json_new.price_ofi_mb;
+                            } else {
+                                cost = 0;
+                            }
+
+                            let expected_sack_amount;
+
+                            if (config_json_new.cft) {
+                                console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
+                                expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 60) * 1000000000000));
+                            } else if (config_json_new.cfd) {
+                                console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
+                                expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 64) * 1000000000000));
+                            } else {
+                                expected_sack_amount = 0;
+                            }
+
+                            if (json_object.command.arguments.sack.amount >= expected_sack_amount) {
+                                greenlight = true;
+                            } else {
+                                console.log(`SACK: WRONG AMOUNT. Actual: ${json_object.command.arguments.sack.amount} Expected: ${expected_sack_amount}`);
+                            }
+                        } else {
+                            console.log(`SACK: WRONG CLIENT: Actual: ${json_object.command.arguments.sack.client.toLowerCase()} Expected: ${key2.toLowerCase()}`);
                         }
 
-                        let cost;
+                        if (greenlight) {
+                            console.log("LEGITIMATE SACK!");
 
-                        if(config_json_new.cft) {
-                            cost = config_json_new.price_ofi_hr;
-                        } else if(config_json_new.cfd) {
-                            cost = config_json_new.price_ofi_mb;
+
+                            if (session_statuses.get(json_object.command.session) === session_status.SLEEP) {
+                                restored_sessions.push(json_object.command.session);
+                            }
+
+                            response.command.arguments.answer = "SACK-OK";
+                            response.command.arguments.pafren_expiration = session_pafren_expirations.get(json_object.command.session);
+
+                            session_sack_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.sack_period);
+                            session_last_sacks.set(json_object.command.session, JSON.stringify(json_object.command.arguments.sack));
+                            session_statuses.set(json_object.command.session, session_status.ACTIVE);
+
+                            var signature_json = web3.eth.accounts.sign(
+                                JSON.stringify(response.command),
+                                decrypted_private_key
+                            );
+
+                            response.signature = signature_json.signature;
+                            console.log(`XLOG: [6] sending response: ${JSON.stringify(response)}`);
+                            res.send(JSON.stringify(response));
+                            res.end();
                         } else {
-                            cost = 0;
-                        }
+                            console.log("BOGUS SACK");
+                            response.command.arguments.answer = "SACK-FAIL";
 
-                        let expected_sack_amount;
+                            var signature_json = web3.eth.accounts.sign(
+                                JSON.stringify(response.command),
+                                decrypted_private_key
+                            );
 
-                        if(config_json_new.cft) {
-                            console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
-                            expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 60) * 1000000000000));
-                        } else if(config_json_new.cfd) {
-                            console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
-                            expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 64) * 1000000000000));
-                        } else {
-                            expected_sack_amount = 0;
-                        }
-
-                        if(json_object.command.arguments.sack.amount >= expected_sack_amount) {
-                            greenlight = true;
-                        } else {
-                            console.log(`SACK: WRONG AMOUNT. Actual: ${json_object.command.arguments.sack.amount} Expected: ${expected_sack_amount}`);
+                            response.signature = signature_json.signature;
+                            console.log(`XLOG: [6-1] sending response: ${JSON.stringify(response)}`);
+                            res.send(JSON.stringify(response));
+                            res.end();
                         }
                     } else {
-                        console.log(`SACK: WRONG CLIENT: Actual: ${json_object.command.arguments.sack.client.toLowerCase()} Expected: ${key2.toLowerCase()}`);
-                    }
-
-                    if(greenlight) {
-                        console.log("LEGITIMATE SACK!");
-
-
-                        if(session_statuses.get(json_object.command.session) === session_status.SLEEP) {
-                            restored_sessions.push(json_object.command.session);
-                        }
-
-                        response.command.arguments.answer = "SACK-OK";
-                        response.command.arguments.pafren_expiration = session_pafren_expirations.get(json_object.command.session);
-
-                        session_sack_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.sack_period);
-                        session_last_sacks.set(json_object.command.session, JSON.stringify(json_object.command.arguments.sack));
-                        session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                        console.log("SACK only can be accepted during the ACTIVE and SLEEP statuses.");
+                        response.command.arguments.answer = "SACK-FAIL";
 
                         var signature_json = web3.eth.accounts.sign(
                             JSON.stringify(response.command),
@@ -1170,14 +1198,23 @@ if(cluster.isMaster) {
                         );
 
                         response.signature = signature_json.signature;
-                        console.log(`XLOG: [6] sending response: ${JSON.stringify(response)}`);
+                        console.log(`XLOG: [6-1] sending response: ${JSON.stringify(response)}`);
                         res.send(JSON.stringify(response));
                         res.end();
-                    } else {
-                        console.log("BOGUS SACK");
                     }
                 } else {
-                    console.log("SACK only can be accepted during the ACTIVE and SLEEP statuses.");
+                    console.log("The session has been CLOSED or EXPIRED.");
+                    response.command.arguments.answer = "SACK-FAIL";
+
+                    var signature_json = web3.eth.accounts.sign(
+                        JSON.stringify(response.command),
+                        decrypted_private_key
+                    );
+
+                    response.signature = signature_json.signature;
+                    console.log(`XLOG: [6-2] sending response: ${JSON.stringify(response)}`);
+                    res.send(JSON.stringify(response));
+                    res.end();
                 }
             }
 
