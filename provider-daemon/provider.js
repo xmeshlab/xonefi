@@ -258,25 +258,29 @@ if(cluster.isMaster) {
             if(value === session_status.SLEEP
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
-                console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
+                if (session_ipids.has(key)) {
+                    console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
 
-                let cipid = session_ipids.get(key);
-                let sss = cipid.split(";");
+                    let cipid = session_ipids.get(key);
+                    let sss = cipid.split(";");
 
-                accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+                    accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
 
-                if(update_restrictions_flag === true) {
-                    if(accepted_ipids.length === 0) {
-                        console.log(`[4] update restrictions flag: ${update_restrictions_flag}`);
-                        fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                        let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);                
-                        console.log(`[4] fw_update_counter.increment_update.counter ret_status=${ret_status}`);   
-                    } else {
-                        firewall.update_internet_unrestrictions(accepted_ipids);
+                    if (update_restrictions_flag === true) {
+                        if (accepted_ipids.length === 0) {
+                            console.log(`[4] update restrictions flag: ${update_restrictions_flag}`);
+                            fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                            let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                            console.log(`[4] fw_update_counter.increment_update.counter ret_status=${ret_status}`);
+                        } else {
+                            firewall.update_internet_unrestrictions(accepted_ipids);
+                        }
                     }
-                }
 
-                restricted_ipids.push(session_ipids.get(key));
+                    restricted_ipids.push(session_ipids.get(key));
+                } else {
+                    session_statuses.delete(key);
+                }
             }
 
             if(value === session_status.HANDSHAKE
@@ -848,6 +852,7 @@ if(cluster.isMaster) {
 
                         if(clients_sessions.has(json_object.command.from)) {
                             session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
+                            console.log("XLOG: [2-1] set session to CLOSED");
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                         session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
@@ -875,6 +880,7 @@ if(cluster.isMaster) {
 
                     if(clients_sessions.has(json_object.command.from)) {
                         session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
+                        console.log("XLOG: [2-2] set session to CLOSED");
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                     session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
