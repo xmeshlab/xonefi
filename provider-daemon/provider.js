@@ -852,17 +852,17 @@ if(cluster.isMaster) {
 
                         if(clients_sessions.has(json_object.command.from)) {
                             session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
-                            console.log("XLOG: [2-1] set session to CLOSED");
+                            console.log("XLOG: [2] set session to CLOSED");
 
                             if(session_last_sacks.has(clients_sessions.get(json_object.command.from))) {
                                 let sack = JSON.parse(session_last_sacks.get(clients_sessions.get(json_object.command.from)));
                                 let gas_offer = gas.get_gas_offer(config_json_new);
 
-                                console.log("XLOG: [2-1] Calling the claim() function of the smart contract.")
-                                console.log(`XLOG: [2-1] sack.client: ${sack.client}`);
-                                console.log(`XLOG: [2-1] sack.amount.toString(): ${sack.amount.toString()}`);
-                                console.log(`XLOG: [2-1] sack.timestamp: ${sack.timestamp}`);
-                                console.log(`XLOG: [2-1] sack.proof: ${sack.proof}`);
+                                console.log("XLOG: [2] Calling the claim() function of the smart contract.")
+                                console.log(`XLOG: [2] sack.client: ${sack.client}`);
+                                console.log(`XLOG: [2] sack.amount.toString(): ${sack.amount.toString()}`);
+                                console.log(`XLOG: [2] sack.timestamp: ${sack.timestamp}`);
+                                console.log(`XLOG: [2] sack.proof: ${sack.proof}`);
 
                                 const {Worker} = require('worker_threads');
 
@@ -897,6 +897,15 @@ if(cluster.isMaster) {
                         session_clients.set(json_object.command.session, json_object.command.from);
                         clients_sessions.set(json_object.command.from, json_object.command.session);
 
+
+                        let cipid = `${json_object.command.provider_prefix};${json_object.command.router_no};${json_object.command.client_ip}`;
+                        let sss = cipid.split(";");
+
+                        let pol = firewall_rules.generate_accept_rule(sss[2], "137.184.243.11");
+                        fw_write_policy.write_firewall_policy(sss[0], sss[1], pol);
+                        let ret_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                        console.log(`[2] fw_update_counter.increment_update.counter ret_status=${ret_status}`);
+
                         console.log(`XLOG: [2] sending response: ${JSON.stringify(response)}`);
                         res.send(JSON.stringify(response));
                         res.end();
@@ -916,17 +925,17 @@ if(cluster.isMaster) {
 
                     if(clients_sessions.has(json_object.command.from)) {
                         session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
-                        console.log("XLOG: [2-2] set session to CLOSED");
+                        console.log("XLOG: [3] set session to CLOSED");
 
                         if(session_last_sacks.has(clients_sessions.get(json_object.command.from))) {
                             let sack = JSON.parse(session_last_sacks.get(clients_sessions.get(json_object.command.from)));
                             let gas_offer = gas.get_gas_offer(config_json_new);
 
-                            console.log("XLOG: [2-2] Calling the claim() function of the smart contract.")
-                            console.log(`XLOG: [2-2] sack.client: ${sack.client}`);
-                            console.log(`XLOG: [2-2] sack.amount.toString(): ${sack.amount.toString()}`);
-                            console.log(`XLOG: [2-2] sack.timestamp: ${sack.timestamp}`);
-                            console.log(`XLOG: [2-2] sack.proof: ${sack.proof}`);
+                            console.log("XLOG: [3] Calling the claim() function of the smart contract.")
+                            console.log(`XLOG: [3] sack.client: ${sack.client}`);
+                            console.log(`XLOG: [3] sack.amount.toString(): ${sack.amount.toString()}`);
+                            console.log(`XLOG: [3] sack.timestamp: ${sack.timestamp}`);
+                            console.log(`XLOG: [3] sack.proof: ${sack.proof}`);
 
                             const {Worker} = require('worker_threads');
 
