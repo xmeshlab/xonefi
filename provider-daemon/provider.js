@@ -853,6 +853,42 @@ if(cluster.isMaster) {
                         if(clients_sessions.has(json_object.command.from)) {
                             session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
                             console.log("XLOG: [2-1] set session to CLOSED");
+
+                            if(session_last_sacks.has(clients_sessions.get(json_object.command.from))) {
+                                let sack = JSON.parse(session_last_sacks.get(clients_sessions.get(json_object.command.from)));
+                                let gas_offer = gas.get_gas_offer(config_json_new);
+
+                                console.log("XLOG: [2-1] Calling the claim() function of the smart contract.")
+                                console.log(`XLOG: [2-1] sack.client: ${sack.client}`);
+                                console.log(`XLOG: [2-1] sack.amount.toString(): ${sack.amount.toString()}`);
+                                console.log(`XLOG: [2-1] sack.timestamp: ${sack.timestamp}`);
+                                console.log(`XLOG: [2-1] sack.proof: ${sack.proof}`);
+
+                                const {Worker} = require('worker_threads');
+
+                                const runClaim = () => {
+
+                                    const worker1 = new Worker('./claim.js', {
+                                        workerData: {
+                                            gas_offer: gas_offer,
+                                            decrypted_private_key: decrypted_private_key,
+                                            config_json_new: config_json_new,
+                                            contract_config_json: contract_config_json,
+                                            sack: sack
+                                        },
+                                    });
+
+                                    worker1.on('exit', () => {
+                                        console.log('Worker finished.');
+                                    });
+
+                                    worker1.on('error', (err) => {
+                                        console.error('Worker error:', err);
+                                    });
+                                };
+
+                                runClaim();
+                            }
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                         session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
@@ -881,6 +917,42 @@ if(cluster.isMaster) {
                     if(clients_sessions.has(json_object.command.from)) {
                         session_statuses.set(clients_sessions.get(json_object.command.from), session_status.CLOSED);
                         console.log("XLOG: [2-2] set session to CLOSED");
+
+                        if(session_last_sacks.has(clients_sessions.get(json_object.command.from))) {
+                            let sack = JSON.parse(session_last_sacks.get(clients_sessions.get(json_object.command.from)));
+                            let gas_offer = gas.get_gas_offer(config_json_new);
+
+                            console.log("XLOG: [2-2] Calling the claim() function of the smart contract.")
+                            console.log(`XLOG: [2-2] sack.client: ${sack.client}`);
+                            console.log(`XLOG: [2-2] sack.amount.toString(): ${sack.amount.toString()}`);
+                            console.log(`XLOG: [2-2] sack.timestamp: ${sack.timestamp}`);
+                            console.log(`XLOG: [2-2] sack.proof: ${sack.proof}`);
+
+                            const {Worker} = require('worker_threads');
+
+                            const runClaim = () => {
+
+                                const worker1 = new Worker('./claim.js', {
+                                    workerData: {
+                                        gas_offer: gas_offer,
+                                        decrypted_private_key: decrypted_private_key,
+                                        config_json_new: config_json_new,
+                                        contract_config_json: contract_config_json,
+                                        sack: sack
+                                    },
+                                });
+
+                                worker1.on('exit', () => {
+                                    console.log('Worker finished.');
+                                });
+
+                                worker1.on('error', (err) => {
+                                    console.error('Worker error:', err);
+                                });
+                            };
+
+                            runClaim();
+                        }
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
                     session_handshake_deadlines.set(json_object.command.session, Math.floor(new Date() / 1000) + config_json_new.handshake_time);
