@@ -250,6 +250,15 @@ if(cluster.isMaster) {
                             session_clients.delete(key);
                         });
                     });
+                } else {
+                    console.log("INFO: Duplicate UNDEFINED/EXPIRED/CLOSED Session " + key + " is deleted.");
+                    session_statuses.delete(key);
+                    session_ipids.delete(key);
+                    session_sack_deadlines.delete(key);
+                    session_pafren_expirations.delete(key);
+                    let addr = clients_sessions.get(key);
+                    clients_sessions.delete(addr);
+                    session_clients.delete(key);
                 }
             }
         }
