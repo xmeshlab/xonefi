@@ -268,7 +268,7 @@ if(cluster.isMaster) {
                 || value === session_status.EXPIRED
                 || value === session_status.CLOSED) {
                 if (session_ipids.has(key)) {
-                    console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
+                    //console.log("ADDING A RESTRICTED IPID: " + session_ipids.get(key));
 
                     let cipid = session_ipids.get(key);
                     let sss = cipid.split(";");
