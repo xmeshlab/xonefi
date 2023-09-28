@@ -292,12 +292,12 @@ if(cluster.isMaster) {
                 }
             }
 
-            if(value === session_status.HANDSHAKE
-                || value === session_status.ACTIVE) {
-                console.log("ADDING AN ACTIVE IPID: " + session_ipids.get(key));
-                firewall.update_internet_unrestrictions(accepted_ipids);
-                accepted_ipids.push(session_ipids.get(key));
-            }
+            //if(value === session_status.HANDSHAKE
+            //    || value === session_status.ACTIVE) {
+            //    console.log("ADDING AN ACTIVE IPID: " + session_ipids.get(key));
+            //    firewall.update_internet_unrestrictions(accepted_ipids);
+	    //    accepted_ipids.push(session_ipids.get(key));
+            //}
         }
 
         if(update_restrictions_flag) {
