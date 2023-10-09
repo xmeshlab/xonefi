@@ -1142,7 +1142,7 @@ if(cluster.isMaster) {
                                     runFreeze();
                                 }
                                else {
-                                    console.log("@DEBUG: Removing session due to low ONEFI balance")
+                                    console.log("@DEBUG: Removing session due to low ONEFI balance");
                                     session_statuses.delete(json_object.command.session);
                                     session_ipids.delete(json_object.command.session);
                                     session_sack_deadlines.delete(json_object.command.session);
@@ -1152,8 +1152,6 @@ if(cluster.isMaster) {
                                     session_clients.delete(json_object.command.session);
                              }
                             });
-
-                        
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
