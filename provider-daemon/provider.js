@@ -174,7 +174,6 @@ if(cluster.isMaster) {
                 async function getTokenBalance(userAddress) {
                     try {
                         const result = await contract.methods.balanceOf(userAddress).call();
-                        //console.log(result)
                         return result;
                     } catch (error) {
                         console.log(`getTokenBalance ERROR: ${error}`);
@@ -1090,37 +1089,68 @@ if(cluster.isMaster) {
 
                         if(sack_mgmt.sacks_needed(config_json_new)) {
 
-                            const { Worker } = require('worker_threads');
-
+                            const { Worker, isMainThread } = require('worker_threads');
+                            
                             const runFreeze = () => {
+                                if(isMainThread) {
+                                    const worker = new Worker('./freeze.js', {
+                                        workerData: {
+                                            json_object: json_object,
+                                            gas_offer: gas_offer,
+                                            gas_price: gas_price,
+                                            session_statuses: session_statuses,
+                                            session_status: session_status,
+                                            session_pafren_expirations: session_pafren_expirations,
+                                            decrypted_private_key: decrypted_private_key,
+                                            session_handshake_deadlines: session_handshake_deadlines,
+                                            session_sack_deadlines: session_sack_deadlines,
+                                            config_json_new: config_json_new,
+                                            contract_config_json: contract_config_json,
+                                            response: response
+                                        },
+                                    });
 
-                                const worker = new Worker('./freeze.js', {
-                                    workerData: {
-                                        json_object: json_object,
-                                        gas_offer: gas_offer,
-                                        gas_price: gas_price,
-                                        session_statuses: session_statuses,
-                                        session_status: session_status,
-                                        session_pafren_expirations: session_pafren_expirations,
-                                        decrypted_private_key: decrypted_private_key,
-                                        session_handshake_deadlines: session_handshake_deadlines,
-                                        session_sack_deadlines: session_sack_deadlines,
-                                        config_json_new: config_json_new,
-                                        contract_config_json: contract_config_json,
-                                        response: response
-                                    },
-                                });
+                                    worker.on('exit', () => {
+                                        console.log('Worker finished.');
+                                    });
 
-                                worker.on('exit', () => {
-                                    console.log('Worker finished.');
-                                });
-
-                                worker.on('error', (err) => {
-                                    console.error('Worker error:', err);
-                                });
+                                    worker.on('error', (err) => {
+                                        console.error('Worker error:', err);
+                                    });
+                                }
                             };
 
-                            runFreeze();
+
+                            var web3_bal = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                            const contract = new web3_bal.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+
+                            //Check if balance is greater than 0 before calling freeze.
+                            async function getTokenBalance(userAccount) {
+                                try {
+                                    const result = await contract.methods.balanceOf(userAccount).call();
+                                    //console.log(result)
+                                    return result;
+                                } catch (error) {
+                                    console.log(`getTokenBalance ERROR: ${error}`);
+                                    return `-1`;
+                                }
+                            }
+
+                            getTokenBalance(json_object.command.from).then((balance) => { 
+                                if (balance > 0){
+                                    runFreeze();
+                                }
+                               else {
+                                    console.log("@DEBUG: Removing session due to low ONEFI balance");
+                                    session_statuses.delete(json_object.command.session);
+                                    session_ipids.delete(json_object.command.session);
+                                    session_sack_deadlines.delete(json_object.command.session);
+                                    session_pafren_expirations.delete(json_object.command.session);
+                                    let addr = clients_sessions.get(json_object.command.session);
+                                    clients_sessions.delete(addr);
+                                    session_clients.delete(json_object.command.session);
+                             }
+                            });
 
                             if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
                                 response.command.arguments.answer = "PAFREN-OK";
