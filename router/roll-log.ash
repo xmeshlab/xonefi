@@ -1,7 +1,7 @@
 #!/bin/ash
 
 LOG_FILE=/root/xonefi.log
-LOG_CAP=5000000
+LOG_CAP=100000
 
 roll_log() {
   log_size=$(wc -l < "$LOG_FILE")
