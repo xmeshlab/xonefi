@@ -326,31 +326,64 @@ if(cluster.isMaster) {
                 console.log(`XLOG: sack.timestamp: ${sack.timestamp}`);
                 console.log(`XLOG: sack.proof: ${sack.proof}`);
 
-                const { Worker } = require('worker_threads');
+//                const { Worker, isMainThread } = require('worker_threads');
+//
+//                if (isMainThread) {
+//                const runClaim = () => {
 
-                const runClaim = () => {
+//                    const worker1 = new Worker('./claim.js', {
+//                        workerData: {
+//                            gas_offer: gas_offer,
+//                            decrypted_private_key: decrypted_private_key,
+//                            config_json_new: config_json_new,
+//                            contract_config_json: contract_config_json,
+//                            sack: sack
+//                        },
+//                    });
 
-                    const worker1 = new Worker('./claim.js', {
-                        workerData: {
-                            gas_offer: gas_offer,
-                            decrypted_private_key: decrypted_private_key,
-                            config_json_new: config_json_new,
-                            contract_config_json: contract_config_json,
-                            sack: sack
-                        },
-                    });
+//                    const setAppTimeout = (workerName, seconds) => {
+//                        setTimeout(workerName.terminate.bind(workerName), seconds * 1000);
+//                    }
+//                    setAppTimeout(worker1, 120);
 
-                    worker1.on('exit', () => {
-                        console.log('Worker finished.');
-                    });
+//                    worker1.on('exit', () => {
+//                        console.log('Claim Worker 1 finished.');
+//                    });
 
-                    worker1.on('error', (err) => {
-                        console.error('Worker error:', err);
-                    });
-                };
+//                    worker1.on('error', (err) => {
+//                        console.error('Claim Worker 1 error:', err);
+//                    });
+//                };
+//                }else{
+//                  console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
+//               }
 
-                runClaim();
+//                runClaim();
+  try{
+    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
 
+    var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+
+    var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
+    web3_claim1.eth.accounts.wallet.add(account);
+
+    myContract.methods.claim(sack.client,
+        sack.amount.toString(),
+        sack.timestamp,
+        sack.proof)
+        .send({from: account.address, gas: gas_offer})
+        .on('transactionHash', function(hash){
+            console.log("TNX HASH IS READY: " + hash);
+        }).on('error', console.error)
+        .catch(err => {
+            console.log("ERROR: " + err.message);
+        });
+
+    console.log('Claim 1 finished.');
+  } catch (error) {
+        console.log('Error in Claim 1:', error);
+        // Handle the error at a higher level if needed
+  }
                 //session_last_sacks.delete(key);
                 break;
             }
@@ -872,30 +905,33 @@ if(cluster.isMaster) {
                                 console.log(`XLOG: [2] sack.timestamp: ${sack.timestamp}`);
                                 console.log(`XLOG: [2] sack.proof: ${sack.proof}`);
 
-                                const {Worker} = require('worker_threads');
 
-                                const runClaim = () => {
+//                                runClaim();
+  try{
+    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
 
-                                    const worker1 = new Worker('./claim.js', {
-                                        workerData: {
-                                            gas_offer: gas_offer,
-                                            decrypted_private_key: decrypted_private_key,
-                                            config_json_new: config_json_new,
-                                            contract_config_json: contract_config_json,
-                                            sack: sack
-                                        },
-                                    });
+    var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
-                                    worker1.on('exit', () => {
-                                        console.log('Worker finished.');
-                                    });
+    var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
+    web3_claim2.eth.accounts.wallet.add(account);
 
-                                    worker1.on('error', (err) => {
-                                        console.error('Worker error:', err);
-                                    });
-                                };
+    myContract.methods.claim(sack.client,
+        sack.amount.toString(),
+        sack.timestamp,
+        sack.proof)
+        .send({from: account.address, gas: gas_offer})
+        .on('transactionHash', function(hash){
+            console.log("TNX HASH IS READY: " + hash);
+        }).on('error', console.error)
+        .catch(err => {
+            console.log("ERROR: " + err.message);
+        });
 
-                                runClaim();
+    console.log('Claim 2 finished.');
+  } catch (error) {
+        console.log('Error in Claim 2:', error);
+        // Handle the error at a higher level if needed
+  }
                             }
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
@@ -945,30 +981,33 @@ if(cluster.isMaster) {
                             console.log(`XLOG: [3] sack.timestamp: ${sack.timestamp}`);
                             console.log(`XLOG: [3] sack.proof: ${sack.proof}`);
 
-                            const {Worker} = require('worker_threads');
 
-                            const runClaim = () => {
+//                            runClaim();
+  try{
+    var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
 
-                                const worker1 = new Worker('./claim.js', {
-                                    workerData: {
-                                        gas_offer: gas_offer,
-                                        decrypted_private_key: decrypted_private_key,
-                                        config_json_new: config_json_new,
-                                        contract_config_json: contract_config_json,
-                                        sack: sack
-                                    },
-                                });
+    var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
-                                worker1.on('exit', () => {
-                                    console.log('Worker finished.');
-                                });
+    var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
+    web3_claim3.eth.accounts.wallet.add(account);
 
-                                worker1.on('error', (err) => {
-                                    console.error('Worker error:', err);
-                                });
-                            };
+    myContract.methods.claim(sack.client,
+        sack.amount.toString(),
+        sack.timestamp,
+        sack.proof)
+        .send({from: account.address, gas: gas_offer})
+        .on('transactionHash', function(hash){
+            console.log("TNX HASH IS READY: " + hash);
+        }).on('error', console.error)
+        .catch(err => {
+            console.log("ERROR: " + err.message);
+        });
 
-                            runClaim();
+    console.log('Claim 3 finished.');
+  } catch (error) {
+        console.log('Error in Claim 3:', error);
+        // Handle the error at a higher level if needed
+  }
                         }
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
@@ -1089,40 +1128,45 @@ if(cluster.isMaster) {
 
                         if(sack_mgmt.sacks_needed(config_json_new)) {
 
-                            const { Worker, isMainThread } = require('worker_threads');
+//                           const { Worker, isMainThread } = require('worker_threads');
                             
-                            const runFreeze = () => {
-                                if(isMainThread) {
-                                    const worker = new Worker('./freeze.js', {
-                                        workerData: {
-                                            json_object: json_object,
-                                            gas_offer: gas_offer,
-                                            gas_price: gas_price,
-                                            session_statuses: session_statuses,
-                                            session_status: session_status,
-                                            session_pafren_expirations: session_pafren_expirations,
-                                            decrypted_private_key: decrypted_private_key,
-                                            session_handshake_deadlines: session_handshake_deadlines,
-                                            session_sack_deadlines: session_sack_deadlines,
-                                            config_json_new: config_json_new,
-                                            contract_config_json: contract_config_json,
-                                            response: response
-                                        },
-                                    });
+//                            const runFreeze = () => {
+//                                if(isMainThread) {
+                                  
+//                                    const worker2 = new Worker('./freeze.js', {
+//                                        workerData: {
+//                                            json_object: json_object,
+//                                            gas_offer: gas_offer,
+//                                            gas_price: gas_price,
+//                                            session_statuses: session_statuses,
+//                                            session_status: session_status,
+//                                            session_pafren_expirations: session_pafren_expirations,
+//                                            decrypted_private_key: decrypted_private_key,
+//                                            session_handshake_deadlines: session_handshake_deadlines,
+//                                            session_sack_deadlines: session_sack_deadlines,
+//                                            config_json_new: config_json_new,
+//                                            contract_config_json: contract_config_json,
+//                                            response: response
+//                                        },
+//                                    });
 
-                                    worker.on('exit', () => {
-                                        console.log('Worker finished.');
-                                    });
+//                                    worker2.on('exit', () => {
+//                                        console.log('Freeze Worker finished.');
+//                                        worker2.terminate();       
+//                                    });
 
-                                    worker.on('error', (err) => {
-                                        console.error('Worker error:', err);
-                                    });
-                                }
-                            };
+//                                    worker2.on('error', (err) => {
+                                        //console.error('Worker error:', err);
+//					console.error('Freeze WORKER2 would exit with error, but we caught it: ${err}');
+//                                    });
+//                                }else{
+//                                    console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
+//                                }
+//                            };
 
 
-                            var web3_bal = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                            const contract = new web3_bal.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                            var web3_bal2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                            const contract = new web3_bal2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                             //Check if balance is greater than 0 before calling freeze.
                             async function getTokenBalance(userAccount) {
@@ -1138,7 +1182,63 @@ if(cluster.isMaster) {
 
                             getTokenBalance(json_object.command.from).then((balance) => { 
                                 if (balance > 0){
-                                    runFreeze();
+                                    //runFreeze();
+    try {
+        console.log("[55]: DEBUG: Calling freeze.");
+//        console.log("XLOG: Entering callfreeze");
+//        const { workerData } = require('worker_threads');
+//        console.log("XLOG: Assigning WorkerData Threads");
+//        const Web3 = require('web3');
+//        console.log("XLOG: Initializing Web3");
+
+//        console.log('XLOG: Data from main thread:', workerData);
+        // let counter = 0;
+        // while (counter < 9000000000) {
+        //     counter++;
+        // }
+        // console.log('XLOG: finish complex test calculation.');
+
+        const timestamp = require("../api/timestamp");
+
+        var web3_freeze = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+
+        var myContract = new web3_freeze.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+
+        var account = web3_freeze.eth.accounts.privateKeyToAccount(decrypted_private_key);
+        web3_freeze.eth.accounts.wallet.add(account);
+
+        myContract.methods.freeze(json_object.command.arguments.pafren.client,
+            json_object.command.arguments.pafren.amount.toString(),
+            json_object.command.arguments.pafren.timestamp,
+            //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
+            json_object.command.arguments.pafren.proof)
+            .send({ from: account.address, gas: gas_offer, gasPrice: gas_price })
+            .on('transactionHash', function (hash) {
+                console.log("TNX HASH IS READY: " + hash);
+
+                if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
+                    response.command.arguments.answer = "PAFREN-OK";
+                    session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                    var signature_json = web3_freeze.eth.accounts.sign(
+                        JSON.stringify(response.command),
+                        decrypted_private_key
+                    );
+
+                    response.signature = signature_json.signature;
+                    session_statuses.set(json_object.command.session, session_status.ACTIVE);
+                    session_handshake_deadlines.set(json_object.command.session, 0);
+                    session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
+                    session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
+               }
+            })
+            .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
+                console.log(`NEW ERROR: ${error}`);
+                console.log(`NEW RECEIPT: ${receipt}`);
+            });
+    } catch (error) {
+        console.log('Error in callFreeze:', error);
+        // Handle the error at a higher level if needed
+    }
                                 }
                                else {
                                     console.log("@DEBUG: Removing session due to low ONEFI balance");
