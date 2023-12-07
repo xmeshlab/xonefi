@@ -30,7 +30,7 @@
 ## Contact and Resources
 - **Website**: [XOneFi Official Site](#xmesh.org)
 - **Community Forum**: [XOneFi Community Discussions](#)
-- **Contribution Guidelines**: [How to Contribute to XOneFi](#)
+- **Contribution Guidelines**: [How to Contribute to XOneFi](#https://github.com/xmeshlab/xonefi/blob/master/CONTRIBUTING.md)
 
 ---
 
