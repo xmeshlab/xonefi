@@ -28,9 +28,9 @@
 - **Enhanced Features**: Continuous development of new features and improvements based on user feedback.
 
 ## Contact and Resources
-- **Website**: [XOneFi Official Site](#xmesh.org)
+- **Website**: [XOneFi Official Site](https://xmesh.org)
 - **Community Forum**: [XOneFi Community Discussions](#)
-- **Contribution Guidelines**: [How to Contribute to XOneFi](#https://github.com/xmeshlab/xonefi/blob/master/CONTRIBUTING.md)
+- **Contribution Guidelines**: [How to Contribute to XOneFi](https://github.com/xmeshlab/xonefi/blob/master/CONTRIBUTING.md)
 
 ---
 
