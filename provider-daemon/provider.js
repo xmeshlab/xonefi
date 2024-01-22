@@ -905,31 +905,33 @@ if (cluster.isMaster) {
 
 
 //                                runClaim();
-                                try {
-                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                            try {
+                                var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                                var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                                web3_claim2.eth.accounts.wallet.add(account);
 
-                                    var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-
-                                    var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                                    web3_claim2.eth.accounts.wallet.add(account);
-
-                                    myContract.methods.claim(sack.client,
-                                        sack.amount.toString(),
-                                        sack.timestamp,
-                                        sack.proof)
-                                        .send({from: account.address, gas: gas_offer})
-                                        .on('transactionHash', function (hash) {
+                                // Fetch the current gas price
+                                web3_claim2.eth.getGasPrice().then((currentGasPrice) => {
+                                    console.log("Current Gas Price: " + currentGasPrice);
+                                    
+                                    // Using the current gas price in the transaction
+                                    myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                        .send({ from: account.address, gasPrice: currentGasPrice })
+                                        .on('transactionHash', function(hash) {
                                             console.log("TNX HASH IS READY: " + hash);
-                                        }).on('error', console.error)
+                                        })
+                                        .on('error', console.error)
                                         .catch(err => {
                                             console.log("ERROR: " + err.message);
                                         });
 
                                     console.log('Claim 2 finished.');
-                                } catch (error) {
-                                    console.log('Error in Claim 2:', error);
-                                    // Handle the error at a higher level if needed
-                                }
+                                });
+                            } catch (error) {
+                                console.log('Error in Claim 2:', error);
+                                // Handle the error at a higher level if needed
+                            }
                             }
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
@@ -981,31 +983,33 @@ if (cluster.isMaster) {
 
 
 //                            runClaim();
-                            try {
-                                var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                try {
+                                    var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                    var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                                    var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                                    web3_claim3.eth.accounts.wallet.add(account);
 
-                                var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                                    // Fetch the current gas price
+                                    web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
+                                        console.log("Current Gas Price: " + currentGasPrice);
+                                        
+                                        // Using the current gas price in the transaction
+                                        myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                            .send({ from: account.address, gasPrice: currentGasPrice })
+                                            .on('transactionHash', function(hash) {
+                                                console.log("TNX HASH IS READY: " + hash);
+                                            })
+                                            .on('error', console.error)
+                                            .catch(err => {
+                                                console.log("ERROR: " + err.message);
+                                            });
 
-                                var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                                web3_claim3.eth.accounts.wallet.add(account);
-
-                                myContract.methods.claim(sack.client,
-                                    sack.amount.toString(),
-                                    sack.timestamp,
-                                    sack.proof)
-                                    .send({from: account.address, gas: gas_offer})
-                                    .on('transactionHash', function (hash) {
-                                        console.log("TNX HASH IS READY: " + hash);
-                                    }).on('error', console.error)
-                                    .catch(err => {
-                                        console.log("ERROR: " + err.message);
+                                        console.log('Claim 3 finished.');
                                     });
-
-                                console.log('Claim 3 finished.');
-                            } catch (error) {
-                                console.log('Error in Claim 3:', error);
-                                // Handle the error at a higher level if needed
-                            }
+                                } catch (error) {
+                                    console.log('Error in Claim 3:', error);
+                                    // Handle the error at a higher level if needed
+                                }
                         }
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
