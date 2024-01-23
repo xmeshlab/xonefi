@@ -18,8 +18,14 @@ const callClaim = () => {
     var account = web3.eth.accounts.privateKeyToAccount(workerData.decrypted_private_key);
     web3.eth.accounts.wallet.add(account);
 
+    console.log("Sack amount: " + workerData.sack.amount);
+
+    var sackAmount = workerData.sack.amount * 10**18;
+
+    console.log("After Sack amount: " + workerData.sack.amount);
+
     myContract.methods.claim(workerData.sack.client,
-        workerData.sack.amount.toString(),
+        sackAmount.toString(),
         workerData.sack.timestamp,
         workerData.sack.proof)
         .send({from: account.address, gas: workerData.gas_offer})
