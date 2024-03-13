@@ -358,7 +358,6 @@ if (cluster.isMaster) {
 //               }
 
 //                runClaim();
-//// WIP: Changed getGasPrice() and estimateGas()
 
                     try {
                         var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
