@@ -358,33 +358,45 @@ if (cluster.isMaster) {
 //               }
 
 //                runClaim();
-                try {
-                    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                    var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                    var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                    web3_claim1.eth.accounts.wallet.add(account);
 
-                    // Fetch the current gas price
-                    web3_claim1.eth.getGasPrice().then((currentGasPrice) => {
-                        console.log("Current Gas Price: " + currentGasPrice);
-                        
-                        // Using the current gas price in the transaction
-                        myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                            .send({ from: account.address, gasPrice: currentGasPrice })
-                            .on('transactionHash', function(hash) {
-                                console.log("TNX HASH IS READY: " + hash);
+                    try {
+                        var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                        var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                        var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                        web3_claim1.eth.accounts.wallet.add(account);
+
+                        web3_claim1.eth.getGasPrice()
+                            .then((currentGasPrice) => {
+
+                                const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
+                                const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                                const increasedGasPrice = increasedGasPriceBN.toString();
+
+                                console.log("Current Gas Price: " + currentGasPrice + ", Increased Gas Price: " + increasedGasPrice);
+                                myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                    .estimateGas({ from: account.address })
+                                    .then(estimatedGas => {
+                                        console.log("Estimated Gas: " + estimatedGas);
+                                        // Execute the transaction with the increased gas price and estimated gas limit
+                                        return myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                            .send({ from: account.address, gasPrice: increasedGasPrice, gas: estimatedGas })
+                                            .on('transactionHash', function(hash) {
+                                                console.log("TNX HASH IS READY: " + hash);
+                                            });
+                                    })
+                                    .then(() => {
+                                        console.log('Claim 1 finished.');
+                                    })
+                                    .catch(err => {
+                                        console.error("Transaction Error: " + err.message);
+                                    });
                             })
-                            .on('error', console.error)
-                            .catch(err => {
-                                console.log("ERROR: " + err.message);
+                            .catch(error => {
+                                console.error('Error fetching gas price:', error);
                             });
-
-                        console.log('Claim 1 finished.');
-                    });
-                } catch (error) {
-                    console.log('Error in Claim 1:', error);
-                    // Handle the error at a higher level if needed
-                }
+                    } catch (error) {
+                        console.error('Error in Claim 1 setup:', error);
+                    }
                 //session_last_sacks.delete(key);
                 break;
             }
@@ -913,11 +925,13 @@ if (cluster.isMaster) {
 
                                 // Fetch the current gas price
                                 web3_claim2.eth.getGasPrice().then((currentGasPrice) => {
-                                    console.log("Current Gas Price: " + currentGasPrice);
-                                    
+                                    const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
+                                    const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                                    const increasedGasPrice = increasedGasPriceBN.toString();
+                                    console.log("Current Gas Price: " + increasedGasPrice);
                                     // Using the current gas price in the transaction
                                     myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                        .send({ from: account.address, gasPrice: currentGasPrice })
+                                        .send({ from: account.address, gasPrice: increasedGasPrice })
                                         .on('transactionHash', function(hash) {
                                             console.log("TNX HASH IS READY: " + hash);
                                         })
@@ -992,10 +1006,14 @@ if (cluster.isMaster) {
                                     // Fetch the current gas price
                                     web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
                                         console.log("Current Gas Price: " + currentGasPrice);
+                                        const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
+                                        const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                                        const increasedGasPrice = increasedGasPriceBN.toString();
+                                        console.log("Current Gas Price: " + increasedGasPrice);
                                         
                                         // Using the current gas price in the transaction
                                         myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                            .send({ from: account.address, gasPrice: currentGasPrice })
+                                            .send({ from: account.address, gasPrice: increasedGasPrice })
                                             .on('transactionHash', function(hash) {
                                                 console.log("TNX HASH IS READY: " + hash);
                                             })
@@ -1179,66 +1197,64 @@ if (cluster.isMaster) {
                                     return `-1`;
                                 }
                             }
-
                             getTokenBalance(json_object.command.from).then((balance) => {
                                 if (balance > 0) {
                                     //runFreeze();
                                     try {
-                                        console.log("[55]: DEBUG: Calling freeze.");
-//        console.log("XLOG: Entering callfreeze");
-//        const { workerData } = require('worker_threads');
-//        console.log("XLOG: Assigning WorkerData Threads");
-//        const Web3 = require('web3');
-//        console.log("XLOG: Initializing Web3");
-
-//        console.log('XLOG: Data from main thread:', workerData);
-                                        // let counter = 0;
-                                        // while (counter < 9000000000) {
-                                        //     counter++;
-                                        // }
-                                        // console.log('XLOG: finish complex test calculation.');
-
-                                        const timestamp = require("../api/timestamp");
-
+                                        const Web3 = require('web3');
+                                    
+                                        // Assuming config_json_new and contract_config_json are defined earlier in your code
                                         var web3_freeze = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-
+                                    
                                         var myContract = new web3_freeze.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-
+                                    
                                         var account = web3_freeze.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                         web3_freeze.eth.accounts.wallet.add(account);
-
-                                        myContract.methods.freeze(json_object.command.arguments.pafren.client,
-                                            json_object.command.arguments.pafren.amount.toString(),
-                                            json_object.command.arguments.pafren.timestamp,
-                                            //web3.utils.hexToBytes(json_object.command.arguments.pafren.proof))
-                                            json_object.command.arguments.pafren.proof)
-                                            .send({from: account.address, gas: gas_offer, gasPrice: gas_price})
-                                            .on('transactionHash', function (hash) {
-                                                console.log("TNX HASH IS READY: " + hash);
-
-                                                if (session_statuses.get(json_object.command.session) === session_status.HANDSHAKE) {
-                                                    response.command.arguments.answer = "PAFREN-OK";
-                                                    session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                                                    var signature_json = web3_freeze.eth.accounts.sign(
-                                                        JSON.stringify(response.command),
-                                                        decrypted_private_key
-                                                    );
-
-                                                    response.signature = signature_json.signature;
-                                                    session_statuses.set(json_object.command.session, session_status.ACTIVE);
-                                                    session_handshake_deadlines.set(json_object.command.session, 0);
-                                                    session_pafren_expirations.set(json_object.command.session, json_object.command.arguments.pafren.timestamp);
-                                                    session_sack_deadlines.set(json_object.command.session, timestamp.get_current_timestamp() + config_json_new.sack_period);
-                                                }
+                                    
+                                        // Fetch the current gas price
+                                        web3_freeze.eth.getGasPrice().then((currentGasPrice) => {
+                                            console.log("Current Gas Price: " + currentGasPrice);
+                                    
+                                            // Estimate the gas required for the freeze function
+                                            myContract.methods.freeze(
+                                                json_object.command.arguments.pafren.client,
+                                                json_object.command.arguments.pafren.amount.toString(),
+                                                json_object.command.arguments.pafren.timestamp,
+                                                json_object.command.arguments.pafren.proof
+                                            )
+                                            .estimateGas({from: account.address})
+                                            .then(estimatedGas => {
+                                                console.log("Estimated Gas: " + estimatedGas);
+                                    
+                                                // Using the estimated gas and current gas price in the transaction
+                                                myContract.methods.freeze(
+                                                    json_object.command.arguments.pafren.client,
+                                                    json_object.command.arguments.pafren.amount.toString(),
+                                                    json_object.command.arguments.pafren.timestamp,
+                                                    json_object.command.arguments.pafren.proof
+                                                )
+                                                .send({ from: account.address, gas: estimatedGas, gasPrice: currentGasPrice })
+                                                .on('transactionHash', function(hash) {
+                                                    console.log("Transaction hash is ready: " + hash);
+                                                })
+                                                .on('error', function(error) {
+                                                    console.log("NEW ERROR: " + error.message);
+                                                })
+                                                .catch(err => {
+                                                    console.log("ERROR: " + err.message);
+                                                });
+                                    
+                                                console.log('Freeze operation finished.');
                                             })
-                                            .on('error', function (error, receipt) { // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
-                                                console.log(`NEW ERROR: ${error}`);
-                                                console.log(`NEW RECEIPT: ${receipt}`);
+                                            .catch(err => {
+                                                console.log("Estimate Gas Error: " + err.message);
                                             });
+                                        });
                                     } catch (error) {
-                                        console.log('Error in callFreeze:', error);
+                                        console.log('Error in freeze operation:', error);
                                         // Handle the error at a higher level if needed
-                                    }
+                                    }                                    
+                                  
                                 } else {
                                     console.log("@DEBUG: Removing session due to low ONEFI balance");
                                     session_statuses.delete(json_object.command.session);
