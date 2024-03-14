@@ -925,8 +925,8 @@ if (cluster.isMaster) {
 
                                 // Fetch the current gas price
                                 web3_claim2.eth.getGasPrice().then((currentGasPrice) => {
-                                    const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
-                                    const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                                    const currentGasPriceBN = web3_claim2.utils.toBN(currentGasPrice);
+                                    const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim2.utils.toBN(12)).div(web3_claim2.utils.toBN(10));
                                     const increasedGasPrice = increasedGasPriceBN.toString();
                                     console.log("Current Gas Price: " + increasedGasPrice);
                                     // Using the current gas price in the transaction
@@ -1006,8 +1006,8 @@ if (cluster.isMaster) {
                                     // Fetch the current gas price
                                     web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
                                         console.log("Current Gas Price: " + currentGasPrice);
-                                        const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
-                                        const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                                        const currentGasPriceBN = web3_claim3.utils.toBN(currentGasPrice);
+                                        const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim3.utils.toBN(12)).div(web3_claim3.utils.toBN(10));
                                         const increasedGasPrice = increasedGasPriceBN.toString();
                                         console.log("Current Gas Price: " + increasedGasPrice);
                                         
@@ -1082,7 +1082,7 @@ if (cluster.isMaster) {
                         let expected_pafren_amount;
 
                         if (config_json_new.cft) {
-                            expected_pafren_amount = cost * config_json_new.pafren_percentage * 0.01 * 1000000000000 * 60;
+                            expected_pafren_amount = cost * config_json_new.pafren_percentage * 0.01 * 1000000000000000000;
                         } else if (config_json_new.cfd) {
                             expected_pafren_amount = cost * config_json_new.pafren_percentage * 0.01 * 1000000000000 * 64;
                         } else {
@@ -1102,7 +1102,7 @@ if (cluster.isMaster) {
                         let calculated_number_of_sacks;
 
                         if (config_json_new.cft) {
-                            calculated_number_of_sacks = expected_pafren_amount / (Math.pow(10, 12) * calculated_sack_amount * 60);
+                            calculated_number_of_sacks = expected_pafren_amount / (Math.pow(10, 18) * calculated_sack_amount);
                         } else if (config_json_new.cfd) {
                             calculated_number_of_sacks = expected_pafren_amount / (Math.pow(10, 12) * calculated_sack_amount * 64);
                         } else {
@@ -1374,7 +1374,7 @@ if (cluster.isMaster) {
 
                             if (config_json_new.cft) {
                                 console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
-                                expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 60) * 1000000000000));
+                                expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 60) * 1000000000000000000));
                             } else if (config_json_new.cfd) {
                                 console.log(`SERVICE COST: ${cost}, PREVIOUS SACK AMOUNT: ${previous_sack_amount}`);
                                 expected_sack_amount = Math.floor(previous_sack_amount + ((cost / 64) * 1000000000000));
