@@ -9,6 +9,10 @@ echo "IMPORTANT: DO NOT SHUT DOWN THE ROUTER UNTIL THE UPDATE IS COMPLETE!!!"
 
 /root/xonefi/stop-router.sh
 
+rm -fr /root/xonefi.log
+rm -fr /root/xonefix.log
+rm -fr /root/xonefis.log
+
 rm -fr /root/xcurrent.dat
 cp /root/xonefi/xcurrent.dat /root
 rm -fr /root/xupdate.dat

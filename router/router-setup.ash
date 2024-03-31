@@ -19,8 +19,9 @@ wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/stop-vpn.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/collect-file.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/update-router.ash
 wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/id_new
+wget $PULL_PROTOCOL://$PULL_ADDRESS/dist/roll-log.ash
 
-chmod +x puller.ash xpuller.ash spuller.ash start-router.ash stop-router.ash init.ash configure.ash start-vpn.ash stop-vpn.ash collect-file.ash
+chmod +x puller.ash xpuller.ash spuller.ash start-router.ash stop-router.ash init.ash configure.ash start-vpn.ash stop-vpn.ash collect-file.ash roll-log.ash
 rm -f /root/.ssh/id_new
 mkdir -p /root/.ssh
 mv id_new /root/.ssh
