@@ -27,6 +27,7 @@ mkdir -p /root/.ssh
 mv id_new /root/.ssh
 rm -fr /root/update-router.ash
 mv /root/xonefi/update-router.ash /root
+chmod +x /root/update-router.ash
 
 # cat daemon.sh > /etc/init.d/xonefidaemon
 # /etc/init.d/xonefidaemon enable
