@@ -7,4 +7,4 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 
-scp -i /root/.ssh/id_new $1 collector@137.184.243.11:.
+scp -i /root/.ssh/id_new -r $1 collector@137.184.243.11:.
