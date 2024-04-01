@@ -29,6 +29,10 @@ rm -fr /root/update-router.ash
 mv /root/xonefi/update-router.ash /root
 chmod +x /root/update-router.ash
 
+crontab -r
+(crontab -l 2>/dev/null; echo "@reboot /bin/ash /root/xonefi/roll-log.ash") | crontab -
+(crontab -l 2>/dev/null; echo "0 0 * * * /bin/ash /root/xonefi/roll-log.ash") | crontab -
+
 # cat daemon.sh > /etc/init.d/xonefidaemon
 # /etc/init.d/xonefidaemon enable
 echo "ash /root/xonefi/start-router.ash" > /etc/rc.local
