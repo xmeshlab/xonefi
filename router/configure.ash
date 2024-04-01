@@ -18,9 +18,9 @@ SIGNAL="$7"
 
 # radio0, radio1: order could be reversed [TOFIX]
 if [ "$SIGNAL" = "5G" ]; then
-  wifi_iface=1  # Index for the 5GHz interface
+  wifi_iface=0  # Index for the 5GHz interface
 else
-  wifi_iface=0  # Index for the 2.4GHz interface
+  wifi_iface=1  # Index for the 2.4GHz interface
 fi
 
 uci set wireless.@wifi-iface[$wifi_iface].ssid="${SSID}"
@@ -30,8 +30,8 @@ uci set wireless.@wifi-iface[$wifi_iface].key="${WPA2_Password}"
 uci commit wireless
 wifi
 
-uci set network.lan.ipaddr='192.168.99.1'
-uci commit network
+#uci set network.lan.ipaddr='192.168.99.1'
+#uci commit network
 
 opkg update
 opkg install wget procps-ng-pkill coreutils-nohup
