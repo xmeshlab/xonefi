@@ -27,6 +27,7 @@ while true; do
   fi
 
   wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/update.dat -O /root/xonefi/update.dat
+  sleep 3
   content=$(cat "/root/xonefi/update.dat")
   ccontent=$(cat "/root/xonefi/current.dat")
   echo -n "update.dat content: " >> $LOG_FILE
@@ -53,7 +54,9 @@ while true; do
     rm -f /root/xonefi/policy.fw
     rm -f /root/xonefi/wpolicy.fw
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/policy.fw -O /root/xonefi/policy.fw
+    sleep 3
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/wpolicy.fw -O /root/xonefi/wpolicy.fw
+    sleep 3
     cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
     /etc/init.d/firewall restart
   fi

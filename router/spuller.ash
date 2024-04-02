@@ -20,6 +20,7 @@ while true; do
   fi
 
   wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/ssid.dat -O /root/xonefi/ssid.dat
+  sleep 3
   content=$(cat "/root/xonefi/ssid.dat")
   ccontent=$(cat "/root/xonefi/scurrent.dat")
   echo -n "ssid.dat content: " >> $LOG_FILE
@@ -39,6 +40,7 @@ while true; do
     echo "Pull and update SSID." >> $LOG_FILE
     rm -f /root/xonefi/ssid.fw
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/ssid.fw -O /root/xonefi/ssid.fw
+    sleep 3
     #ash /root/xonefi/ssid.fw
 
     wcontent=$(cat "/root/xonefi/ssid.fw")
