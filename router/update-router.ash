@@ -31,10 +31,9 @@ SIGNAL="$7"
 
 mkdir xonefi
 cd xonefi
-wget http://137.184.243.11/dist/router-setup.ash
-chmod +x router-setup.ash
-./router-setup.ash
-
+wget http://137.184.243.11/dist/router-setup.ash &&
+chmod +x router-setup.ash &&
+./router-setup.ash &&
 sed -i "s|^PINGER_ADDRESS=.*|PINGER_ADDRESS=${PINGER_ADDRESS}|" puller.ash
 sed -i "s|^PINGER_USER=.*|PINGER_USER=${PINGER_USER}|" puller.ash
 sed -i "s|^PINGER_TOKEN=.*|PINGER_TOKEN=${PINGER_TOKEN}|" puller.ash
@@ -50,10 +49,9 @@ sed -i "s|^PINGER_USER=.*|PINGER_USER=${PINGER_USER}|" spuller.ash
 sed -i "s|^PINGER_TOKEN=.*|PINGER_TOKEN=${PINGER_TOKEN}|" spuller.ash
 sed -i "s|^ROUTER_NUMBER=.*|ROUTER_NUMBER=${ROUTER_NUMBER}|" spuller.ash
 
-
-cp /root/xupdate.dat /root/xonefi
-cp /root/xupdate.dat /root/xonefi/xcurrent.dat
-
+sleep 60 &&
+cp /root/xupdate.dat /root/xonefi &&
+cp /root/xupdate.dat /root/xonefi/xcurrent.dat &&
 /root/xonefi/start-router.ash > /dev/null 2>&1
 
 mv /root/xcurrent.dat /root/xonefi
