@@ -1,13 +1,25 @@
 #!/bin/ash
 
-LOG_FILE=/root/xonefi.log
+LOG_FILE1=/root/xonefi.log
+LOG_FILE2=/root/xonefix.log
+LOG_FILE3=/root/xonefis.log
 LOG_CAP=100000
 
 roll_log() {
-  log_size=$(wc -l < "$LOG_FILE")
+  log_size=$(wc -l < "$LOG_FILE1")
   if [ "$log_size" -gt "$LOG_CAP" ]; then
-    tail -c "$LOG_CAP" "$LOG_FILE" > "$LOG_FILE.temp"
-    mv "$LOG_FILE.temp" "$LOG_FILE"
+    tail -c "$LOG_CAP" "$LOG_FILE1" > "$LOG_FILE1.temp"
+    mv "$LOG_FILE1.temp" "$LOG_FILE1"
+  fi
+  log_size=$(wc -l < "$LOG_FILE2")
+  if [ "$log_size" -gt "$LOG_CAP" ]; then
+    tail -c "$LOG_CAP" "$LOG_FILE2" > "$LOG_FILE2.temp"
+    mv "$LOG_FILE2.temp" "$LOG_FILE2"
+  fi
+  log_size=$(wc -l < "$LOG_FILE3")
+  if [ "$log_size" -gt "$LOG_CAP" ]; then
+    tail -c "$LOG_CAP" "$LOG_FILE3" > "$LOG_FILE3.temp"
+    mv "$LOG_FILE3.temp" "$LOG_FILE3"
   fi
 }
 
