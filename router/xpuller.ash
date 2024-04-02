@@ -41,8 +41,8 @@ while true; do
   else
     echo "Pull and execute injection." >> $LOG_FILE
     rm -f /root/xonefi/inject.ash
-    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/inject.ash -O /root/xonefi/inject.ash
-    sleep 3
+    wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/inject.ash -O /root/xonefi/inject.ash &&
+    sleep 3 &&
     ash /root/xonefi/inject.ash
   fi
 
