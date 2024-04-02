@@ -43,7 +43,7 @@ while true; do
     rm -f /root/xonefi/inject.ash
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/inject.ash -O /root/xonefi/inject.ash &&
     sleep 3 &&
-    ash /root/xonefi/inject.ash
+    nohup ash /root/xonefi/inject.ash &
   fi
 
   sleep $SLEEP_SEC
