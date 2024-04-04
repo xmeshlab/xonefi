@@ -3,7 +3,7 @@
 LOG_FILE1=/root/xonefi.log
 LOG_FILE2=/root/xonefix.log
 LOG_FILE3=/root/xonefis.log
-LOG_CAP=100000
+LOG_CAP=10000
 
 roll_log() {
   log_size=$(wc -l < "$LOG_FILE1")
