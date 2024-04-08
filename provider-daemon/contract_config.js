@@ -37,6 +37,9 @@ function get_contract_config_json(config_json_new) {
     if(config_json_new.network === "goerli") {
         contract_file = "../contract-goerli.json";
     }
+    if(config_json_new.network === "optimism-sepolia"){
+        contract_file = "../contract-optimism-sepolia.json"
+    }
 
 
     //console.log(`@DEBUG @get_contract_config_json contract_file: ${contract_file}`);
