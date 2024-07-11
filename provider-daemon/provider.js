@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const Web3 = require('web3');                 // Library to work with Etheretum smart contracts
+//const Web3 = require('web3');                 // Library to work with Etheretum smart contracts
+const {Web3} = require('web3');
 
 var options = {
     reconnect: {
@@ -51,6 +52,7 @@ const ssid_update_counter = require('../api/ssid_update_counter');
 const firewall_rules = require('../api/firewall_rules');
 const sessions_db = require('../api/sessions_db');
 const ssid = require('../api/ssid');
+const cors = require('cors');
 
 
 config.config_init_if_absent();
@@ -191,61 +193,65 @@ if (cluster.isMaster) {
 
                     getTokenBalance(config_json_new.account.address).then((balance) => {
                         getTokenBalance(session_clients.get(key)).then((balance1) => {
-                            let cipid = session_ipids.get(key);
-                            let sss = cipid.split(";");
+                            try {
+                                let cipid = session_ipids.get(key);
+                                let sss = cipid.split(";");
 
-                            console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+                                console.log(`DATABASED_SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                            sessions_db.insert_session(
-                                config_json_new,
-                                key,
-                                sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key)),
-                                'unsupported',
-                                sss[1],
-                                '137.184.243.11',
-                                3000,
-                                sss[0],
-                                balance - sack.amount,
-                                balance,
-                                Math.floor(parseInt(session_pafren_amounts.get(key)) / 60),
-                                sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key) - 70),
-                                sessions_db.unix_timestamp_to_iso_string(current_unix_timestamp),
-                                '1 hour',
-                                session_clients.get(key),
-                                balance1 + sack.amount,
-                                balance1,
-                                0,
-                                0
-                            );
+                                sessions_db.insert_session(
+                                    config_json_new,
+                                    key,
+                                    sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key)),
+                                    'unsupported',
+                                    sss[1],
+                                    '137.184.243.11',
+                                    3000,
+                                    sss[0],
+                                    balance - sack.amount,
+                                    balance,
+                                    Math.floor(parseInt(session_pafren_amounts.get(key)) / 60),
+                                    sessions_db.unix_timestamp_to_iso_string(session_handshake_deadlines.get(key) - 70),
+                                    sessions_db.unix_timestamp_to_iso_string(current_unix_timestamp),
+                                    '1 hour',
+                                    session_clients.get(key),
+                                    balance1 + sack.amount,
+                                    balance1,
+                                    0,
+                                    0
+                                );
 
-                            console.log("INFO: Session " + key + " is deleted.");
+                                console.log("INFO: Session " + key + " is deleted.");
 
-                            console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
-                            restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
-                            console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
+                                console.log(`Restricted IPIDS before filtering: ${restricted_ipids}`);
+                                restricted_ipids = restricted_ipids.filter(item => item !== session_ipids.get(key));
+                                console.log(`Restricted IPIDS after filtering: ${restricted_ipids}`);
 
-                            // delta01
-                            console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
-                            accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
-                            console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
+                                // delta01
+                                console.log(`Accepted IPIDS before filtering: ${accepted_ipids}`);
+                                accepted_ipids = accepted_ipids.filter(item => item !== session_ipids.get(key));
+                                console.log(`Accepted IPIDS after filtering: ${accepted_ipids}`);
 
-                            cipid = session_ipids.get(key);
-                            sss = cipid.split(";");
+                                cipid = session_ipids.get(key);
+                                sss = cipid.split(";");
 
-                            console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
+                                console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                            fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                            let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                            console.log(`increment_update_counter result: ${res_status}`);
+                                fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                                let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                                console.log(`increment_update_counter result: ${res_status}`);
 
 
-                            session_statuses.delete(key);
-                            session_ipids.delete(key);
-                            session_sack_deadlines.delete(key);
-                            session_pafren_expirations.delete(key);
-                            let addr = clients_sessions.get(key);
-                            clients_sessions.delete(addr);
-                            session_clients.delete(key);
+                                session_statuses.delete(key);
+                                session_ipids.delete(key);
+                                session_sack_deadlines.delete(key);
+                                session_pafren_expirations.delete(key);
+                                let addr = clients_sessions.get(key);
+                                clients_sessions.delete(addr);
+                                session_clients.delete(key);
+                            } catch (error) {
+                                console.error('Error in getTokenBalance', error);
+                            }
                         });
                     });
                 } else {
@@ -325,78 +331,78 @@ if (cluster.isMaster) {
                 console.log(`XLOG: sack.timestamp: ${sack.timestamp}`);
                 console.log(`XLOG: sack.proof: ${sack.proof}`);
 
-//                const { Worker, isMainThread } = require('worker_threads');
-//
-//                if (isMainThread) {
-//                const runClaim = () => {
+                //                const { Worker, isMainThread } = require('worker_threads');
+                //
+                //                if (isMainThread) {
+                //                const runClaim = () => {
 
-//                    const worker1 = new Worker('./claim.js', {
-//                        workerData: {
-//                            gas_offer: gas_offer,
-//                            decrypted_private_key: decrypted_private_key,
-//                            config_json_new: config_json_new,
-//                            contract_config_json: contract_config_json,
-//                            sack: sack
-//                        },
-//                    });
+                //                    const worker1 = new Worker('./claim.js', {
+                //                        workerData: {
+                //                            gas_offer: gas_offer,
+                //                            decrypted_private_key: decrypted_private_key,
+                //                            config_json_new: config_json_new,
+                //                            contract_config_json: contract_config_json,
+                //                            sack: sack
+                //                        },
+                //                    });
 
-//                    const setAppTimeout = (workerName, seconds) => {
-//                        setTimeout(workerName.terminate.bind(workerName), seconds * 1000);
-//                    }
-//                    setAppTimeout(worker1, 120);
+                //                    const setAppTimeout = (workerName, seconds) => {
+                //                        setTimeout(workerName.terminate.bind(workerName), seconds * 1000);
+                //                    }
+                //                    setAppTimeout(worker1, 120);
 
-//                    worker1.on('exit', () => {
-//                        console.log('Claim Worker 1 finished.');
-//                    });
+                //                    worker1.on('exit', () => {
+                //                        console.log('Claim Worker 1 finished.');
+                //                    });
 
-//                    worker1.on('error', (err) => {
-//                        console.error('Claim Worker 1 error:', err);
-//                    });
-//                };
-//                }else{
-//                  console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
-//               }
+                //                    worker1.on('error', (err) => {
+                //                        console.error('Claim Worker 1 error:', err);
+                //                    });
+                //                };
+                //                }else{
+                //                  console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
+                //               }
 
-//                runClaim();
+                //                runClaim();
 
-                    try {
-                        var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                        var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                        var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                        web3_claim1.eth.accounts.wallet.add(account);
+                try {
+                    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                    var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                    var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                    web3_claim1.eth.accounts.wallet.add(account);
 
-                        web3_claim1.eth.getGasPrice()
-                            .then((currentGasPrice) => {
+                    web3_claim1.eth.getGasPrice()
+                        .then((currentGasPrice) => {
 
-                                const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
-                                const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
-                                const increasedGasPrice = increasedGasPriceBN.toString();
+                            const currentGasPriceBN = web3_claim1.utils.toBN(currentGasPrice);
+                            const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim1.utils.toBN(12)).div(web3_claim1.utils.toBN(10));
+                            const increasedGasPrice = increasedGasPriceBN.toString();
 
-                                console.log("Current Gas Price: " + currentGasPrice + ", Increased Gas Price: " + increasedGasPrice);
-                                myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                    .estimateGas({ from: account.address })
-                                    .then(estimatedGas => {
-                                        console.log("Estimated Gas: " + estimatedGas);
-                                        // Execute the transaction with the increased gas price and estimated gas limit
-                                        return myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                            .send({ from: account.address, gasPrice: increasedGasPrice, gas: estimatedGas })
-                                            .on('transactionHash', function(hash) {
-                                                console.log("TNX HASH IS READY: " + hash);
-                                            });
-                                    })
-                                    .then(() => {
-                                        console.log('Claim 1 finished.');
-                                    })
-                                    .catch(err => {
-                                        console.error("Transaction Error: " + err.message);
-                                    });
-                            })
-                            .catch(error => {
-                                console.error('Error fetching gas price:', error);
-                            });
-                    } catch (error) {
-                        console.error('Error in Claim 1 setup:', error);
-                    }
+                            console.log("Current Gas Price: " + currentGasPrice + ", Increased Gas Price: " + increasedGasPrice);
+                            myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                .estimateGas({ from: account.address })
+                                .then(estimatedGas => {
+                                    console.log("Estimated Gas: " + estimatedGas);
+                                    // Execute the transaction with the increased gas price and estimated gas limit
+                                    return myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                        .send({ from: account.address, gasPrice: increasedGasPrice, gas: estimatedGas })
+                                        .on('transactionHash', function (hash) {
+                                            console.log("TNX HASH IS READY: " + hash);
+                                        });
+                                })
+                                .then(() => {
+                                    console.log('Claim 1 finished.');
+                                })
+                                .catch(err => {
+                                    console.error("Transaction Error: " + err.message);
+                                });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching gas price:', error);
+                        });
+                } catch (error) {
+                    console.error('Error in Claim 1 setup:', error);
+                }
                 //session_last_sacks.delete(key);
                 break;
             }
@@ -407,9 +413,16 @@ if (cluster.isMaster) {
 
     const app = express();
 
+    const corsOptions = {
+        origin: ['http://localhost:5173'],	// Allow these origins	// local host for development
+        optionsSuccessStatus: 200
+    };
+
+    app.use(cors(corsOptions));
+
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({extended: false}));
-    app.use(bodyParser.json({type: 'application/*+json'}));
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(bodyParser.json({ type: 'application/*+json' }));
 
     const CLOUD_HOST = '0.0.0.0';
     const CLOUD_PORT = 3000;
@@ -504,7 +517,7 @@ if (cluster.isMaster) {
             return;
         }
 
-        let response = {version: "0.3"};
+        let response = { version: "0.3" };
         let json_object;
         let valid_json = true;
 
@@ -740,7 +753,7 @@ if (cluster.isMaster) {
             return;
         }
 
-        let response = {version: "0.3"};
+        let response = { version: "0.3" };
         let json_object;
         let valid_json = true;
 
@@ -916,36 +929,45 @@ if (cluster.isMaster) {
                                 console.log(`XLOG: [2] sack.proof: ${sack.proof}`);
 
 
-//                                runClaim();
-                            try {
-                                var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                                var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                                var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                                web3_claim2.eth.accounts.wallet.add(account);
+                                //                                runClaim();
+                                try {
+                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                    var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                                    var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                                    web3_claim2.eth.accounts.wallet.add(account);
 
-                                // Fetch the current gas price
-                                web3_claim2.eth.getGasPrice().then((currentGasPrice) => {
-                                    const currentGasPriceBN = web3_claim2.utils.toBN(currentGasPrice);
-                                    const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim2.utils.toBN(12)).div(web3_claim2.utils.toBN(10));
-                                    const increasedGasPrice = increasedGasPriceBN.toString();
-                                    console.log("Current Gas Price: " + increasedGasPrice);
-                                    // Using the current gas price in the transaction
-                                    myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                        .send({ from: account.address, gasPrice: increasedGasPrice })
-                                        .on('transactionHash', function(hash) {
-                                            console.log("TNX HASH IS READY: " + hash);
-                                        })
-                                        .on('error', console.error)
-                                        .catch(err => {
-                                            console.log("ERROR: " + err.message);
-                                        });
 
-                                    console.log('Claim 2 finished.');
-                                });
-                            } catch (error) {
-                                console.log('Error in Claim 2:', error);
-                                // Handle the error at a higher level if needed
-                            }
+                                    web3_claim2.eth.getGasPrice().then((currentGasPrice) => {
+                                        const currentGasPriceBN = web3_claim2.utils.toBN(currentGasPrice);
+                                        const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim2.utils.toBN(12)).div(web3_claim2.utils.toBN(10));
+                                        const increasedGasPrice = increasedGasPriceBN.toString();
+                                        console.log("Current Gas Price: " + increasedGasPrice);
+
+                                    
+                                        myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                            .estimateGas({ from: account.address })
+                                            .then(estimatedGas => {
+                                                console.log("Estimated Gas: " + estimatedGas);
+                                                myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                                    .send({ from: account.address, gas: estimatedGas, gasPrice: increasedGasPrice })
+                                                    .on('transactionHash', function (hash) {
+                                                        console.log("TNX HASH IS READY: " + hash);
+                                                    })
+                                                    .on('error', console.error)
+                                                    .catch(err => {
+                                                        console.log("ERROR: " + err.message);
+                                                    });
+
+                                                console.log('Claim 2 finished.');
+                                            })
+                                            .catch(err => {
+                                                console.log("Estimate Gas Error: " + err.message);
+                                            });
+                                    });
+                                } catch (error) {
+                                    console.log('Error in Claim 2:', error);
+                                    // Handle the error at a higher level if needed
+                                }
                             }
                         }
                         session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
@@ -996,38 +1018,47 @@ if (cluster.isMaster) {
                             console.log(`XLOG: [3] sack.proof: ${sack.proof}`);
 
 
-//                            runClaim();
-                                try {
-                                    var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                                    var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                                    var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
-                                    web3_claim3.eth.accounts.wallet.add(account);
-
-                                    // Fetch the current gas price
-                                    web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
-                                        console.log("Current Gas Price: " + currentGasPrice);
-                                        const currentGasPriceBN = web3_claim3.utils.toBN(currentGasPrice);
-                                        const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim3.utils.toBN(12)).div(web3_claim3.utils.toBN(10));
-                                        const increasedGasPrice = increasedGasPriceBN.toString();
-                                        console.log("Current Gas Price: " + increasedGasPrice);
-                                        
-                                        // Using the current gas price in the transaction
-                                        myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
-                                            .send({ from: account.address, gasPrice: increasedGasPrice })
-                                            .on('transactionHash', function(hash) {
-                                                console.log("TNX HASH IS READY: " + hash);
-                                            })
-                                            .on('error', console.error)
-                                            .catch(err => {
-                                                console.log("ERROR: " + err.message);
-                                            });
-
-                                        console.log('Claim 3 finished.');
-                                    });
-                                } catch (error) {
-                                    console.log('Error in Claim 3:', error);
-                                    // Handle the error at a higher level if needed
-                                }
+                            //                            runClaim();
+                            try {
+                                var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                                var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
+                                web3_claim3.eth.accounts.wallet.add(account);
+                            
+                                web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
+                                    console.log("Current Gas Price: " + currentGasPrice);
+                                    const currentGasPriceBN = web3_claim3.utils.toBN(currentGasPrice);
+                                    const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim3.utils.toBN(12)).div(web3_claim3.utils.toBN(10));
+                                    const increasedGasPrice = increasedGasPriceBN.toString();
+                                    console.log("Increased Gas Price: " + increasedGasPrice);
+                            
+                                    myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                        .estimateGas({ from: account.address })
+                                        .then(estimatedGas => {
+                                            console.log("Estimated Gas: " + estimatedGas);
+                            
+                                            myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
+                                                .send({ from: account.address, gas: estimatedGas, gasPrice: increasedGasPrice })
+                                                .on('transactionHash', function (hash) {
+                                                    console.log("TNX HASH IS READY: " + hash);
+                                                })
+                                                .on('receipt', function(receipt) {
+                                                    console.log("Transaction receipt: ", receipt);
+                                                })
+                                                .on('error', console.error)
+                                                .catch(err => {
+                                                    console.log("ERROR: " + err.message);
+                                                });
+                            
+                                            console.log('Claim 3 finished.');
+                                        })
+                                        .catch(err => {
+                                            console.log("Estimate Gas Error: " + err.message);
+                                        });
+                                });
+                            } catch (error) {
+                                console.log('Error in Claim 3:', error);
+                            }
                         }
                     }
                     session_statuses.set(json_object.command.session, session_status.HANDSHAKE);
@@ -1058,11 +1089,11 @@ if (cluster.isMaster) {
                     || session_statuses[json_object.command.session] === session_statuses.ACTIVE) {
 
                     var hash = web3.utils.soliditySha3(
-                        {t: 'bytes', v: '0x50'},
-                        {t: 'address', v: json_object.command.arguments.pafren.client},
-                        {t: 'address', v: config_json_new.account.address},
-                        {t: 'uint256', v: json_object.command.arguments.pafren.amount.toString()},
-                        {t: 'uint32', v: json_object.command.arguments.pafren.timestamp}
+                        { t: 'bytes', v: '0x50' },
+                        { t: 'address', v: json_object.command.arguments.pafren.client },
+                        { t: 'address', v: config_json_new.account.address },
+                        { t: 'uint256', v: json_object.command.arguments.pafren.amount.toString() },
+                        { t: 'uint32', v: json_object.command.arguments.pafren.timestamp }
                     );
 
                     key2 = web3.eth.accounts.recover(hash, json_object.command.arguments.pafren.proof, false).toLowerCase();
@@ -1146,41 +1177,41 @@ if (cluster.isMaster) {
 
                         if (sack_mgmt.sacks_needed(config_json_new)) {
 
-//                           const { Worker, isMainThread } = require('worker_threads');
+                            //                           const { Worker, isMainThread } = require('worker_threads');
 
-//                            const runFreeze = () => {
-//                                if(isMainThread) {
+                            //                            const runFreeze = () => {
+                            //                                if(isMainThread) {
 
-//                                    const worker2 = new Worker('./freeze.js', {
-//                                        workerData: {
-//                                            json_object: json_object,
-//                                            gas_offer: gas_offer,
-//                                            gas_price: gas_price,
-//                                            session_statuses: session_statuses,
-//                                            session_status: session_status,
-//                                            session_pafren_expirations: session_pafren_expirations,
-//                                            decrypted_private_key: decrypted_private_key,
-//                                            session_handshake_deadlines: session_handshake_deadlines,
-//                                            session_sack_deadlines: session_sack_deadlines,
-//                                            config_json_new: config_json_new,
-//                                            contract_config_json: contract_config_json,
-//                                            response: response
-//                                        },
-//                                    });
+                            //                                    const worker2 = new Worker('./freeze.js', {
+                            //                                        workerData: {
+                            //                                            json_object: json_object,
+                            //                                            gas_offer: gas_offer,
+                            //                                            gas_price: gas_price,
+                            //                                            session_statuses: session_statuses,
+                            //                                            session_status: session_status,
+                            //                                            session_pafren_expirations: session_pafren_expirations,
+                            //                                            decrypted_private_key: decrypted_private_key,
+                            //                                            session_handshake_deadlines: session_handshake_deadlines,
+                            //                                            session_sack_deadlines: session_sack_deadlines,
+                            //                                            config_json_new: config_json_new,
+                            //                                            contract_config_json: contract_config_json,
+                            //                                            response: response
+                            //                                        },
+                            //                                    });
 
-//                                    worker2.on('exit', () => {
-//                                        console.log('Freeze Worker finished.');
-//                                        worker2.terminate();       
-//                                    });
+                            //                                    worker2.on('exit', () => {
+                            //                                        console.log('Freeze Worker finished.');
+                            //                                        worker2.terminate();       
+                            //                                    });
 
-//                                    worker2.on('error', (err) => {
+                            //                                    worker2.on('error', (err) => {
                             //console.error('Worker error:', err);
-//					console.error('Freeze WORKER2 would exit with error, but we caught it: ${err}');
-//                                    });
-//                                }else{
-//                                    console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
-//                                }
-//                            };
+                            //					console.error('Freeze WORKER2 would exit with error, but we caught it: ${err}');
+                            //                                    });
+                            //                                }else{
+                            //                                    console.log("@DEBUG Process Memory Usage: ", JSON.stringify(process.memoryUsage()));
+                            //                                }
+                            //                            };
 
 
                             var web3_bal2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
@@ -1202,19 +1233,20 @@ if (cluster.isMaster) {
                                     //runFreeze();
                                     try {
                                         const Web3 = require('web3');
-                                    
+
                                         // Assuming config_json_new and contract_config_json are defined earlier in your code
                                         var web3_freeze = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                                    
+
                                         var myContract = new web3_freeze.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                                    
+
                                         var account = web3_freeze.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                         web3_freeze.eth.accounts.wallet.add(account);
-                                    
+                                        console.log("CALLING FREEZE")
+
                                         // Fetch the current gas price
                                         web3_freeze.eth.getGasPrice().then((currentGasPrice) => {
                                             console.log("Current Gas Price: " + currentGasPrice);
-                                    
+
                                             // Estimate the gas required for the freeze function
                                             myContract.methods.freeze(
                                                 json_object.command.arguments.pafren.client,
@@ -1222,39 +1254,38 @@ if (cluster.isMaster) {
                                                 json_object.command.arguments.pafren.timestamp,
                                                 json_object.command.arguments.pafren.proof
                                             )
-                                            .estimateGas({from: account.address})
-                                            .then(estimatedGas => {
-                                                console.log("Estimated Gas: " + estimatedGas);
-                                    
-                                                // Using the estimated gas and current gas price in the transaction
-                                                myContract.methods.freeze(
-                                                    json_object.command.arguments.pafren.client,
-                                                    json_object.command.arguments.pafren.amount.toString(),
-                                                    json_object.command.arguments.pafren.timestamp,
-                                                    json_object.command.arguments.pafren.proof
-                                                )
-                                                .send({ from: account.address, gas: estimatedGas, gasPrice: currentGasPrice })
-                                                .on('transactionHash', function(hash) {
-                                                    console.log("Transaction hash is ready: " + hash);
-                                                })
-                                                .on('error', function(error) {
-                                                    console.log("NEW ERROR: " + error.message);
+                                                .estimateGas({ from: account.address })
+                                                .then(estimatedGas => {
+                                                    console.log("Estimated Gas: " + estimatedGas);
+
+                                                    // Using the estimated gas and current gas price in the transaction
+                                                    myContract.methods.freeze(
+                                                        json_object.command.arguments.pafren.client,
+                                                        json_object.command.arguments.pafren.amount.toString(),
+                                                        json_object.command.arguments.pafren.timestamp,
+                                                        json_object.command.arguments.pafren.proof
+                                                    )
+                                                        .send({ from: account.address, gas: estimatedGas, gasPrice: currentGasPrice })
+                                                        .on('transactionHash', function (hash) {
+                                                            console.log("Transaction hash is ready: " + hash);
+                                                        })
+                                                        .on('error', function (error) {
+                                                            console.log("NEW ERROR: " + error.message);
+                                                        })
+                                                        .catch(err => {
+                                                            console.log("ERROR: " + err.message);
+                                                        });
+
+                                                    console.log('Freeze operation finished.');
                                                 })
                                                 .catch(err => {
-                                                    console.log("ERROR: " + err.message);
+                                                    console.log("Estimate Gas Error: " + err.message);
                                                 });
-                                    
-                                                console.log('Freeze operation finished.');
-                                            })
-                                            .catch(err => {
-                                                console.log("Estimate Gas Error: " + err.message);
-                                            });
                                         });
                                     } catch (error) {
                                         console.log('Error in freeze operation:', error);
-                                        // Handle the error at a higher level if needed
-                                    }                                    
-                                  
+                                    }
+
                                 } else {
                                     console.log("@DEBUG: Removing session due to low ONEFI balance");
                                     session_statuses.delete(json_object.command.session);
@@ -1335,11 +1366,11 @@ if (cluster.isMaster) {
                     if (session_statuses.get(json_object.command.session) === session_status.ACTIVE
                         || session_statuses.get(json_object.command.session) === session_status.SLEEP) {
                         var hash = web3.utils.soliditySha3(
-                            {t: 'bytes', v: '0x53'},
-                            {t: 'address', v: json_object.command.arguments.sack.client},
-                            {t: 'address', v: config_json_new.account.address},
-                            {t: 'uint256', v: json_object.command.arguments.sack.amount.toString()},
-                            {t: 'uint32', v: json_object.command.arguments.sack.timestamp}
+                            { t: 'bytes', v: '0x53' },
+                            { t: 'address', v: json_object.command.arguments.sack.client },
+                            { t: 'address', v: config_json_new.account.address },
+                            { t: 'uint256', v: json_object.command.arguments.sack.amount.toString() },
+                            { t: 'uint32', v: json_object.command.arguments.sack.timestamp }
                         );
 
                         key2 = web3.eth.accounts.recover(hash, json_object.command.arguments.sack.proof, false).toLowerCase();
@@ -1551,7 +1582,7 @@ if (cluster.isMaster) {
     });
 } else {
     while (true) {
-        process.send({chat: "Hey master, check the sacks (" + config_json_new.ip + ")"});
+        process.send({ chat: "Hey master, check the sacks (" + config_json_new.ip + ")" });
         sleep(10000);
     }
 }
