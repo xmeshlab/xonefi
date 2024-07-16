@@ -429,7 +429,7 @@ if (cluster.isMaster) {
 
     let jsonParser = bodyParser.json();
 
-    app.get('/quickservice', (req, res) => {
+    app.get('/quickservice', async (req, res) => {
         console.log(`QUICKSERVICE req.query: ${JSON.stringify(req.query)}`);
         if ("op" in req.query && "token" in req.query) {
             if (req.query.op === "test") {
@@ -456,20 +456,17 @@ if (cluster.isMaster) {
             } else if (req.query.op === "ofibalance") {
                 if (config_json_new["quickservice_tokens"]["ofibalance"] === req.query.token) {
                     if ("address" in req.query) {
-                        var web31 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                        const web31 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                        // console.log(contract_config_json.contract_abi, contract_config_json.smart_contract);
                         const contract = new web31.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-                        //called balanceOf using address from config from: config_json_new.account.address 
-                        contract.methods.balanceOf(req.query.address).call({}, function (error, result) {
-                            if (error !== null) {
-                                console.log(`balanceOf ERROR: ${error}`);
-                            }
-
-                            if (result === undefined) {
-                                res.send(`-1`);
-                            } else {
-                                res.send(result);
-                            }
-                        });
+        
+                        try {
+                            const result = await contract.methods.balanceOf(req.query.address).call();
+                            res.send(result.toString());
+                        } catch (error) {
+                            console.error(`balanceOf ERROR: ${error}`);
+                            res.send('-1');
+                        }
                     } else {
                         res.send("ERROR: Wrong parameters.");
                     }
