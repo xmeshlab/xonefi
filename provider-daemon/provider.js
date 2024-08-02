@@ -414,7 +414,7 @@ if (cluster.isMaster) {
     const app = express();
 
     const corsOptions = {
-        origin: ['http://localhost:5173'],	// Allow these origins	// local host for development
+        origin: ['http://192.168.1.1', 'http://localhost:5173', 'http://localhost:4173'],   // Allow these origins     // local host for development    
         optionsSuccessStatus: 200
     };
 
