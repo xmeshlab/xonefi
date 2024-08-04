@@ -57,7 +57,11 @@ while true; do
     sleep 3
     wget -q --user=$PINGER_USER --password=$PINGER_TOKEN $PROTOCOL://$PINGER_ADDRESS/$PINGER_USER/$ROUTER_NUMBER/wpolicy.fw -O /root/xonefi/wpolicy.fw
     sleep 3
-    cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+    if [ -f "/root/xonefi/twpolicy.fw" ]
+      cat /root/xonefi/firewall.orig /root/xonefi/twpolicy.fw /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+    else
+      cat /root/xonefi/firewall.orig /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+    fi
     /etc/init.d/firewall restart
   fi
 
