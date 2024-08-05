@@ -43,6 +43,7 @@ the firewall configurations should be set after Nodogsplash is set up to overrid
 1. Copy Captive portal files: (These files are not on github yet)
    ```sh
    cd /etc/nodogsplash/htdocs/
+   rm splash.css splash.html status.html
    wget https://raw.githubusercontent.com/xmeshlab/xonefi/master/router/splash.html
    wget https://raw.githubusercontent.com/xmeshlab/xonefi/master/router/splash.css
    wget https://raw.githubusercontent.com/xmeshlab/xonefi/master/router/status.html
@@ -54,3 +55,14 @@ the firewall configurations should be set after Nodogsplash is set up to overrid
    ```sh
    /etc/init.d/nodogsplash restart
    ```
+
+# Temp 1 min access configuration
+
+```sh
+cd /root/xonefi/
+wget wget https://raw.githubusercontent.com/xmeshlab/xonefi/master/router/manage_temp_firewall.ash
+chmod +x manage_temp_firewall.ash
+cd /www/cgi-bin/
+wget wget https://raw.githubusercontent.com/xmeshlab/xonefi/master/router/set_temp_access.ash
+chmod +x set_temp_access.ash
+```

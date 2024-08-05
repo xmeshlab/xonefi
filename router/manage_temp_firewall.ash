@@ -10,8 +10,11 @@ add_rule() {
   echo "        option dest     wan" >> /root/xonefi/twpolicy.fw
   echo "        option proto    all" >> /root/xonefi/twpolicy.fw
   echo "        option target   ACCEPT" >> /root/xonefi/twpolicy.fw
+  echo "add_rule() called" >> /root/xonefi.log
 
-  increment_update_dat
+  cat /root/xonefi/firewall.orig /root/xonefi/twpolicy.fw /root/xonefi/wpolicy.fw /root/xonefi/policy.fw /root/xonefi/firewall-blocker.orig > /etc/config/firewall
+  /etc/init.d/firewall restart
+  echo "firewall restarted from temp manager" >> /root/xonefi.log
 }
 
 # Function to remove a rule from twpolicy.fw
@@ -32,6 +35,7 @@ remove_rule() {
   if ! grep -q 'option src_ip' /root/xonefi/twpolicy.fw; then
     rm /root/xonefi/twpolicy.fw
   fi
+  echo "remove_rule() called" >> /root/xonefi.log
 
   increment_update_dat
 }
@@ -42,6 +46,7 @@ increment_update_dat() {
   local current_value=$(cat ${update_file})
   local new_value=$((current_value + 1))
   echo ${new_value} > ${update_file}
+  echo "increment_update_dat() called" >> /root/xonefi.log
 }
 
 main() {
@@ -71,4 +76,3 @@ main() {
 }
 
 main $1
-
