@@ -34,7 +34,7 @@ wifi
 #uci commit network
 
 opkg update
-opkg install wget procps-ng-pkill coreutils-nohup
+opkg install wget procps-ng-pkill coreutils-nohup iwinfo nodogsplash
 
 mkdir xonefi
 cd xonefi
@@ -55,3 +55,40 @@ sed -i "s|^PINGER_ADDRESS=.*|PINGER_ADDRESS=${PINGER_ADDRESS}|" spuller.ash
 sed -i "s|^PINGER_USER=.*|PINGER_USER=${PINGER_USER}|" spuller.ash
 sed -i "s|^PINGER_TOKEN=.*|PINGER_TOKEN=${PINGER_TOKEN}|" spuller.ash
 sed -i "s|^ROUTER_NUMBER=.*|ROUTER_NUMBER=${ROUTER_NUMBER}|" spuller.ash
+
+# Router Setup
+cd /www/cgi-bin/
+wget http://137.184.243.11/dist/get_local_ip.ash
+wget http://137.184.243.11/dist/get_wifi_ssid.ash
+chmod +x get_local_ip.ash get_wifi_ssid.ash
+/etc/init.d/uhttpd restart
+
+cd /www/
+wget http://137.184.243.11/dist/xonefi-app.tar.gz
+tar -xzf xonefi-app.tar.gz
+mv dist/ xonefi-app
+rm xonefi-app.tar.gz
+
+cd /root/
+uci set nodogsplash.@nodogsplash[0].gatewayname='XOneFi'
+uci commit nodogsplash
+
+# Copy Captive portal files
+cd /etc/nodogsplash/htdocs/
+rm -f splash.css splash.html status.html
+wget http://137.184.243.11/dist/splash.html
+wget http://137.184.243.11/dist/splash.css
+wget http://137.184.243.11/dist/status.html
+cd images/
+wget http://137.184.243.11/dist/xmesh-favicon.jpg
+wget http://137.184.243.11/dist/xonefi-logo.jpg
+
+/etc/init.d/nodogsplash restart
+
+# Temp 1 min access configuration
+cd /root/xonefi/
+wget http://137.184.243.11/dist/manage_temp_firewall.ash
+chmod +x manage_temp_firewall.ash
+cd /www/cgi-bin/
+wget http://137.184.243.11/dist/set_temp_access.ash
+chmod +x set_temp_access.ash
