@@ -92,3 +92,8 @@ chmod +x manage_temp_firewall.ash
 cd /www/cgi-bin/
 wget http://137.184.243.11/dist/set_temp_access.ash
 chmod +x set_temp_access.ash
+
+uci set wireless.@wifi-iface[0].ifname='wlan0'
+uci set wireless.@wifi-iface[1].ifname='wlan1'
+uci commit wireless
+wifi reload
