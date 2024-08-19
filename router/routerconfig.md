@@ -40,7 +40,7 @@ the firewall configurations should be set after Nodogsplash is set up to overrid
    uci set nodogsplash.@nodogsplash[0].gatewayname='XOneFi'
    uci commit nodogsplash
    ```
-1. Copy Captive portal files: (These files are not on github yet)
+1. Copy Captive portal files
    ```sh
    cd /etc/nodogsplash/htdocs/
    rm splash.css splash.html status.html
