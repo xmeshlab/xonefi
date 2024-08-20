@@ -113,6 +113,16 @@ cp ../router/start-vpn.ash /var/www/html/dist
 cp ../router/stop-vpn.ash /var/www/html/dist
 cp ../router/collect-file.ash /var/www/html/dist
 cp ../router/update-router.ash /var/www/html/dist
+cp ../router/get_local_ip.ash /var/www/html/dist
+cp ../router/get_wifi_ssid.ash /var/www/html/dist
+cp /root/xonefi-web/xonefi-app.tar.gz /var/www/html/dist
+cp ../router/splash.html /var/www/html/dist
+cp ../router/splash.css /var/www/html/dist
+cp ../router/status.html /var/www/html/dist
+cp ../router/xmesh-favicon.jpg /var/www/html/dist
+cp ../router/xonefi-logo.jpg /var/www/html/dist
+cp ../router/manage_temp_firewall.ash /var/www/html/dist
+cp ../router/set_temp_access.ash /var/www/html/dist
 cp /home/collector/id_new /var/www/html/dist
 
 mkdir /var/www/html/quickservice
@@ -134,6 +144,10 @@ chmod 755 /var/www/html/dist/start-vpn.ash
 chmod 755 /var/www/html/dist/stop-vpn.ash
 chmod 755 /var/www/html/dist/collect-file.ash
 chmod 755 /var/www/html/dist/update-router.ash
+chmod 755 /var/www/html/dist/get_local_ip.ash
+chmod 755 /var/www/html/dist/get_wifi_ssid.ash
+chmod 775 /var/www/html/dist/manage_temp_firewall.ash
+chmod 775 /var/www/html/dist/set_temp_access.ash
 chmod 755 /var/www/html/dist/id_new
 chmod 755 /var/www/html/quickservice/ipwhitelist.html
 
