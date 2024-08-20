@@ -116,6 +116,7 @@ cp ../router/update-router.ash /var/www/html/dist
 cp ../router/roll-log.ash /var/www/html/dist
 cp ../router/get_local_ip.ash /var/www/html/dist
 cp ../router/get_wifi_ssid.ash /var/www/html/dist
+cp ../router/deauth_user.ash /var/www/html/dist
 cp /root/xonefi-web/xonefi-app.tar.gz /var/www/html/dist
 cp ../router/splash.html /var/www/html/dist
 cp ../router/splash.css /var/www/html/dist
@@ -148,6 +149,7 @@ chmod 755 /var/www/html/dist/update-router.ash
 chmod 755 /var/www/html/dist/roll-log.ash
 chmod 755 /var/www/html/dist/get_local_ip.ash
 chmod 755 /var/www/html/dist/get_wifi_ssid.ash
+chmod 755 /var/www/html/dist/deauth_user.ash
 chmod 775 /var/www/html/dist/manage_temp_firewall.ash
 chmod 775 /var/www/html/dist/set_temp_access.ash
 chmod 755 /var/www/html/dist/id_new

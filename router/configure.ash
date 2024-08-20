@@ -60,7 +60,8 @@ sed -i "s|^ROUTER_NUMBER=.*|ROUTER_NUMBER=${ROUTER_NUMBER}|" spuller.ash
 cd /www/cgi-bin/
 wget http://137.184.243.11/dist/get_local_ip.ash
 wget http://137.184.243.11/dist/get_wifi_ssid.ash
-chmod +x get_local_ip.ash get_wifi_ssid.ash
+wget http://137.184.243.11/dist/deauth_user.ash
+chmod +x get_local_ip.ash get_wifi_ssid.ash deauth_user.ash
 /etc/init.d/uhttpd restart
 
 cd /www/
