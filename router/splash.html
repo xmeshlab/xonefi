@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -16,46 +17,68 @@
         #copySection {
             display: none;
         }
+        /* Hide the splash content by default */
+        #splashContent {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>$gatewayname Hotspot Gateway</h1>
-        </div>
-        <div class="content">
-            <img src="/images/xonefi-logo.jpg" alt="XOneFi Logo">
-            <hr>
-            <h2>Welcome!</h2>
-            <p id="instructions"></p>
+    <!-- Hidden form for authentication -->
+    <form method="GET" action="$authaction" id="auth_form" style="display: none;">
+        <input type="hidden" name="tok" value="$tok">
+    </form>
 
-            <!-- Form for macOS (No Redirect) -->
-            <div id="mac_form_section" style="display: none;">
-                <form method="GET" action="$authaction" id="mac_form">
-                    <input type="hidden" name="tok" value="$tok">
-                    <input type="hidden" name="redir" value="about:blank">
-                </form>
-                <div id="copySection">
-                    <input type="text" id="urlToCopy" value="http://192.168.1.1/xonefi-app" readonly>
-                    <button id="copyButton">Copy URL</button>
+    <!-- Splash content that will be shown only on computers -->
+    <div id="splashContent">
+        <div class="container">
+            <div class="header">
+                <h1>$gatewayname Hotspot Gateway</h1>
+            </div>
+            <div class="content">
+                <img src="/images/xonefi-logo.jpg" alt="XOneFi Logo">
+                <hr>
+                <h2>Welcome!</h2>
+                <p id="instructions"></p>
+
+                <!-- Form for macOS (No Redirect) -->
+                <div id="mac_form_section" style="display: none;">
+                    <form method="GET" action="$authaction" id="mac_form">
+                        <input type="hidden" name="tok" value="$tok">
+                        <input type="hidden" name="redir" value="about:blank">
+                    </form>
+                    <div id="copySection">
+                        <input type="text" id="urlToCopy" value="http://192.168.1.1/xonefi-app" readonly>
+                        <button id="copyButton">Copy URL</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Hidden form for Windows/Linux (With Redirect) -->
-            <div id="other_form_section" style="display: none;">
-                <form method="GET" action="$authaction" id="other_form">
-                    <input type="hidden" name="tok" value="$tok">
-                    <input type="hidden" name="redir" value="http://192.168.1.1/xonefi-app">
-                </form>
-            </div>
+                <!-- Hidden form for Windows/Linux (With Redirect) -->
+                <div id="other_form_section" style="display: none;">
+                    <form method="GET" action="$authaction" id="other_form">
+                        <input type="hidden" name="tok" value="$tok">
+                        <input type="hidden" name="redir" value="http://192.168.1.1/xonefi-app">
+                    </form>
+                </div>
 
-            <hr>
-            <footer>
-                <p>Copyright 2024 &copy; Xmesh</p>
-            </footer>
+                <hr>
+                <footer>
+                    <p>Copyright 2024 &copy; Xmesh</p>
+                </footer>
+            </div>
         </div>
     </div>
+
     <script>
+        function isMobileDevice() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            return /android|iphone|ipad|ipod/i.test(userAgent);
+        }
+
+        function authenticate() {
+            document.getElementById('auth_form').submit();
+        }
+
         function detectOS() {
             var platform = window.navigator.platform;
             var macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
@@ -69,29 +92,37 @@
             return 'Other';
         }
 
-        var os = detectOS();
-        var macFormSection = document.getElementById('mac_form_section');
-        var otherFormSection = document.getElementById('other_form_section');
-        var instructions = document.getElementById('instructions');
+        window.onload = function() {
+            if (isMobileDevice()) {
+                authenticate();
+            } else {
+                document.getElementById('splashContent').style.display = 'block';
 
-        if (os === 'Mac') {
-            instructions.innerHTML = 'Please click the button to authenticate and copy the URL. Then paste it into your browser to complete authentication:';
-            macFormSection.style.display = 'block';
-            document.getElementById('copySection').style.display = 'block';
+                var os = detectOS();
+                var macFormSection = document.getElementById('mac_form_section');
+                var otherFormSection = document.getElementById('other_form_section');
+                var instructions = document.getElementById('instructions');
 
-            document.getElementById('copyButton').addEventListener('click', function() {
-                document.getElementById('mac_form').submit();
-                document.getElementById('urlToCopy').select();
-                document.execCommand('copy');
-                this.textContent = 'URL Copied!';
-            });
-        } else {
-            instructions.innerHTML = 'You will be redirected to log in through Web3Auth in 5 seconds...';
-            otherFormSection.style.display = 'block';
-            setTimeout(function() {
-                document.getElementById('other_form').submit();
-            }, 5000);
-        }
+                if (os === 'Mac') {
+                    instructions.innerHTML = 'Please click the button to authenticate and copy the URL. Then paste it into your browser to complete authentication:';
+                    macFormSection.style.display = 'block';
+                    document.getElementById('copySection').style.display = 'block';
+
+                    document.getElementById('copyButton').addEventListener('click', function() {
+                        document.getElementById('mac_form').submit();
+                        document.getElementById('urlToCopy').select();
+                        document.execCommand('copy');
+                        this.textContent = 'URL Copied!';
+                    });
+                } else {
+                    instructions.innerHTML = 'You will be redirected to log in through Web3Auth in 5 seconds...';
+                    otherFormSection.style.display = 'block';
+                    setTimeout(function() {
+                        document.getElementById('other_form').submit();
+                    }, 5000);
+                }
+            }
+        };
     </script>
 </body>
 </html>
