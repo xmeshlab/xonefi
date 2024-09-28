@@ -2,6 +2,6 @@
 
 IP=$REMOTE_ADDR
 
-ndsctl deauth $MAC
+ndsctl deauth $IP
 
-echo "Deauthenticated user with MAC: $MAC" >> /root/xonefi.log
+echo "Deauthenticated user with IP: $IP" >> /root/xonefi.log
