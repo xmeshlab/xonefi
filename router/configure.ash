@@ -19,8 +19,10 @@ SIGNAL="$7"
 # radio0, radio1: order could be reversed [TOFIX]
 if [ "$SIGNAL" = "5G" ]; then
   wifi_iface=0  # Index for the 5GHz interface
+  uci set wireless.radio0.disabled='0'
 else
   wifi_iface=1  # Index for the 2.4GHz interface
+  uci set wireless.radio1.disabled='0'
 fi
 
 uci set wireless.@wifi-iface[$wifi_iface].ssid="${SSID}"
