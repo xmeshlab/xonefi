@@ -82,6 +82,7 @@ rm -f splash.css splash.html status.html
 wget http://137.184.243.11/dist/splash.html
 wget http://137.184.243.11/dist/splash.css
 wget http://137.184.243.11/dist/status.html
+wget http://137.184.243.11/dist/close.html
 cd images/
 wget http://137.184.243.11/dist/xmesh-favicon.jpg
 wget http://137.184.243.11/dist/xonefi-logo.jpg
