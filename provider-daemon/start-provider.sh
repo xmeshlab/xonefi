@@ -121,6 +121,7 @@ cp /root/xonefi-web/xonefi-app.tar.gz /var/www/html/dist
 cp ../router/splash.html /var/www/html/dist
 cp ../router/splash.css /var/www/html/dist
 cp ../router/status.html /var/www/html/dist
+cp ../router/close.html /var/www/html/dist
 cp ../router/xmesh-favicon.jpg /var/www/html/dist
 cp ../router/xonefi-logo.jpg /var/www/html/dist
 cp ../router/manage_temp_firewall.ash /var/www/html/dist

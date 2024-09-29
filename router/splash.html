@@ -45,7 +45,7 @@
                 <div id="mac_form_section" style="display: none;">
                     <form method="GET" action="$authaction" id="mac_form">
                         <input type="hidden" name="tok" value="$tok">
-                        <input type="hidden" name="redir" value="about:blank">
+                        <input type="hidden" name="redir" value="/close.html">
                     </form>
                     <div id="copySection">
                         <input type="text" id="urlToCopy" value="http://192.168.1.1/xonefi-app" readonly>
@@ -109,10 +109,10 @@
                     document.getElementById('copySection').style.display = 'block';
 
                     document.getElementById('copyButton').addEventListener('click', function() {
-                        document.getElementById('mac_form').submit();
                         document.getElementById('urlToCopy').select();
                         document.execCommand('copy');
                         this.textContent = 'URL Copied!';
+                        document.getElementById('mac_form').submit();
                     });
                 } else {
                     instructions.innerHTML = 'You will be redirected to log in through Web3Auth in 5 seconds...';
