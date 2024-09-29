@@ -29,6 +29,7 @@ rm -fr /www/xonefi-app
 rm -fr /etc/nodogsplash/htdocs/splash.html
 rm -fr /etc/nodogsplash/htdocs/splash.css
 rm -fr /etc/nodogsplash/htdocs/status.html
+rm -fr /etc/nodogsplash/htdocs/close.html
 rm -fr /etc/nodogsplash/htdocs/images/xmesh-favicon.jpg
 rm -fr /etc/nodogsplash/htdocs/images/xonefi-logo.jpg
 
@@ -85,6 +86,7 @@ cd /etc/nodogsplash/htdocs/
 wget http://137.184.243.11/dist/splash.html
 wget http://137.184.243.11/dist/splash.css
 wget http://137.184.243.11/dist/status.html
+wget http://137.184.243.11/dist/close.html
 cd images/
 wget http://137.184.243.11/dist/xmesh-favicon.jpg
 wget http://137.184.243.11/dist/xonefi-logo.jpg
