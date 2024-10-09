@@ -62,7 +62,8 @@ let worker;                                 // worker=cluster.fork();
 let active_sessions = 0;                    // Session tally.
 let contract_config_json = contract_config.get_contract_config_json(config_json_new);
 console.log("DEBUG: ping");
-var web3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+wss://opt-sepolia.g.alchemy.com/v2/Ixe-siPuAOiZFNaUuW48KhscPVO_eAKE
+var web3 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
 let session_status = session_stat.status;
 
 var session_statuses = new Map();               // Hash map of sessions.
@@ -169,7 +170,7 @@ if (cluster.isMaster) {
 
                 databased_sessions.add(key);
 
-                var web3_bal = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                var web3_bal = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                 const contract = new web3_bal.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                 async function getTokenBalance(userAddress) {
@@ -366,7 +367,7 @@ if (cluster.isMaster) {
                 //                runClaim();
 
                 try {
-                    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                     var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                     var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
                     web3_claim1.eth.accounts.wallet.add(account);
@@ -456,8 +457,7 @@ if (cluster.isMaster) {
             } else if (req.query.op === "ofibalance") {
                 if (config_json_new["quickservice_tokens"]["ofibalance"] === req.query.token) {
                     if ("address" in req.query) {
-                        const web31 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
-                        // console.log(contract_config_json.contract_abi, contract_config_json.smart_contract);
+                        const web31 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                         const contract = new web31.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
         
                         try {
@@ -928,7 +928,7 @@ if (cluster.isMaster) {
 
                                 //                                runClaim();
                                 try {
-                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                                     var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                                     var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                     web3_claim2.eth.accounts.wallet.add(account);
@@ -1017,7 +1017,7 @@ if (cluster.isMaster) {
 
                             //                            runClaim();
                             try {
-                                var web3_claim3 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                var web3_claim3 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                                 var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                                 var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                 web3_claim3.eth.accounts.wallet.add(account);
@@ -1211,7 +1211,7 @@ if (cluster.isMaster) {
                             //                            };
 
 
-                            var web3_bal2 = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                            var web3_bal2 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
                             const contract = new web3_bal2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                             //Check if balance is greater than 0 before calling freeze.
@@ -1232,7 +1232,7 @@ if (cluster.isMaster) {
                                         const Web3 = require('web3');
 
                                         // Assuming config_json_new and contract_config_json are defined earlier in your code
-                                        var web3_freeze = new Web3("wss://" + config_json_new.network + ".infura.io/ws/v3/" + config_json_new.infura_api_key);
+                                        var web3_freeze = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
 
                                         var myContract = new web3_freeze.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
