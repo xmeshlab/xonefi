@@ -18,7 +18,7 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 //const Web3 = require('web3');                 // Library to work with Etheretum smart contracts
-const {Web3} = require('web3');
+const Web3 = require('web3');
 
 var options = {
     reconnect: {
@@ -62,7 +62,7 @@ let worker;                                 // worker=cluster.fork();
 let active_sessions = 0;                    // Session tally.
 let contract_config_json = contract_config.get_contract_config_json(config_json_new);
 console.log("DEBUG: ping");
-wss://opt-sepolia.g.alchemy.com/v2/Ixe-siPuAOiZFNaUuW48KhscPVO_eAKE
+// wss://opt-sepolia.g.alchemy.com/v2/Ixe-siPuAOiZFNaUuW48KhscPVO_eAKE
 var web3 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
 let session_status = session_stat.status;
 

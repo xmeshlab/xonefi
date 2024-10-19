@@ -41,6 +41,31 @@ function get_infura_id() {
     return config_json.infura_api_key;
 }
 
+/**
+ * Read Infura Websocket from the config
+ * @returns {string} Infura Websocket .
+ */
+function get_infura_ws() {
+    const config = require("./config");
+    var config_json = config.read_default_config();
+    return config_json.infura_websocket;
+}
+
+/**
+ * Write Infura Websocket url in the config.
+ * @param {string} id - Websocket Url
+ * @returns {boolean} - true: success; false: failure
+ */
+function save_infura_id(url) {
+    const config = require("./config");
+    var config_json = config.read_default_config();
+    config_json.infura_websocket = url;
+    config.write_default_config(config_json);
+    return true;
+}
+
+
+
 module.exports = {
     save_infura_id,
     get_infura_id
