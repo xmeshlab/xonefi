@@ -53,6 +53,7 @@ const firewall_rules = require('../api/firewall_rules');
 const sessions_db = require('../api/sessions_db');
 const ssid = require('../api/ssid');
 const cors = require('cors');
+const rpc = require('../api/rpc')
 
 
 config.config_init_if_absent();
@@ -62,8 +63,16 @@ let worker;                                 // worker=cluster.fork();
 let active_sessions = 0;                    // Session tally.
 let contract_config_json = contract_config.get_contract_config_json(config_json_new);
 console.log("DEBUG: ping");
-// wss://opt-sepolia.g.alchemy.com/v2/Ixe-siPuAOiZFNaUuW48KhscPVO_eAKE
-var web3 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+let rpc_url = rpc.get_rpc_ws()
+let rpc_api = rpc.get_rpc_id()
+var web3 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
+web3.eth.net.isListening()
+    .then(() => {
+        console.log("Web3 is connected to the WebSocket RPC.");
+    })
+    .catch((error) => {
+        console.error("Connection error:", error);
+    });
 let session_status = session_stat.status;
 
 var session_statuses = new Map();               // Hash map of sessions.
@@ -170,7 +179,7 @@ if (cluster.isMaster) {
 
                 databased_sessions.add(key);
 
-                var web3_bal = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                var web3_bal = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                 const contract = new web3_bal.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                 async function getTokenBalance(userAddress) {
@@ -367,7 +376,7 @@ if (cluster.isMaster) {
                 //                runClaim();
 
                 try {
-                    var web3_claim1 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                    var web3_claim1 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                     var myContract = new web3_claim1.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                     var account = web3_claim1.eth.accounts.privateKeyToAccount(decrypted_private_key);
                     web3_claim1.eth.accounts.wallet.add(account);
@@ -457,9 +466,9 @@ if (cluster.isMaster) {
             } else if (req.query.op === "ofibalance") {
                 if (config_json_new["quickservice_tokens"]["ofibalance"] === req.query.token) {
                     if ("address" in req.query) {
-                        const web31 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                        const web31 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                         const contract = new web31.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
-        
+
                         try {
                             const result = await contract.methods.balanceOf(req.query.address).call();
                             res.send(result.toString());
@@ -928,7 +937,7 @@ if (cluster.isMaster) {
 
                                 //                                runClaim();
                                 try {
-                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                                    var web3_claim2 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                                     var myContract = new web3_claim2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                                     var account = web3_claim2.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                     web3_claim2.eth.accounts.wallet.add(account);
@@ -940,7 +949,7 @@ if (cluster.isMaster) {
                                         const increasedGasPrice = increasedGasPriceBN.toString();
                                         console.log("Current Gas Price: " + increasedGasPrice);
 
-                                    
+
                                         myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
                                             .estimateGas({ from: account.address })
                                             .then(estimatedGas => {
@@ -1017,36 +1026,36 @@ if (cluster.isMaster) {
 
                             //                            runClaim();
                             try {
-                                var web3_claim3 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                                var web3_claim3 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                                 var myContract = new web3_claim3.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
                                 var account = web3_claim3.eth.accounts.privateKeyToAccount(decrypted_private_key);
                                 web3_claim3.eth.accounts.wallet.add(account);
-                            
+
                                 web3_claim3.eth.getGasPrice().then((currentGasPrice) => {
                                     console.log("Current Gas Price: " + currentGasPrice);
                                     const currentGasPriceBN = web3_claim3.utils.toBN(currentGasPrice);
                                     const increasedGasPriceBN = currentGasPriceBN.mul(web3_claim3.utils.toBN(12)).div(web3_claim3.utils.toBN(10));
                                     const increasedGasPrice = increasedGasPriceBN.toString();
                                     console.log("Increased Gas Price: " + increasedGasPrice);
-                            
+
                                     myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
                                         .estimateGas({ from: account.address })
                                         .then(estimatedGas => {
                                             console.log("Estimated Gas: " + estimatedGas);
-                            
+
                                             myContract.methods.claim(sack.client, sack.amount.toString(), sack.timestamp, sack.proof)
                                                 .send({ from: account.address, gas: estimatedGas, gasPrice: increasedGasPrice })
                                                 .on('transactionHash', function (hash) {
                                                     console.log("TNX HASH IS READY: " + hash);
                                                 })
-                                                .on('receipt', function(receipt) {
+                                                .on('receipt', function (receipt) {
                                                     console.log("Transaction receipt: ", receipt);
                                                 })
                                                 .on('error', console.error)
                                                 .catch(err => {
                                                     console.log("ERROR: " + err.message);
                                                 });
-                            
+
                                             console.log('Claim 3 finished.');
                                         })
                                         .catch(err => {
@@ -1211,7 +1220,7 @@ if (cluster.isMaster) {
                             //                            };
 
 
-                            var web3_bal2 = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                            var web3_bal2 = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
                             const contract = new web3_bal2.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
                             //Check if balance is greater than 0 before calling freeze.
@@ -1232,7 +1241,7 @@ if (cluster.isMaster) {
                                         const Web3 = require('web3');
 
                                         // Assuming config_json_new and contract_config_json are defined earlier in your code
-                                        var web3_freeze = new Web3("wss://" + config_json_new.network + ".g.alchemy.com/v2/" + config_json_new.infura_api_key);
+                                        var web3_freeze = new Web3("wss://" + config_json_new.network + rpc_url + rpc_api);
 
                                         var myContract = new web3_freeze.eth.Contract(contract_config_json.contract_abi, contract_config_json.smart_contract);
 
