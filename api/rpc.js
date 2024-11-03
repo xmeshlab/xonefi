@@ -18,48 +18,48 @@ along with OneFi Router.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 /**
- * Save Infura (Ethereum blockchain API service used by OneFi) API token (ID) in the config.
+ * Save RPC (Ethereum blockchain API service used by OneFi) API token (ID) in the config.
  * @param {string} id - API token
  * @returns {boolean} - true: success; false: failure
  */
-function save_infura_id(id) {
+function save_rpc_id(id) {
     const config = require("./config");
     var config_json = config.read_default_config();
-    config_json.infura_api_key = id;
+    config_json.rpc_api_key = id;
     config.write_default_config(config_json);
     return true;
 }
 
 
 /**
- * Read Infura API key (token) from the config
- * @returns {string} Infura API key.
+ * Read RPC API key (token) from the config
+ * @returns {string} RPC API key.
  */
-function get_infura_id() {
+function get_rpc_id() {
     const config = require("./config");
     var config_json = config.read_default_config();
-    return config_json.infura_api_key;
+    return config_json.rpc_api_key;
 }
 
 /**
- * Read Infura Websocket from the config
- * @returns {string} Infura Websocket .
+ * Read RPC Websocket from the config
+ * @returns {string} RPC Websocket .
  */
-function get_infura_ws() {
+function get_rpc_ws() {
     const config = require("./config");
     var config_json = config.read_default_config();
-    return config_json.infura_websocket;
+    return config_json.rpc_websocket;
 }
 
 /**
- * Write Infura Websocket url in the config.
- * @param {string} id - Websocket Url
+ * Save RPC Websocket (Ethereum blockchain API service used by OneFi) n the config.
+ * @param {string} id - Websocket string
  * @returns {boolean} - true: success; false: failure
  */
-function save_infura_id(url) {
+function save_rpc_ws(id) {
     const config = require("./config");
     var config_json = config.read_default_config();
-    config_json.infura_websocket = url;
+    config_json.rpc_websocket= id;
     config.write_default_config(config_json);
     return true;
 }
@@ -67,6 +67,6 @@ function save_infura_id(url) {
 
 
 module.exports = {
-    save_infura_id,
-    get_infura_id
+    get_rpc_id,
+    get_rpc_ws
 };
