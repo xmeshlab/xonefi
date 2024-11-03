@@ -247,10 +247,12 @@ if (cluster.isMaster) {
 
                                 console.log(`SESSION_INFO: cipid=${cipid}, provider_prefix=${sss[0]}, router_no=${sss[1]}`);
 
-                                fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
-                                let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
-                                console.log(`increment_update_counter result: ${res_status}`);
-
+                                if (value === session_status.UNDEFINED
+                                    || value === session_status.EXPIRED) {
+                                    fw_write_policy.write_firewall_policy(sss[0], sss[1], "\n\n");
+                                    let res_status = fw_update_counter.increment_update_counter(sss[0], sss[1]);
+                                    console.log(`increment_update_counter result: ${res_status}`);
+                                }
 
                                 session_statuses.delete(key);
                                 session_ipids.delete(key);
